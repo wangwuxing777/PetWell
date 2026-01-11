@@ -6,17 +6,34 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		206606672EFBEBB5004CAA54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206606642EFBEBB5004CAA54 /* ContentView.swift */; };
+		206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206606652EFBEBB5004CAA54 /* PetWellApp.swift */; };
+		206606692EFBEBB5004CAA54 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 206606632EFBEBB5004CAA54 /* Assets.xcassets */; };
+		2066066A2EFBEF8C004CAA54 /* GuardianChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2066065F2EFBE68A004CAA54 /* GuardianChatView.swift */; };
+		2066066B2EFBEF92004CAA54 /* RecordsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2066065E2EFBE668004CAA54 /* RecordsView.swift */; };
+		2066066C2EFBEF99004CAA54 /* PetModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2066065D2EFBE648004CAA54 /* PetModels.swift */; };
+		2066066D2EFBEF9F004CAA54 /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206606602EFBE6AD004CAA54 /* AIService.swift */; };
+		206606702EFE6F67004CAA54 /* ConsultationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2066066F2EFE5F68004CAA54 /* ConsultationEngine.swift */; };
+		206606722F03CE4C004CAA54 /* ChatHistoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206606712F03CE37004CAA54 /* ChatHistoryModels.swift */; };
+		20CCB5FF2F0418F300CE57E7 /* AddPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */; };
+		20CCB6012F04190E00CE57E7 /* PetDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB6002F04190A00CE57E7 /* PetDetailView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		2066063D2EFBB4B2004CAA54 /* PetWell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PetWell.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2066065D2EFBE648004CAA54 /* PetModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetModels.swift; sourceTree = "<group>"; };
+		2066065E2EFBE668004CAA54 /* RecordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsView.swift; sourceTree = "<group>"; };
+		2066065F2EFBE68A004CAA54 /* GuardianChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuardianChatView.swift; sourceTree = "<group>"; };
+		206606602EFBE6AD004CAA54 /* AIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIService.swift; sourceTree = "<group>"; };
+		206606632EFBEBB5004CAA54 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		206606642EFBEBB5004CAA54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		206606652EFBEBB5004CAA54 /* PetWellApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetWellApp.swift; sourceTree = "<group>"; };
+		2066066F2EFE5F68004CAA54 /* ConsultationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsultationEngine.swift; sourceTree = "<group>"; };
+		206606712F03CE37004CAA54 /* ChatHistoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryModels.swift; sourceTree = "<group>"; };
+		20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPetView.swift; sourceTree = "<group>"; };
+		20CCB6002F04190A00CE57E7 /* PetDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		2066063F2EFBB4B2004CAA54 /* PetWell */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PetWell;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		2066063A2EFBB4B2004CAA54 /* Frameworks */ = {
@@ -32,7 +49,11 @@
 		206606342EFBB4B2004CAA54 = {
 			isa = PBXGroup;
 			children = (
-				2066063F2EFBB4B2004CAA54 /* PetWell */,
+				2066066E2EFE5F55004CAA54 /* Consultation */,
+				206606662EFBEBB5004CAA54 /* PetWell */,
+				2066065C2EFBE621004CAA54 /* Services */,
+				206606592EFBE5E1004CAA54 /* Views */,
+				206606582EFBE5CB004CAA54 /* Models */,
 				2066063E2EFBB4B2004CAA54 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +64,92 @@
 				2066063D2EFBB4B2004CAA54 /* PetWell.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		206606582EFBE5CB004CAA54 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				206606712F03CE37004CAA54 /* ChatHistoryModels.swift */,
+				2066065D2EFBE648004CAA54 /* PetModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		206606592EFBE5E1004CAA54 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				20CCB6042F13E14100CE57E7 /* Insurance */,
+				20CCB6032F13E12700CE57E7 /* Medical */,
+				20CCB6022F13E11300CE57E7 /* Shop */,
+				2066065B2EFBE5FE004CAA54 /* Guardian */,
+				2066065A2EFBE5ED004CAA54 /* Records */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		2066065A2EFBE5ED004CAA54 /* Records */ = {
+			isa = PBXGroup;
+			children = (
+				20CCB6002F04190A00CE57E7 /* PetDetailView.swift */,
+				20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */,
+				2066065E2EFBE668004CAA54 /* RecordsView.swift */,
+			);
+			path = Records;
+			sourceTree = "<group>";
+		};
+		2066065B2EFBE5FE004CAA54 /* Guardian */ = {
+			isa = PBXGroup;
+			children = (
+				2066065F2EFBE68A004CAA54 /* GuardianChatView.swift */,
+			);
+			path = Guardian;
+			sourceTree = "<group>";
+		};
+		2066065C2EFBE621004CAA54 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				206606602EFBE6AD004CAA54 /* AIService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		206606662EFBEBB5004CAA54 /* PetWell */ = {
+			isa = PBXGroup;
+			children = (
+				206606632EFBEBB5004CAA54 /* Assets.xcassets */,
+				206606642EFBEBB5004CAA54 /* ContentView.swift */,
+				206606652EFBEBB5004CAA54 /* PetWellApp.swift */,
+			);
+			path = PetWell;
+			sourceTree = "<group>";
+		};
+		2066066E2EFE5F55004CAA54 /* Consultation */ = {
+			isa = PBXGroup;
+			children = (
+				2066066F2EFE5F68004CAA54 /* ConsultationEngine.swift */,
+			);
+			path = Consultation;
+			sourceTree = "<group>";
+		};
+		20CCB6022F13E11300CE57E7 /* Shop */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Shop;
+			sourceTree = "<group>";
+		};
+		20CCB6032F13E12700CE57E7 /* Medical */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Medical;
+			sourceTree = "<group>";
+		};
+		20CCB6042F13E14100CE57E7 /* Insurance */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Insurance;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -59,9 +166,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				2066063F2EFBB4B2004CAA54 /* PetWell */,
 			);
 			name = PetWell;
 			packageProductDependencies = (
@@ -109,6 +213,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				206606692EFBEBB5004CAA54 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +224,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2066066C2EFBEF99004CAA54 /* PetModels.swift in Sources */,
+				20CCB6012F04190E00CE57E7 /* PetDetailView.swift in Sources */,
+				206606702EFE6F67004CAA54 /* ConsultationEngine.swift in Sources */,
+				206606722F03CE4C004CAA54 /* ChatHistoryModels.swift in Sources */,
+				2066066D2EFBEF9F004CAA54 /* AIService.swift in Sources */,
+				20CCB5FF2F0418F300CE57E7 /* AddPetView.swift in Sources */,
+				206606672EFBEBB5004CAA54 /* ContentView.swift in Sources */,
+				2066066B2EFBEF92004CAA54 /* RecordsView.swift in Sources */,
+				2066066A2EFBEF8C004CAA54 /* GuardianChatView.swift in Sources */,
+				206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
