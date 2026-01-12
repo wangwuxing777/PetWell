@@ -137,19 +137,7 @@ private struct ClinicView: View {
 
 private struct InsuranceView: View {
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Insurance (MVP stub)")
-                    .font(.title2).bold()
-
-                Text("Next: plans comparison + recommendations.")
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-            }
-            .padding()
-            .navigationTitle("Insurance")
-        }
+		InsuranceLandingView()
     }
 }
 
