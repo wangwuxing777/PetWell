@@ -18,6 +18,7 @@
 		206606722F03CE4C004CAA54 /* ChatHistoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206606712F03CE37004CAA54 /* ChatHistoryModels.swift */; };
 		20CCB5FF2F0418F300CE57E7 /* AddPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */; };
 		20CCB6012F04190E00CE57E7 /* PetDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB6002F04190A00CE57E7 /* PetDetailView.swift */; };
+		5254A2072F14D0AA002C6BFB /* InsuranceCompareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A2062F14D0A1002C6BFB /* InsuranceCompareView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 		206606712F03CE37004CAA54 /* ChatHistoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryModels.swift; sourceTree = "<group>"; };
 		20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPetView.swift; sourceTree = "<group>"; };
 		20CCB6002F04190A00CE57E7 /* PetDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDetailView.swift; sourceTree = "<group>"; };
+		5254A2062F14D0A1002C6BFB /* InsuranceCompareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceCompareView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,9 +80,7 @@
 		206606592EFBE5E1004CAA54 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				20CCB6042F13E14100CE57E7 /* Insurance */,
-				20CCB6032F13E12700CE57E7 /* Medical */,
-				20CCB6022F13E11300CE57E7 /* Shop */,
+				5254A2052F14D091002C6BFB /* Insurance */,
 				2066065B2EFBE5FE004CAA54 /* Guardian */,
 				2066065A2EFBE5ED004CAA54 /* Records */,
 			);
@@ -131,23 +131,10 @@
 			path = Consultation;
 			sourceTree = "<group>";
 		};
-		20CCB6022F13E11300CE57E7 /* Shop */ = {
+		5254A2052F14D091002C6BFB /* Insurance */ = {
 			isa = PBXGroup;
 			children = (
-			);
-			path = Shop;
-			sourceTree = "<group>";
-		};
-		20CCB6032F13E12700CE57E7 /* Medical */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Medical;
-			sourceTree = "<group>";
-		};
-		20CCB6042F13E14100CE57E7 /* Insurance */ = {
-			isa = PBXGroup;
-			children = (
+				5254A2062F14D0A1002C6BFB /* InsuranceCompareView.swift */,
 			);
 			path = Insurance;
 			sourceTree = "<group>";
@@ -232,6 +219,7 @@
 				20CCB5FF2F0418F300CE57E7 /* AddPetView.swift in Sources */,
 				206606672EFBEBB5004CAA54 /* ContentView.swift in Sources */,
 				2066066B2EFBEF92004CAA54 /* RecordsView.swift in Sources */,
+				5254A2072F14D0AA002C6BFB /* InsuranceCompareView.swift in Sources */,
 				2066066A2EFBEF8C004CAA54 /* GuardianChatView.swift in Sources */,
 				206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */,
 			);
