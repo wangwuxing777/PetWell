@@ -5,165 +5,218 @@
 //  Created by Yu Fang on 2026/1/12.
 //
 
-
 import SwiftUI
-import SwiftData
 
 struct InsuranceCompareView: View {
-	struct FeatureRow: Identifiable {
+	@State private var companies: [InsuranceCompany] = []
+	@State private var selectedCompany: InsuranceCompany?
+	@State private var productsForCompany: [InsuranceProduct] = []
+	@State private var selectedProduct: InsuranceProduct?
+	@State private var plansForProduct: [InsurancePlan] = []
+	@State private var selectedPlanIds: Set<Int> = []
+	@State private var isLoading = false
+
+	private let service = InsuranceService.shared
+
+	struct CoverageRowData: Identifiable {
 		let id = UUID()
-		let feature: String
-		let essential: String
-		let plus: String
+		let label: String
+		let value: String
+
+		static func fromProfile(_ profile: ProductCoverageProfile) -> [CoverageRowData] {
+			return [
+				.init(label: "Annual Coverage Limit", value: profile.annualLimitAmount.map { "HKD \($0)" } ?? "—"),
+				.init(label: "Reimbursement Rate", value: profile.reimbursementPercent.map { "\($0)%" } ?? "—"),
+				.init(label: "Surgery Covered", value: (profile.typicalSurgeryCovered == 1) ? "✓" : "—"),
+				.init(label: "Chronic Illness Support", value: (profile.chronicIllnessSupported == 1) ? "✓" : "—"),
+				.init(label: "Sub-limits", value: profile.hasSubLimits == 1 ? "Yes" : "No"),
+				.init(label: "No Sub-limit Tag", value: (profile.noSubLimitMarketingTag == 1) ? "✓" : "—"),
+				.init(label: "Inpatient Surgery Included", value: (profile.inpatientSurgeryIncluded == 1) ? "✓" : "—"),
+				.init(label: "Online Claims", value: (profile.onlineClaimSupported == 1) ? "✓" : "—"),
+				.init(label: "Claim Speed", value: profile.claimProcessSpeedNote ?? "—"),
+				.init(label: "Brand Reputation", value: profile.brandReputationSummary ?? "—"),
+			]
+		}
 	}
-
-	@State private var selectedPlans: Set<String> = ["Essential", "Plus"]
-
-	private let essentialPlan = (
-		name: "Essential",
-		badge: "1st year: 25% off",
-		monthlyPrice: "HKD 196",
-		monthlyPriceSmall: "/mo",
-		annualPrice: "HKD 262/mo",
-		annualPriceSmall: "HKD 2,352/yr"
-	)
-
-	private let plusPlan = (
-		name: "Plus",
-		badge: "1st year: 25% off",
-		monthlyPrice: "HKD 270",
-		monthlyPriceSmall: "/mo",
-		annualPrice: "HKD 361/mo",
-		annualPriceSmall: "HKD 3,240/yr"
-	)
-
-	private let features: [FeatureRow] = [
-		.init(feature: "Annual Coverage", essential: "HKD 30,000", plus: "HKD 50,000"),
-		.init(feature: "Reimbursement Rate", essential: "✓", plus: "✓"),
-		.init(feature: "Insured age at Age 1 or above: Network Clinic 90%; Non-Network Clinic 70%, 13 weeks to 11 months; All HK registered vets 50%", essential: "✓", plus: "✓"),
-		.init(feature: "Surgery", essential: "✓", plus: "✓"),
-		.init(feature: "Overnight Hospitalization", essential: "✓", plus: "✓"),
-		.init(feature: "X-Ray & Ultrasound", essential: "✓", plus: "✓"),
-		.init(feature: "Lab Test", essential: "✓", plus: "✓"),
-		.init(feature: "Medication", essential: "✓", plus: "✓"),
-		.init(feature: "Consultation", essential: "—", plus: "✓"),
-		.init(feature: "Specialist Consultation", essential: "—", plus: "✓"),
-		.init(feature: "MRI & CT Coverage", essential: "—", plus: "—"),
-		.init(feature: "Cancer Cash Additional lump sum", essential: "HKD 10,000", plus: "HKD 10,000"),
-		.init(feature: "Additional Critical Illness Cash Benefit", essential: "✓", plus: "✓"),
-	]
 
 	var body: some View {
 		NavigationStack {
-			ScrollView {
-				VStack(alignment: .leading, spacing: 16) {
-					// Selection Section
-					VStack(alignment: .leading, spacing: 12) {
-						Text("Select Plans to Compare")
-							.font(.system(.headline, design: .default).weight(.semibold))
-							.foregroundStyle(.primary)
+			if isLoading {
+				VStack {
+					ProgressView()
+						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+				}
+			} else {
+				ScrollView {
+					VStack(alignment: .leading, spacing: 16) {
+						// Step 1: Company Selection
+						VStack(alignment: .leading, spacing: 12) {
+							Text("Step 1: Select a Company")
+								.font(.system(.headline, design: .default).weight(.semibold))
+								.foregroundStyle(.primary)
 
-						HStack(spacing: 12) {
-							planSelectionButton(
-								name: "Essential",
-								isSelected: selectedPlans.contains("Essential"),
-								action: {
-									if selectedPlans.contains("Essential") {
-										selectedPlans.remove("Essential")
-									} else {
-										selectedPlans.insert("Essential")
-									}
+							Picker("Company", selection: $selectedCompany) {
+								Text("Choose a company...").tag(nil as InsuranceCompany?)
+								ForEach(companies) { company in
+									Text(company.displayName).tag(company as InsuranceCompany?)
 								}
-							)
-
-							planSelectionButton(
-								name: "Plus",
-								isSelected: selectedPlans.contains("Plus"),
-								action: {
-									if selectedPlans.contains("Plus") {
-										selectedPlans.remove("Plus")
-									} else {
-										selectedPlans.insert("Plus")
-									}
-								}
-							)
-						}
-					}
-					.padding(16)
-					.background(Color(.systemGray6))
-					.cornerRadius(8)
-					.padding(.horizontal, 16)
-					.padding(.top, 16)
-
-					// Plan header cards - only show selected
-					if !selectedPlans.isEmpty {
-						HStack(spacing: 12) {
-							if selectedPlans.contains("Essential") {
-								planCard(
-									name: essentialPlan.name,
-									badge: essentialPlan.badge,
-									monthlyPrice: essentialPlan.monthlyPrice,
-									monthlyPriceSmall: essentialPlan.monthlyPriceSmall,
-									annualPrice: essentialPlan.annualPrice,
-									annualPriceSmall: essentialPlan.annualPriceSmall,
-									isHighlighted: false
-								)
 							}
-
-							if selectedPlans.contains("Plus") {
-								planCard(
-									name: plusPlan.name,
-									badge: plusPlan.badge,
-									monthlyPrice: plusPlan.monthlyPrice,
-									monthlyPriceSmall: plusPlan.monthlyPriceSmall,
-									annualPrice: plusPlan.annualPrice,
-									annualPriceSmall: plusPlan.annualPriceSmall,
-									isHighlighted: true
-								)
+							.onChange(of: selectedCompany) { _, newCompany in
+								if let company = newCompany {
+									selectedProduct = nil
+									selectedPlanIds.removeAll()
+									productsForCompany = service.getProductsByCompany(companyId: company.id)
+								}
 							}
 						}
 						.padding(16)
-					}
+						.background(Color(.systemGray6))
+						.cornerRadius(8)
+						.padding(.horizontal, 16)
+						.padding(.top, 16)
 
-					// Features comparison table - filtered based on selection
-					if !selectedPlans.isEmpty {
-						VStack(spacing: 0) {
-							ForEach(features) { feature in
-								featureRow(feature)
-								Divider()
-									.padding(.leading, 16)
+						// Step 2: Product Selection
+						if !productsForCompany.isEmpty {
+							VStack(alignment: .leading, spacing: 12) {
+								Text("Step 2: Select a Product")
+									.font(.system(.headline, design: .default).weight(.semibold))
+									.foregroundStyle(.primary)
+
+								Picker("Product", selection: $selectedProduct) {
+									Text("Choose a product...").tag(nil as InsuranceProduct?)
+									ForEach(productsForCompany) { product in
+										Text(product.displayName).tag(product as InsuranceProduct?)
+									}
+								}
+								.onChange(of: selectedProduct) { _, newProduct in
+									if let product = newProduct {
+										selectedPlanIds.removeAll()
+										plansForProduct = service.getPlansByProduct(productId: product.id)
+									}
+								}
 							}
+							.padding(16)
+							.background(Color(.systemGray6))
+							.cornerRadius(8)
+							.padding(.horizontal, 16)
 						}
-						.padding(.top, 8)
-					} else {
-						VStack(spacing: 12) {
-							Image(systemName: "checkmark.circle.dashed")
-								.font(.system(.largeTitle))
-								.foregroundStyle(.secondary)
 
-							Text("Select at least one plan to compare")
-								.font(.system(.body, design: .default))
-								.foregroundStyle(.secondary)
+						// Step 3: Plan Selection
+						if let product = selectedProduct, !plansForProduct.isEmpty {
+							VStack(alignment: .leading, spacing: 12) {
+								Text("Step 3: Select Plans to Compare")
+									.font(.system(.headline, design: .default).weight(.semibold))
+									.foregroundStyle(.primary)
+
+								VStack(spacing: 10) {
+									ForEach(plansForProduct) { plan in
+										planSelectionButton(
+											plan: plan,
+											isSelected: selectedPlanIds.contains(plan.id),
+											action: {
+												if selectedPlanIds.contains(plan.id) {
+													selectedPlanIds.remove(plan.id)
+												} else {
+													selectedPlanIds.insert(plan.id)
+												}
+											}
+										)
+									}
+								}
+							}
+							.padding(16)
+							.background(Color(.systemGray6))
+							.cornerRadius(8)
+							.padding(.horizontal, 16)
 						}
-						.frame(maxWidth: .infinity, maxHeight: 200, alignment: .center)
-						.padding(32)
+
+						// Plan Details Display
+						if let product = selectedProduct, !selectedPlanIds.isEmpty {
+							VStack(alignment: .leading, spacing: 12) {
+								Text("Plan Details")
+									.font(.system(.headline, design: .default).weight(.semibold))
+									.foregroundStyle(.primary)
+									.padding(.horizontal, 16)
+
+								// Show coverage profile
+								if let coverage = service.getCoverageProfile(productId: product.id) {
+									VStack(spacing: 0) {
+										ForEach(CoverageRowData.fromProfile(coverage)) { row in
+											coverageRow(row)
+											Divider()
+												.padding(.leading, 16)
+										}
+									}
+									.padding(.top, 8)
+								}
+
+								// Show selected plans
+								HStack(spacing: 12) {
+									ForEach(plansForProduct.filter { selectedPlanIds.contains($0.id) }) { plan in
+										planCard(plan: plan)
+									}
+								}
+								.padding(.horizontal, 16)
+								.padding(.bottom, 8)
+							}
+							.padding(.vertical, 16)
+							.background(Color(.systemGray6))
+							.cornerRadius(8)
+							.padding(.horizontal, 16)
+						} else if selectedProduct != nil {
+							VStack(spacing: 12) {
+								Image(systemName: "checkmark.circle.dashed")
+									.font(.system(.largeTitle))
+									.foregroundStyle(.secondary)
+
+								Text("Select at least one plan to compare")
+									.font(.system(.body, design: .default))
+									.foregroundStyle(.secondary)
+							}
+							.frame(maxWidth: .infinity, maxHeight: 200, alignment: .center)
+							.padding(32)
+						}
 					}
 				}
 			}
 			.navigationTitle("Compare Plans")
 			.navigationBarTitleDisplayMode(.inline)
+			.onAppear {
+				loadData()
+			}
 		}
 	}
 
-	private func planSelectionButton(name: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+	private func loadData() {
+		isLoading = true
+		companies = service.getAllCompanies()
+		isLoading = false
+	}
+
+	private func planSelectionButton(plan: InsurancePlan, isSelected: Bool, action: @escaping () -> Void) -> some View {
 		Button(action: action) {
-			HStack {
+			HStack(spacing: 12) {
 				Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
 					.foregroundStyle(isSelected ? .blue : .secondary)
 
-				Text(name)
-					.foregroundStyle(isSelected ? .blue : .primary)
-					.font(.system(.body, design: .default).weight(.medium))
+				VStack(alignment: .leading, spacing: 2) {
+					Text(plan.name)
+						.font(.system(.body, design: .default).weight(.medium))
+						.foregroundStyle(isSelected ? .blue : .primary)
+
+					HStack(spacing: 8) {
+						if let premium = plan.typicalMonthlyPremium {
+							Text("HKD \(premium)/mo")
+								.font(.system(.caption, design: .default))
+								.foregroundStyle(.secondary)
+						}
+						if let limit = plan.annualLimitAmount {
+							Text("Limit: HKD \(limit)")
+								.font(.system(.caption, design: .default))
+								.foregroundStyle(.secondary)
+						}
+					}
+				}
 
 				Spacer()
 			}
@@ -179,108 +232,63 @@ struct InsuranceCompareView: View {
 		}
 	}
 
-	private func planCard(
-		name: String,
-		badge: String,
-		monthlyPrice: String,
-		monthlyPriceSmall: String,
-		annualPrice: String,
-		annualPriceSmall: String,
-		isHighlighted: Bool
-	) -> some View {
+	private func planCard(plan: InsurancePlan) -> some View {
 		VStack(alignment: .leading, spacing: 8) {
-			HStack {
-				Text(name)
-					.font(.system(.body, design: .default).weight(.semibold))
-					.foregroundStyle(.primary)
+			Text(plan.name)
+				.font(.system(.body, design: .default).weight(.semibold))
+				.foregroundStyle(.primary)
 
-				Spacer()
-			}
+			if let premium = plan.typicalMonthlyPremium {
+				VStack(alignment: .leading, spacing: 2) {
+					HStack(spacing: 2) {
+						Text("HKD \(premium)")
+							.font(.system(.title3, design: .default).weight(.bold))
+							.foregroundStyle(.blue)
 
-			Text(badge)
-				.font(.system(.caption, design: .default))
-				.foregroundStyle(.blue)
+						Text("/mo")
+							.font(.system(.caption))
+							.foregroundStyle(.secondary)
+					}
 
-			VStack(alignment: .leading, spacing: 2) {
-				HStack(spacing: 2) {
-					Text(monthlyPrice)
-						.font(.system(.title3, design: .default).weight(.bold))
-						.foregroundStyle(.blue)
-
-					Text(monthlyPriceSmall)
-						.font(.system(.caption))
-						.foregroundStyle(.secondary)
+					if let limit = plan.annualLimitAmount {
+						Text("Annual: HKD \(limit)")
+							.font(.system(.caption2))
+							.foregroundStyle(.secondary)
+					}
 				}
-
-				Text(annualPrice)
-					.font(.system(.caption2))
-					.foregroundStyle(.secondary)
-
-				Text(annualPriceSmall)
-					.font(.system(.caption2))
-					.foregroundStyle(.secondary)
 			}
 
 			Spacer()
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.padding(12)
-		.background(isHighlighted ? Color.blue.opacity(0.1) : Color(.systemGray6))
+		.background(Color.blue.opacity(0.1))
 		.cornerRadius(8)
 		.overlay(
 			RoundedRectangle(cornerRadius: 8)
-				.stroke(isHighlighted ? Color.blue : Color.clear, lineWidth: 2)
+				.stroke(Color.blue, lineWidth: 1)
 		)
 	}
 
-	private func featureRow(_ feature: FeatureRow) -> some View {
+	private func coverageRow(_ row: CoverageRowData) -> some View {
 		HStack(alignment: .top, spacing: 12) {
-			Text(feature.feature)
+			Text(row.label)
 				.font(.system(.caption, design: .default))
 				.foregroundStyle(.primary)
 				.frame(maxWidth: .infinity, alignment: .leading)
-				.lineLimit(4)
+				.lineLimit(3)
 				.padding(.vertical, 12)
 				.padding(.leading, 16)
 
-			VStack(alignment: .center, spacing: 0) {
-				featureValue(feature.essential)
-			}
-			.frame(maxWidth: 80, alignment: .center)
-			.padding(.vertical, 12)
-
-			VStack(alignment: .center, spacing: 0) {
-				featureValue(feature.plus)
-			}
-			.frame(maxWidth: 80, alignment: .center)
-			.padding(.vertical, 12)
-			.padding(.trailing, 16)
+			Text(row.value)
+				.font(.system(.caption, design: .default))
+				.foregroundStyle(.secondary)
+				.lineLimit(3)
+				.padding(.vertical, 12)
+				.padding(.trailing, 16)
+				.frame(maxWidth: 150, alignment: .trailing)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
-	}
-
-	private func featureValue(_ value: String) -> some View {
-		if value == "✓" {
-			return AnyView(
-				Image(systemName: "checkmark")
-					.font(.system(.body, design: .default).weight(.semibold))
-					.foregroundStyle(.green)
-			)
-		} else if value == "—" {
-			return AnyView(
-				Text("—")
-					.font(.system(.body, design: .default).weight(.semibold))
-					.foregroundStyle(.secondary)
-			)
-		} else {
-			return AnyView(
-				Text(value)
-					.font(.system(.caption, design: .default))
-					.foregroundStyle(.primary)
-					.multilineTextAlignment(.center)
-					.lineLimit(3)
-			)
-		}
 	}
 }
 
