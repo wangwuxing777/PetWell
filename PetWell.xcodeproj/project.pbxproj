@@ -20,6 +20,7 @@
 		20CCB6012F04190E00CE57E7 /* PetDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB6002F04190A00CE57E7 /* PetDetailView.swift */; };
 		5254A2072F14D0AA002C6BFB /* InsuranceCompareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A2062F14D0A1002C6BFB /* InsuranceCompareView.swift */; };
 		5254A2082F14D0AA002C6BFB /* InsuranceLandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A2092F14D0AA002C6BFB /* InsuranceLandingView.swift */; };
+		5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +38,7 @@
 		20CCB6002F04190A00CE57E7 /* PetDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDetailView.swift; sourceTree = "<group>"; };
 		5254A2062F14D0A1002C6BFB /* InsuranceCompareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceCompareView.swift; sourceTree = "<group>"; };
 		5254A2092F14D0AA002C6BFB /* InsuranceLandingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceLandingView.swift; sourceTree = "<group>"; };
+		5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				206606602EFBE6AD004CAA54 /* AIService.swift */,
+				5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -221,7 +224,10 @@
 				2066066D2EFBEF9F004CAA54 /* AIService.swift in Sources */,
 				20CCB5FF2F0418F300CE57E7 /* AddPetView.swift in Sources */,
 				206606672EFBEBB5004CAA54 /* ContentView.swift in Sources */,
-				2066066B2EFBEF92004CAA54 /* RecordsView.swift in Sources */,				5254A2082F14D0AA002C6BFB /* InsuranceLandingView.swift in Sources */,				5254A2072F14D0AA002C6BFB /* InsuranceCompareView.swift in Sources */,
+				2066066B2EFBEF92004CAA54 /* RecordsView.swift in Sources */,
+				5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */,
+				5254A2082F14D0AA002C6BFB /* InsuranceLandingView.swift in Sources */,
+				5254A2072F14D0AA002C6BFB /* InsuranceCompareView.swift in Sources */,
 				2066066A2EFBEF8C004CAA54 /* GuardianChatView.swift in Sources */,
 				206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */,
 			);

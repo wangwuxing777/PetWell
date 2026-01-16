@@ -8,77 +8,7 @@
 import Foundation
 import SQLite3
 
-/// Insurance data models
-struct InsuranceCompany: Identifiable, Hashable {
-	let id: Int
-	let nameEn: String
-	let nameZh: String?
-	let brandType: String
-	let website: String?
-	let contactPhone: String?
-	let notes: String?
-
-	var displayName: String {
-		nameZh ?? nameEn
-	}
-}
-
-struct InsuranceProduct: Identifiable, Hashable {
-	let id: Int
-	let companyId: Int
-	let nameEn: String
-	let nameZh: String?
-	let description: String?
-	let targetSegment: String?
-	let isActive: Int
-	let notes: String?
-
-	var displayName: String {
-		nameZh ?? nameEn
-	}
-}
-
-struct ProductCoverageProfile: Identifiable {
-	let id: Int
-	let productId: Int
-	let typicalSurgeryCovered: Int?
-	let chronicIllnessSupported: Int?
-	let coverageVsCostNotes: String?
-	let annualLimitAmount: Int?
-	let hasSubLimits: Int?
-	let subLimitStructure: String?
-	let noSubLimitMarketingTag: Int?
-	let chronicMultiYearLimit: String?
-	let preexistingExcluded: Int?
-	let hereditaryDiseasePolicy: String?
-	let breedAgeRestrictions: String?
-	let waitingPeriodDescription: String?
-	let inpatientSurgeryIncluded: Int?
-	let exclusionsNotes: String?
-	let typicalMonthlyPremium: Int?
-	let reimbursementPercent: Int?
-	let hasDeductible: Int?
-	let deductibleAmount: Int?
-	let copayPercent: Int?
-	let priceValueNotes: String?
-	let onlineClaimSupported: Int?
-	let claimProcessSpeedNote: String?
-	let claimConvenienceNotes: String?
-	let brandReputationSummary: String?
-	let reviewSourceNotes: String?
-}
-
-struct InsurancePlan: Identifiable, Hashable {
-	let id: Int
-	let productId: Int
-	let name: String
-	let annualLimitAmount: Int?
-	let reimbursementPercent: Int?
-	let hasSubLimits: Int?
-	let subLimitStructure: String?
-	let typicalMonthlyPremium: Int?
-	let notes: String?
-}
+// MARK: - Service
 
 /// Service to load and query insurance data from SQLite database
 final class InsuranceService {
@@ -95,10 +25,6 @@ final class InsuranceService {
 	}
 
 	private func openDatabase() {
-		let fileURL = try? FileManager.default
-			.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-			.appendingPathComponent("insurance_list.db")
-
 		// For now, use in-memory DB to test. Later, bundle the SQL as a resource.
 		if sqlite3_open(":memory:", &db) == SQLITE_OK {
 			initializeDatabase()
@@ -125,6 +51,8 @@ final class InsuranceService {
 		  brand_type      TEXT NOT NULL,
 		  website         TEXT,
 		  contact_phone   TEXT,
+		  logo_url        TEXT,
+		  logo_base64     TEXT,
 		  notes           TEXT
 		);
 
@@ -193,7 +121,7 @@ final class InsuranceService {
 		  sub_limit_structure     TEXT,
 		  typical_monthly_premium INTEGER,
 		  notes                   TEXT,
-		  FOREIGN KEY (product_id) REFERENCES insurance_plans(id)
+		  FOREIGN KEY (product_id) REFERENCES insurance_products(id)
 		);
 
 		CREATE INDEX IF NOT EXISTS idx_plans_product
@@ -215,12 +143,12 @@ final class InsuranceService {
 
 	private func loadSampleData() {
 		let inserts = """
-		INSERT OR IGNORE INTO insurance_companies (id, name_en, name_zh, brand_type, website, contact_phone, notes)
+		INSERT OR IGNORE INTO insurance_companies (id, name_en, name_zh, brand_type, website, contact_phone, logo_url, logo_base64, notes)
 		VALUES
-		  (1, 'OneDegree', '一度保', 'insurer', 'https://www.onedegree.hk', '+852 2588 3388', 'Leading HK pet insurer, online-first, strong mobile experience'),
-		  (2, 'MSIG', 'MSIG', 'insurer', 'https://www.msig.com.hk', '+852 2891 0898', 'Established Japanese-backed insurer, traditional + digital'),
-		  (3, 'AIA', 'AIA', 'bank_partner', 'https://www.aia.com.hk', '+852 2881 1000', 'Major regional insurer, various partnerships'),
-		  (4, 'Zurich', 'Zurich', 'insurer', 'https://www.zurich.com.hk', '+852 2978 8000', 'Global insurer with HK presence, comprehensive coverage');
+		  (1, 'OneDegree', '一度保', 'insurer', 'https://www.onedegree.hk', '+852 2588 3388', NULL, NULL, 'Leading HK pet insurer, online-first, strong mobile experience'),
+		  (2, 'MSIG', 'MSIG', 'insurer', 'https://www.msig.com.hk', '+852 2891 0898', NULL, NULL, 'Established Japanese-backed insurer, traditional + digital'),
+		  (3, 'AIA', 'AIA', 'bank_partner', 'https://www.aia.com.hk', '+852 2881 1000', NULL, NULL, 'Major regional insurer, various partnerships'),
+		  (4, 'Zurich', 'Zurich', 'insurer', 'https://www.zurich.com.hk', '+852 2978 8000', NULL, NULL, 'Global insurer with HK presence, comprehensive coverage');
 
 		INSERT OR IGNORE INTO insurance_products (id, company_id, name_en, name_zh, description, target_segment, is_active, notes)
 		VALUES
@@ -274,7 +202,9 @@ final class InsuranceService {
 				brandType: String(cString: sqlite3_column_text(statement, 3)),
 				website: columnString(statement, 4),
 				contactPhone: columnString(statement, 5),
-				notes: columnString(statement, 6)
+				logoUrl: columnString(statement, 6),
+				logoBase64: columnString(statement, 7),
+				notes: columnString(statement, 8)
 			)
 		}
 	}
@@ -379,3 +309,4 @@ final class InsuranceService {
 		return value == 0 && sqlite3_column_type(statement, index) != SQLITE_INTEGER ? nil : Int(value)
 	}
 }
+

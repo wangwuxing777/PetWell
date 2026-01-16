@@ -38,6 +38,49 @@ struct InsuranceLandingView: View {
 							.foregroundStyle(.primary)
 							.padding(.horizontal, 16)
 
+						// 1. Cost of Raising a Pet Section
+						VStack(alignment: .leading, spacing: 12) {
+							Text("The Real Cost of Pet Parenthood")
+								.font(.subheadline)
+								.fontWeight(.bold)
+								.foregroundColor(.secondary)
+							
+							HStack(spacing: 16) {
+								costCard(petType: "Dog", lifetimeCost: "$650k+", monthlyAvg: "~$20k/yr")
+								costCard(petType: "Cat", lifetimeCost: "$500k+", monthlyAvg: "~$12.5k/yr")
+							}
+							
+							VStack(alignment: .leading, spacing: 8) {
+								HStack(alignment: .top) {
+									Image(systemName: "exclamationmark.triangle.fill")
+										.foregroundColor(.orange)
+									Text("Unexpected surgeries can cost HKD 30,000 - 100,000+")
+										.font(.caption)
+										.fontWeight(.medium)
+								}
+								HStack(alignment: .top) {
+									Image(systemName: "chart.line.uptrend.xyaxis")
+										.foregroundColor(.blue)
+									Text("Medical inflation is rising every year.")
+										.font(.caption)
+										.fontWeight(.medium)
+								}
+								Text("Source: OneDegree & Market Analysis (2025)")
+									.font(.system(size: 10))
+									.foregroundColor(.gray)
+									.padding(.top, 4)
+							}
+							.padding()
+							.background(Color.white)
+							.cornerRadius(8)
+							.shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+
+						}
+						.padding(16)
+						.background(Color(.systemGray6))
+						.cornerRadius(12)
+						.padding(.horizontal, 16)
+
 						VStack(alignment: .leading, spacing: 12) {
 							benefitCard(
 								icon: "heart.fill",
@@ -115,6 +158,30 @@ struct InsuranceLandingView: View {
 			.navigationTitle("Insurance")
 			.navigationBarTitleDisplayMode(.inline)
 		}
+	}
+
+	@ViewBuilder
+	private func costCard(petType: String, lifetimeCost: String, monthlyAvg: String) -> some View {
+		VStack(spacing: 6) {
+			Text(petType)
+				.font(.headline)
+			Text(lifetimeCost)
+				.font(.title3)
+				.fontWeight(.bold)
+				.foregroundColor(.blue)
+			Text("Lifetime Est.")
+				.font(.caption2)
+				.foregroundColor(.gray)
+			Divider()
+			Text(monthlyAvg)
+				.font(.caption)
+				.fontWeight(.semibold)
+		}
+		.frame(maxWidth: .infinity)
+		.padding()
+		.background(Color.white)
+		.cornerRadius(10)
+		.shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
 	}
 
 	private func benefitCard(icon: String, title: String, description: String) -> some View {
