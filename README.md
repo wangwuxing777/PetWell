@@ -1,0 +1,51 @@
+# PetWell - Pet Healthcare Management App
+
+## Project Overview
+PetWell is a comprehensive iOS application designed to help pet owners manage their furry friends' healthcare needs. The app integrates insurance comparison, medical records management, a shopping experience for health products, and a community blog for sharing pet stories.
+
+## Status Report (Frontend)
+
+### 1. Blog (Home Tab)
+*   **Status:** ✅ Implemented (RedNote / Xiaohongshu Style)
+*   **Description:** The main entry point of the app. It features a masonry grid layout for browsing community posts.
+*   **Key Features:**
+    *   **Feed:** "Explore" tab with staggered grid layout.
+    *   **Create Post:** Custom "Add Post" sheet with title, content, image picker placeholder, and tag options (#Topic, @User, Poll, Location).
+    *   **Styling:** Follows a modern social media aesthetic.
+
+### 2. Shop
+*   **Status:** 🚧 MVP Stub
+*   **Description:** Placeholder for the e-commerce section focus on pet health products.
+
+### 3. Medical
+*   **Status:** 🚧 MVP Stub
+*   **Description:** Placeholder for managing vaccinations, clinic visits, and booking appointments.
+
+### 4. Insurance
+*   **Status:** ⚠️ Basic UI Done (Needs Refinement)
+*   **Description:** A dedicated section to educate users on insurance value and compare plans.
+*   **Key Features:**
+    *   **Landing View:** Displays "The Real Cost of Pet Parenthood" with lifetime cost estimates for dogs and cats. Highlights medical risks.
+    *   **Compare View:** Side-by-side comparison interface (e.g., comparing Bowtie vs OneDegree). Currently displays Annual Limits and coverage properties (Surgery, Hospitalization, etc.).
+
+### 5. Profile (Formerly Records)
+*   **Status:** ✅ Basic Implementation
+*   **Description:** User and pet profile management. Access to "Records" and other personal settings.
+
+---
+
+## 📝 Roadmap & TODOs
+
+### Immediate Priorities (Insurance Module)
+We are currently focusing on refining the Insurance features to ensure the comparison tool is accurate and user-friendly.
+
+- [ ] **Refine Insurance Landing Page UI:** Polish the current cost analysis cards and benefit sections to be more engaging.
+- [ ] **Refine Insurance Compare Page UI:** Improve the side-by-side layout and visual hierarchy for comparing complex plan details.
+- [ ] **Finalize Insurance Database:** 
+    *   The SQL database schema needs to be finalized.
+    *   Real data for insurance plans (Coverage limits, copays, premiums) needs to be populated to replace the current "Property 1 / Property 2" placeholders in the Compare View.
+
+### Future Work
+- [ ] **Backend Integration:** Connect Blog posts to a persistent backend.
+- [ ] **Shop & Medical:** Develop full UI and logic for these sections.
+- [ ] **Global UI:** Ensure consistent use of the primary App Blue color across all new views.
