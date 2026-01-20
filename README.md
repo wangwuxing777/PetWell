@@ -50,3 +50,21 @@ We are currently focusing on refining the Insurance features to ensure the compa
 - [ ] **Backend Integration:** Connect Blog posts to a persistent backend.
 - [ ] **Shop & Medical:** Develop full UI and logic for these sections.
 - [ ] **Global UI:** Ensure consistent use of the primary App Blue color across all new views.
+
+## 🛠️ Database Management Workflow
+
+### How to update Insurance Data from Excel
+
+To update the app's database with new market research (Excel/CSV):
+
+1.  **Upload the File:** Place the raw Excel file (e.g., `market_research.xlsx`) into the `Data/` folder.
+2.  **Generate Relational Schema:** Use the AI assistant to parse and normalize the data.
+
+**Prompt for AI:**
+> "I have uploaded a new Excel file to `Data/market_research.xlsx` containing raw insurance product information.
+> 
+> Please perform the following:
+> 1. Analyze the columns to understand the hierarchy (Provider -> Product -> Plan -> Coverage Details).
+> 2. Design a normalized SQLite schema (Relational Algebra) to store this effectively.
+> 3. Generate a SQL seed script (INSERT statements) to populate the new tables with the data from the Excel file.
+> 4. Update the SQL files and `Services/InsuranceService.swift` to reflect these changes."
