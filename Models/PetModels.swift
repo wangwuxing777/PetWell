@@ -153,3 +153,82 @@ final class WeightEntryModel {
         self.notes = notes
     }
 }
+
+// MARK: - Insurance Models (Moved here to avoid project file modification issues)
+
+struct InsuranceCompany: Identifiable, Hashable {
+    let id: Int
+    let nameEn: String
+    let nameZh: String?
+    let brandType: String
+    let website: String?
+    let contactPhone: String?
+    let logoUrl: String?
+    let logoBase64: String?
+    let notes: String?
+
+    var displayName: String {
+        nameZh ?? nameEn
+    }
+}
+
+struct InsuranceProduct: Identifiable, Hashable {
+    let id: Int
+    let companyId: Int
+    let nameEn: String
+    let nameZh: String?
+    let description: String?
+    let targetSegment: String?
+    let isActive: Int
+    let notes: String?
+
+    var displayName: String {
+        nameZh ?? nameEn
+    }
+}
+
+struct ProductCoverageProfile: Identifiable {
+    let id: Int
+    let productId: Int
+    let typicalSurgeryCovered: Int?
+    let chronicIllnessSupported: Int?
+    let coverageVsCostNotes: String?
+    let annualLimitAmount: Int?
+    let hasSubLimits: Int?
+    let subLimitStructure: String?
+    let noSubLimitMarketingTag: Int?
+    let chronicMultiYearLimit: String?
+    let preexistingExcluded: Int?
+    let hereditaryDiseasePolicy: String?
+    let breedAgeRestrictions: String?
+    let waitingPeriodDescription: String?
+    let inpatientSurgeryIncluded: Int?
+    let exclusionsNotes: String?
+    let typicalMonthlyPremium: Int?
+    let reimbursementPercent: Int?
+    let hasDeductible: Int?
+    let deductibleAmount: Int?
+    let copayPercent: Int?
+    let priceValueNotes: String?
+    let onlineClaimSupported: Int?
+    let claimProcessSpeedNote: String?
+    let claimConvenienceNotes: String?
+    let brandReputationSummary: String?
+    let reviewSourceNotes: String?
+    
+    // New fields
+    let keyPros: String?
+    let keyCons: String?
+}
+
+struct InsurancePlan: Identifiable, Hashable {
+    let id: Int
+    let productId: Int
+    let name: String
+    let annualLimitAmount: Int?
+    let reimbursementPercent: Int?
+    let hasSubLimits: Int?
+    let subLimitStructure: String?
+    let typicalMonthlyPremium: Int?
+    let notes: String?
+}

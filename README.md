@@ -43,6 +43,7 @@ We are currently focusing on refining the Insurance features to ensure the compa
 - [ ] **Refine Insurance Compare Page UI:** Improve the side-by-side layout and visual hierarchy for comparing complex plan details.
 - [ ] **Finalize Insurance Database:** 
     *   The SQL database schema needs to be finalized.
+    *   ✅ **Real product names verified:** Updated OneDegree, MSIG, Zurich, and AIA product names to match official market offerings (Jan 2026).
     *   Real data for insurance plans (Coverage limits, copays, premiums) needs to be populated to replace the current "Property 1 / Property 2" placeholders in the Compare View.
 
 ### Future Work

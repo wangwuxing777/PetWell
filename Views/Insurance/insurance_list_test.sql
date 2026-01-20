@@ -80,6 +80,8 @@ CREATE TABLE IF NOT EXISTS product_coverage_profiles (
   claim_convenience_notes     TEXT,         -- app/portal, documents required, etc.
   brand_reputation_summary    TEXT,         -- short summary of reviews / trust
   review_source_notes         TEXT,         -- where info comes from (reviews, CS, etc.)
+  key_pros                    TEXT,         -- bullet points of main advantages
+  key_cons                    TEXT,         -- bullet points of main disadvantages
 
   FOREIGN KEY (product_id) REFERENCES insurance_products(id)
 );
@@ -121,23 +123,23 @@ VALUES
 INSERT OR IGNORE INTO insurance_products (id, company_id, name_en, name_zh, description, target_segment, is_active, notes)
 VALUES
   (1, 1, 'Pawfect Care', '完美呵护', 'Comprehensive pet insurance with no sub-limits', 'both', 1, 'OneDegree flagship product'),
-  (2, 1, 'Happy Paws', '快乐爪印', 'Budget-friendly basic coverage', 'both', 1, 'Entry-level product for cost-conscious owners');
+  (2, 1, 'Pawfect Care (Entry)', '完美呵护 (入门)', 'Budget-friendly basic coverage', 'both', 1, 'Entry-level product for cost-conscious owners');
 
 -- Insert products for MSIG
 INSERT OR IGNORE INTO insurance_products (id, company_id, name_en, name_zh, description, target_segment, is_active, notes)
 VALUES
-  (3, 2, 'Pet Care Plus', '宠物保险+', 'Multi-tier coverage with annual limits', 'dog', 1, 'Popular MSIG dog insurance'),
-  (4, 2, 'Feline Friend', '猫咪好友', 'Specialized cat coverage', 'cat', 1, 'MSIG cat-specific insurance');
+  (3, 2, 'Ulti-mate Pet Insurance (Dog)', '毛价保 (狗)', 'Multi-tier coverage with annual limits', 'dog', 1, 'Popular MSIG dog insurance'),
+  (4, 2, 'Ulti-mate Pet Insurance (Cat)', '毛价保 (猫)', 'Specialized cat coverage', 'cat', 1, 'MSIG cat-specific insurance');
 
 -- Insert products for AIA
 INSERT OR IGNORE INTO insurance_products (id, company_id, name_en, name_zh, description, target_segment, is_active, notes)
 VALUES
-  (5, 3, 'Pet Plus', '宠物加', 'Bundled with health screening', 'both', 1, 'AIA partnership product');
+  (5, 3, 'AIA Pet Insurance', 'AIA 宠物保险', 'Bundled with health screening', 'both', 1, 'AIA partnership product');
 
 -- Insert products for Zurich
 INSERT OR IGNORE INTO insurance_products (id, company_id, name_en, name_zh, description, target_segment, is_active, notes)
 VALUES
-  (6, 4, 'PetShield', '宠物护盾', 'Comprehensive accident & illness coverage', 'both', 1, 'Zurich premium offering');
+  (6, 4, 'Pamper U', '毛孩 宠爱', 'Comprehensive accident & illness coverage', 'both', 1, 'Zurich premium offering');
 
 -- ============================================================================
 -- SAMPLE DATA: Product Coverage Profiles
@@ -152,7 +154,7 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   exclusions_notes, typical_monthly_premium, reimbursement_percent, has_deductible,
   deductible_amount, copay_percent, price_value_notes, online_claim_supported,
   claim_process_speed_note, claim_convenience_notes, brand_reputation_summary,
-  review_source_notes
+  review_source_notes, key_pros, key_cons
 ) VALUES (
   1, 1, 1, 'Covers most surgical procedures up to annual limit; claims reimburse 80-90% of vet invoices',
   100000, 0, NULL, 1,
@@ -163,7 +165,9 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   196, 80, 1, 3000, 0, 'Excellent value for comprehensive coverage; no sub-limits',
   1, '5–7 working days', 'Mobile app claims with photo upload; most claims settled without vet paperwork',
   'High satisfaction; praised for digital experience and no sub-limits',
-  'Google Reviews 4.7/5, Facebook community feedback'
+  'Google Reviews 4.7/5, Facebook community feedback',
+  '- No sub-limits\n- High reimbursement rate\n- Digital claims',
+  '- Deductible applies per condition'
 );
 
 -- OneDegree - Happy Paws
@@ -175,7 +179,7 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   exclusions_notes, typical_monthly_premium, reimbursement_percent, has_deductible,
   deductible_amount, copay_percent, price_value_notes, online_claim_supported,
   claim_process_speed_note, claim_convenience_notes, brand_reputation_summary,
-  review_source_notes
+  review_source_notes, key_pros, key_cons
 ) VALUES (
   2, 1, 0, 'Covers common surgeries; limited chronic illness support',
   60000, 1, 'Per-incident: HKD 15,000; Emergency surgery: HKD 20,000',
@@ -186,7 +190,9 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   128, 70, 1, 2000, 0, 'Budget option with lower premiums; acceptable for young, healthy pets',
   1, '7–10 working days', 'Online app available; straightforward claims process',
   'Good for budget-conscious owners; basic but reliable coverage',
-  'Google Reviews 4.5/5, Pet owner forums'
+  'Google Reviews 4.5/5, Pet owner forums',
+  '- Low monthly premium\n- Digital claims',
+  '- Has sub-limits\n- Lower reimbursement rate'
 );
 
 -- MSIG - Pet Care Plus
@@ -198,7 +204,7 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   exclusions_notes, typical_monthly_premium, reimbursement_percent, has_deductible,
   deductible_amount, copay_percent, price_value_notes, online_claim_supported,
   claim_process_speed_note, claim_convenience_notes, brand_reputation_summary,
-  review_source_notes
+  review_source_notes, key_pros, key_cons
 ) VALUES (
   3, 1, 1, 'Strong surgical coverage; chronic claims up to multi-year limits',
   80000, 1, 'Per-incident: HKD 12,000; Hospitalization: HKD 25,000',
@@ -209,7 +215,9 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   178, 75, 1, 2500, 0, 'Traditional insurer; good balance of coverage and price',
   0, '10–14 working days typical', 'Requires paper claims or online portal; vet referral often needed',
   'Established brand; moderate satisfaction with claims process',
-  'MSIG official website, Pet owner surveys'
+  'MSIG official website, Pet owner surveys',
+  '- Strong brand reputation\n- Good chronic support',
+  '- Paper claims process\n- Sub-limits apply'
 );
 
 -- MSIG - Feline Friend
@@ -221,7 +229,7 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   exclusions_notes, typical_monthly_premium, reimbursement_percent, has_deductible,
   deductible_amount, copay_percent, price_value_notes, online_claim_supported,
   claim_process_speed_note, claim_convenience_notes, brand_reputation_summary,
-  review_source_notes
+  review_source_notes, key_pros, key_cons
 ) VALUES (
   4, 1, 1, 'Specifically designed for cats; strong chronic illness support',
   70000, 0, NULL, 1,
@@ -232,7 +240,9 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   218, 85, 0, NULL, 0, 'Premium cat-specific coverage; excellent for chronic feline conditions',
   1, '7–10 working days', 'Digital portal; MSIG understands cat-specific medical needs',
   'Highly rated among cat owners; specialized coverage appreciated',
-  'Cat owner groups, veterinary recommendations'
+  'Cat owner groups, veterinary recommendations',
+  '- No deductible\n- Specialized for cats\n- No sub-limits',
+  '- Age limit for enrollment'
 );
 
 -- AIA - Pet Plus
@@ -244,7 +254,7 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   exclusions_notes, typical_monthly_premium, reimbursement_percent, has_deductible,
   deductible_amount, copay_percent, price_value_notes, online_claim_supported,
   claim_process_speed_note, claim_convenience_notes, brand_reputation_summary,
-  review_source_notes
+  review_source_notes, key_pros, key_cons
 ) VALUES (
   5, 1, 0, 'Good surgical coverage; includes annual health screening benefit',
   75000, 1, 'Per-incident: HKD 10,000; Surgical: HKD 30,000',
@@ -255,7 +265,9 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   165, 72, 1, 3000, 0, 'Partnership benefit: includes annual health screening; good for preventive care',
   1, '10–15 working days', 'AIA web portal; partnership with major vets for pre-authorization',
   'Moderate satisfaction; screening benefit adds value',
-  'AIA marketing materials, Partner vet feedback'
+  'AIA marketing materials, Partner vet feedback',
+  '- Annual health screening included\n- Trusted brand',
+  '- Lower reimbursement rate\n- Sub-limits apply\n- Limited chronic support'
 );
 
 -- Zurich - PetShield
@@ -267,7 +279,7 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   exclusions_notes, typical_monthly_premium, reimbursement_percent, has_deductible,
   deductible_amount, copay_percent, price_value_notes, online_claim_supported,
   claim_process_speed_note, claim_convenience_notes, brand_reputation_summary,
-  review_source_notes
+  review_source_notes, key_pros, key_cons
 ) VALUES (
   6, 1, 1, 'Premium coverage for accidents and illnesses; most HK vet bills covered',
   120000, 0, NULL, 1,
@@ -278,7 +290,9 @@ INSERT OR IGNORE INTO product_coverage_profiles (
   270, 90, 0, NULL, 0, 'Premium tier; highest coverage percentage and annual limit',
   1, '5–7 working days', 'Zurich global infrastructure; multilingual support',
   'High satisfaction; premium pricing reflects comprehensive coverage',
-  'Zurich official website, International review sites'
+  'Zurich official website, International review sites',
+  '- 90% reimbursement\n- High annual limit\n- No sub-limits',
+  '- Higher premium\n- No online claims portal (Email/Post)'
 );
 
 -- ============================================================================
