@@ -25,8 +25,8 @@ struct ContentView: View {
                         .tabItem { Label("Shop", systemImage: "bag") }
                         .tag(Tab.shop)
 
-                    ClinicView()
-                        .tabItem { Label("Medical", systemImage: "cross.case") }
+                    VaccineView()
+                        .tabItem { Label("Resources", systemImage: "doc.text") }
                         .tag(Tab.medical)
 
                     InsuranceView()

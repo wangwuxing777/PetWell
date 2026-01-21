@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "name": "Rabies",
+    "petType": "dog/cat",
+    "description": "A must-have vaccine that protects your pet from rabies — a deadly virus that affects the brain and can spread to humans through bites or scratches. In many places, rabies vaccination is legally required. Keeping this vaccine up to date protects both your pet and your family.",
+    "youngInfo": "First dose at 12–16 weeks old.",
+    "adultInfo": "Booster 1 year later, then every 1–3 years (depends on local law).",
+    "isCore": true,
+    "isMandatory": true,
+    "price": 280
+  },
+  {
+    "id": 2,
+    "name": "DHPP",
+    "petType": "dog",
+    "description": "A core “all-in-one” puppy vaccine that protects against four serious dog diseases: distemper, hepatitis (adenovirus), parvovirus, and parainfluenza. These infections can spread quickly and may be life-threatening, especially for young puppies. DHPP is one of the most important vaccines for long-term health.",
+    "youngInfo": "Start at 6–8 weeks. Repeat every 3–4 weeks until 16 weeks old.",
+    "adultInfo": "Booster 1 year after the last puppy dose, then every 3 years.",
+    "isCore": true,
+    "isMandatory": false,
+    "price": 280
+  },
+  {
+    "id": 3,
+    "name": "Leptospirosis",
+    "petType": "dog",
+    "description": "Helps protect against leptospirosis — a bacterial infection often found in contaminated water, puddles, soil, or urine from infected animals. It can affect the liver and kidneys and may even spread to humans. Highly recommended for dogs who go outdoors often, visit parks, or live in humid/rainy areas.",
+    "youngInfo": "Usually starts around 12 weeks old (often given with DHPP).",
+    "adultInfo": "Booster every year for continued protection.",
+    "isCore": false,
+    "isMandatory": false,
+    "price": 350
+  },
+  {
+    "id": 4,
+    "name": "Bordetella",
+    "petType": "dog",
+    "description": "Prevents kennel cough, a highly contagious respiratory infection that spreads easily where dogs gather (boarding, daycare, grooming, training classes). Symptoms may include a harsh “honking” cough and sneezing. This vaccine is strongly recommended for social dogs and is commonly required by pet hotels or grooming salons.",
+    "youngInfo": "Can be given from 8 weeks old, especially for social puppies.",
+    "adultInfo": "Booster every year, or as required for boarding/grooming/daycare.",
+    "isCore": false,
+    "isMandatory": false,
+    "price": 350
+  },
+  {
+    "id": 5,
+    "name": "Lyme Disease",
+    "petType": "dog",
+    "description": "Protects dogs against Lyme disease, a tick-borne illness that can cause fever, joint pain, tiredness, and long-term complications. This vaccine is especially useful for dogs who hike, play in grassy areas, or live in regions with high tick exposure. Extra protection for adventurous pups!",
+    "youngInfo": "Starts at 12 weeks+ in tick-risk areas (parks, hiking, grassy regions).",
+    "adultInfo": "Booster every year if tick exposure is ongoing.",
+    "isCore": false,
+    "isMandatory": false,
+    "price": 450
+  },
+  {
+    "id": 6,
+    "name": "Canine Influenza",
+    "petType": "dog",
+    "description": "Helps prevent canine influenza (“dog flu”), a contagious respiratory virus that can spread in dog parks, daycare, grooming salons, and boarding facilities. Dogs may develop coughing, nasal discharge, and fever. Recommended for dogs with frequent social contact or those who travel/board often.",
+    "youngInfo": "Can start from 6–8 weeks old (recommended for social dogs).",
+    "adultInfo": "Booster every year, especially if boarding or frequent social contact.",
+    "isCore": false,
+    "isMandatory": false,
+    "price": 450
+  },
+  {
+    "id": 7,
+    "name": "FVRCP",
+    "petType": "cat",
+    "description": "A core vaccine for cats that protects against three common and serious diseases: feline herpesvirus, calicivirus, and panleukopenia (feline distemper). These infections can cause severe flu-like symptoms, mouth ulcers, dehydration, and may be fatal in kittens. FVRCP is essential for both indoor and outdoor cats.",
+    "youngInfo": "Start at 6–8 weeks. Repeat every 3–4 weeks until 16 weeks old.",
+    "adultInfo": "Booster 1 year after the last kitten dose, then every 3 years.",
+    "isCore": true,
+    "isMandatory": false,
+    "price": 300
+  },
+  {
+    "id": 9,
+    "name": "Feline Leukemia Virus",
+    "petType": "cat",
+    "description": "Protects against feline leukemia virus (FeLV), one of the most dangerous infectious diseases in cats. FeLV weakens the immune system and may lead to anemia, infections, and cancer. Strongly recommended for kittens, outdoor cats, or cats living with other cats, especially in multi-cat households.",
+    "youngInfo": "Start at 8 weeks old for kittens at risk (outdoor or multi-cat homes).",
+    "adultInfo": "Booster every year if exposure risk continues (outdoor contact/other cats).",
+    "isCore": false,
+    "isMandatory": false,
+    "price": 400
+  }
+]
