@@ -34,7 +34,33 @@ PetWell is a comprehensive iOS application designed to help pet owners manage th
 
 ---
 
+### 6. Logs
+
+#### 2026-01-21 - Medical Module & Backend Integration
+*   **Backend Architecture**:
+    *   Established a local Python `http.server` running on port 8000.
+    *   Created `vaccines.json` to serve dynamic data for the application.
+    *   Implemented `VaccineService.swift` to handle async data fetching from localhost.
+*   **Medical / Vaccine Module UI**:
+    *   **Main Dashboard (`VaccineView`)**:
+        *   Redesigned for a "High-End" Apple-style aesthetic.
+        *   Implemented sticky "Pet Health Center" header with search.
+        *   Switched to horizontal scrolling rails for "Services", "Dog Vaccination", and "Cat Vaccination".
+        *   **Standardized Card Design**: Created a polished `VaccineCard` component with fixed dimensions (200x220), ensuring perfect alignment between image and content areas. Added "Book" action buttons and "Core/Mandatory" badges.
+    *   **Detail View (`VaccineDetailView`)**:
+        *   Designed an immersive detail page with gradient headers and dynamic "Puppy/Kitten" logic.
+        *   Added "Vaccination Schedule" timeline visualization.
+        *   Integrated a "Book Appointment" button that flows naturally with the content.
+*   **Asset Management**:
+    *   Fixed image loading issues by restructuring `Assets.xcassets` (converting loose PNGs to `.imageset` folders).
+    *   Verified "Rabies" image display.
+
 ## 📝 Roadmap & TODOs
+
+### Immediate Priorities (Medical Module)
+- [ ] **Data Population**: Complete the `vaccines.json` with accurate data for all vaccine types (DHPP, Bordetella, FVRCP, etc.).
+- [ ] **Asset Completion**: Create `.imageset` folders for the remaining vaccine images in Xcode so they display correctly.
+- [ ] **Booking Flow**: Implement the actual logic or a form for the "Book Appointment" button.
 
 ### Immediate Priorities (Insurance Module)
 We are currently focusing on refining the Insurance features to ensure the comparison tool is accurate and user-friendly.
