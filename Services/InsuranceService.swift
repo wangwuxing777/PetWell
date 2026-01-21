@@ -105,6 +105,8 @@ final class InsuranceService {
 		  claim_convenience_notes     TEXT,
 		  brand_reputation_summary    TEXT,
 		  review_source_notes         TEXT,
+		  key_pros                    TEXT,
+		  key_cons                    TEXT,
 		  FOREIGN KEY (product_id) REFERENCES insurance_products(id)
 		);
 
@@ -153,20 +155,20 @@ final class InsuranceService {
 		INSERT OR IGNORE INTO insurance_products (id, company_id, name_en, name_zh, description, target_segment, is_active, notes)
 		VALUES
 		  (1, 1, 'Pawfect Care', '完美呵护', 'Comprehensive pet insurance with no sub-limits', 'both', 1, 'OneDegree flagship product'),
-		  (2, 1, 'Happy Paws', '快乐爪印', 'Budget-friendly basic coverage', 'both', 1, 'Entry-level product for cost-conscious owners'),
-		  (3, 2, 'Pet Care Plus', '宠物保险+', 'Multi-tier coverage with annual limits', 'dog', 1, 'Popular MSIG dog insurance'),
-		  (4, 2, 'Feline Friend', '猫咪好友', 'Specialized cat coverage', 'cat', 1, 'MSIG cat-specific insurance'),
-		  (5, 3, 'Pet Plus', '宠物加', 'Bundled with health screening', 'both', 1, 'AIA partnership product'),
-		  (6, 4, 'PetShield', '宠物护盾', 'Comprehensive accident & illness coverage', 'both', 1, 'Zurich premium offering');
+		  (2, 1, 'Pawfect Care (Entry)', '完美呵护 (入门)', 'Budget-friendly basic coverage', 'both', 1, 'Entry-level product for cost-conscious owners'),
+		  (3, 2, 'Ulti-mate Pet Insurance (Dog)', '毛价保 (狗)', 'Multi-tier coverage with annual limits', 'dog', 1, 'Popular MSIG dog insurance'),
+		  (4, 2, 'Ulti-mate Pet Insurance (Cat)', '毛价保 (猫)', 'Specialized cat coverage', 'cat', 1, 'MSIG cat-specific insurance'),
+		  (5, 3, 'AIA Pet Insurance', 'AIA 宠物保险', 'Bundled with health screening', 'both', 1, 'AIA partnership product'),
+		  (6, 4, 'Pamper U', '毛孩 宠爱', 'Comprehensive accident & illness coverage', 'both', 1, 'Zurich premium offering');
 
-		INSERT OR IGNORE INTO product_coverage_profiles (product_id, typical_surgery_covered, chronic_illness_supported, coverage_vs_cost_notes, annual_limit_amount, has_sub_limits, no_sub_limit_marketing_tag, preexisting_excluded, typical_monthly_premium, reimbursement_percent, has_deductible, deductible_amount, copay_percent, online_claim_supported, claim_process_speed_note, brand_reputation_summary)
+		INSERT OR IGNORE INTO product_coverage_profiles (product_id, typical_surgery_covered, chronic_illness_supported, coverage_vs_cost_notes, annual_limit_amount, has_sub_limits, no_sub_limit_marketing_tag, preexisting_excluded, typical_monthly_premium, reimbursement_percent, has_deductible, deductible_amount, copay_percent, online_claim_supported, claim_process_speed_note, brand_reputation_summary, key_pros, key_cons)
 		VALUES
-		  (1, 1, 1, 'Covers most surgical procedures up to annual limit', 100000, 0, 1, 1, 196, 80, 1, 3000, 0, 1, '5–7 working days', 'High satisfaction; praised for digital experience and no sub-limits'),
-		  (2, 1, 0, 'Covers common surgeries; limited chronic illness support', 60000, 1, 0, 1, 128, 70, 1, 2000, 0, 1, '7–10 working days', 'Good for budget-conscious owners; basic but reliable coverage'),
-		  (3, 1, 1, 'Strong surgical coverage; chronic claims up to multi-year limits', 80000, 1, 0, 1, 178, 75, 1, 2500, 0, 0, '10–14 working days typical', 'Established brand; moderate satisfaction with claims process'),
-		  (4, 1, 1, 'Specifically designed for cats; strong chronic illness support', 70000, 0, 1, 1, 218, 85, 0, NULL, 0, 1, '7–10 working days', 'Highly rated among cat owners; specialized coverage appreciated'),
-		  (5, 1, 0, 'Good surgical coverage; includes annual health screening benefit', 75000, 1, 0, 1, 165, 72, 1, 3000, 0, 1, '10–15 working days', 'Moderate satisfaction; screening benefit adds value'),
-		  (6, 1, 1, 'Premium coverage for accidents and illnesses', 120000, 0, 1, 1, 270, 90, 0, NULL, 0, 1, '5–7 working days', 'High satisfaction; premium pricing reflects comprehensive coverage');
+		  (1, 1, 1, 'Covers most surgical procedures up to annual limit', 100000, 0, 1, 1, 196, 80, 1, 3000, 0, 1, '5–7 working days', 'High satisfaction; praised for digital experience and no sub-limits', '- No sub-limits\n- High reimbursement rate\n- Digital claims', '- Deductible applies per condition'),
+		  (2, 1, 0, 'Covers common surgeries; limited chronic illness support', 60000, 1, 0, 1, 128, 70, 1, 2000, 0, 1, '7–10 working days', 'Good for budget-conscious owners; basic but reliable coverage', '- Low monthly premium\n- Digital claims', '- Has sub-limits\n- Lower reimbursement rate'),
+		  (3, 1, 1, 'Strong surgical coverage; chronic claims up to multi-year limits', 80000, 1, 0, 1, 178, 75, 1, 2500, 0, 0, '10–14 working days typical', 'Established brand; moderate satisfaction with claims process', '- Strong brand reputation\n- Good chronic support', '- Paper claims process\n- Sub-limits apply'),
+		  (4, 1, 1, 'Specifically designed for cats; strong chronic illness support', 70000, 0, 1, 1, 218, 85, 0, NULL, 0, 1, '7–10 working days', 'Highly rated among cat owners; specialized coverage appreciated', '- No deductible\n- Specialized for cats\n- No sub-limits', '- Age limit for enrollment'),
+		  (5, 1, 0, 'Good surgical coverage; includes annual health screening benefit', 75000, 1, 0, 1, 165, 72, 1, 3000, 0, 1, '10–15 working days', 'Moderate satisfaction; screening benefit adds value', '- Annual health screening included\n- Trusted brand', '- Lower reimbursement rate\n- Sub-limits apply\n- Limited chronic support'),
+		  (6, 1, 1, 'Premium coverage for accidents and illnesses', 120000, 0, 1, 1, 270, 90, 0, NULL, 0, 1, '5–7 working days', 'High satisfaction; premium pricing reflects comprehensive coverage', '- 90% reimbursement\n- High annual limit\n- No sub-limits', '- Higher premium\n- No online claims portal (Email/Post)');
 
 		INSERT OR IGNORE INTO insurance_plans (product_id, name, annual_limit_amount, reimbursement_percent, has_sub_limits, typical_monthly_premium, notes)
 		VALUES
@@ -255,7 +257,9 @@ final class InsuranceService {
 				claimProcessSpeedNote: columnString(statement, 23),
 				claimConvenienceNotes: columnString(statement, 24),
 				brandReputationSummary: columnString(statement, 25),
-				reviewSourceNotes: columnString(statement, 26)
+				reviewSourceNotes: columnString(statement, 26),
+				keyPros: columnString(statement, 27),
+				keyCons: columnString(statement, 28)
 			)
 		}
 		return results.first
