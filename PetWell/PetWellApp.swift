@@ -7,12 +7,54 @@
 
 import SwiftUI
 import SwiftData
+import Combine
+
+// MARK: - Language Manager
+
+enum AppLanguage: String, CaseIterable, Identifiable {
+    case english = "en"
+    case traditionalChinese = "zh-HK"
+    
+    var id: String { rawValue }
+    
+    var displayName: String {
+        switch self {
+        case .english: return "English"
+        case .traditionalChinese: return "繁體中文"
+        }
+    }
+}
+
+class LanguageManager: ObservableObject {
+    @Published var currentLanguage: AppLanguage = .english {
+        didSet {
+            UserDefaults.standard.set(currentLanguage.rawValue, forKey: "selectedLanguage")
+        }
+    }
+    
+    init() {
+        if let storedLang = UserDefaults.standard.string(forKey: "selectedLanguage"),
+           let lang = AppLanguage(rawValue: storedLang) {
+            self.currentLanguage = lang
+        }
+    }
+    
+    // Helper to get localized string dynamically if not using system localization
+    // For simple checking in views
+    var isChinese: Bool {
+        return currentLanguage == .traditionalChinese
+    }
+}
 
 @main
 struct PetWellApp: App {
+    @StateObject private var languageManager = LanguageManager()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(languageManager)
+                .environment(\.locale, .init(identifier: languageManager.currentLanguage.rawValue))
         }
         .modelContainer(for: [
             PetModel.self,

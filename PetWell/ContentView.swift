@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var languageManager: LanguageManager
     @State private var selectedTab: Tab = .blog // Default to Blog as per request "Blog button to the first one"
     @State private var isGuardianPresented = false
     @State private var guardianButtonPosition: CGPoint = .zero
@@ -18,23 +19,23 @@ struct ContentView: View {
             ZStack {
                 TabView(selection: $selectedTab) {
                     BlogView()
-                        .tabItem { Label("Blog", systemImage: "bubble.left.and.bubble.right.fill") }
+                        .tabItem { Label(languageManager.isChinese ? "日誌" : "Blog", systemImage: "bubble.left.and.bubble.right.fill") }
                         .tag(Tab.blog)
 
                     ProductsView()
-                        .tabItem { Label("Shop", systemImage: "bag") }
+                        .tabItem { Label(languageManager.isChinese ? "商店" : "Shop", systemImage: "bag") }
                         .tag(Tab.shop)
 
                     ClinicView()
-                        .tabItem { Label("Medical", systemImage: "cross.case") }
+                        .tabItem { Label(languageManager.isChinese ? "醫療" : "Medical", systemImage: "cross.case") }
                         .tag(Tab.medical)
 
                     InsuranceView()
-                        .tabItem { Label("Insurance", systemImage: "shield") }
+                        .tabItem { Label(languageManager.isChinese ? "保險" : "Insurance", systemImage: "shield") }
                         .tag(Tab.insurance)
 
                     RecordsView()
-                        .tabItem { Label("Profile", systemImage: "person.circle") }
+                        .tabItem { Label(languageManager.isChinese ? "檔案" : "Profile", systemImage: "person.circle") }
                         .tag(Tab.profile)
                 }
 
@@ -182,6 +183,7 @@ struct BlogPost: Identifiable {
 }
 
 struct BlogView: View {
+    @EnvironmentObject var languageManager: LanguageManager
     @State private var showingPostSheet = false
     @State private var selectedTabStr = "Explore"
     @State private var posts: [BlogPost] = [
@@ -213,12 +215,12 @@ struct BlogView: View {
                     
                     Spacer()
                     
-                    Text("Following")
+                    Text(languageManager.isChinese ? "關注" : "Following")
                         .font(.system(size: 16, weight: .regular))
                         .foregroundColor(.gray)
                     
                     VStack(spacing: 4) {
-                        Text("Explore")
+                        Text(languageManager.isChinese ? "探索" : "Explore")
                             .font(.system(size: 17, weight: .bold))
                             .foregroundColor(.black)
                         
@@ -227,7 +229,7 @@ struct BlogView: View {
                             .frame(width: 30, height: 3)
                     }
                     
-                    Text("Nearby")
+                    Text(languageManager.isChinese ? "附近" : "Nearby")
                         .font(.system(size: 16, weight: .regular))
                         .foregroundColor(.gray)
                     
@@ -336,6 +338,7 @@ struct BlogCard: View {
 
 // Ensure PostBlogView is kept or updated if needed, heavily simplified for this request as we focus on list display
 struct PostBlogView: View {
+    @EnvironmentObject var languageManager: LanguageManager
     @Environment(\.dismiss) var dismiss
     @State private var title = ""
     @State private var content = ""
@@ -387,7 +390,7 @@ struct PostBlogView: View {
                     }
                     
                     // Title Input
-                    TextField("Add a title", text: $title)
+                    TextField(languageManager.isChinese ? "加入標題" : "Add a title", text: $title)
                         .font(.system(size: 20, weight: .bold)) // Larger font for title
                         .padding(.horizontal)
                     
@@ -396,7 +399,7 @@ struct PostBlogView: View {
                     // Content Input
                     ZStack(alignment: .topLeading) {
                         if content.isEmpty {
-                            Text("Add text")
+                            Text(languageManager.isChinese ? "加入內文" : "Add text")
                                 .foregroundColor(.gray.opacity(0.6))
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 8)
@@ -409,9 +412,9 @@ struct PostBlogView: View {
                     
                     // Tags Row
                     HStack(spacing: 12) {
-                        TagButton(icon: "number", text: "Topic")
-                        TagButton(icon: "at", text: "User")
-                        TagButton(icon: "chart.bar", text: "Poll")
+                        TagButton(icon: "number", text: languageManager.isChinese ? "話題" : "Topic")
+                        TagButton(icon: "at", text: languageManager.isChinese ? "用戶" : "User")
+                        TagButton(icon: "chart.bar", text: languageManager.isChinese ? "投票" : "Poll")
                     }
                     .padding(.horizontal)
                     
@@ -419,13 +422,13 @@ struct PostBlogView: View {
                     
                     // Options List
                     VStack(spacing: 0) {
-                        OptionRow(icon: "mappin.and.ellipse", text: "Tag Location", detail: "Hong Kong Park")
+                        OptionRow(icon: "mappin.and.ellipse", text: languageManager.isChinese ? "加入地點" : "Tag Location", detail: languageManager.isChinese ? "香港公園" : "Hong Kong Park")
                         Divider().padding(.leading, 40)
-                        OptionRow(icon: "lock.open", text: "Public", detail: "Everyone")
+                        OptionRow(icon: "lock.open", text: languageManager.isChinese ? "公開" : "Public", detail: languageManager.isChinese ? "所有人" : "Everyone")
                         Divider().padding(.leading, 40)
-                        OptionRow(icon: "square.grid.2x2", text: "Add widgets", detail: "")
+                        OptionRow(icon: "square.grid.2x2", text: languageManager.isChinese ? "加入小工具" : "Add widgets", detail: "")
                         Divider().padding(.leading, 40)
-                        OptionRow(icon: "gearshape", text: "Advanced options", detail: "")
+                        OptionRow(icon: "gearshape", text: languageManager.isChinese ? "進階設定" : "Advanced options", detail: "")
                     }
                     .padding(.horizontal)
                 }
@@ -439,7 +442,7 @@ struct PostBlogView: View {
                     Button(action: {
                         // Draft action
                     }) {
-                        Text("Save draft")
+                        Text(languageManager.isChinese ? "存草稿" : "Save draft")
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(.black)
                             .padding(.vertical, 12)
@@ -452,9 +455,9 @@ struct PostBlogView: View {
                     
                     Button(action: {
                         let newPost = BlogPost(
-                            authorName: "You",
+                            authorName: languageManager.isChinese ? "你" : "You",
                             authorAvatar: "person.circle.fill", // Mock avatar
-                            title: title.isEmpty ? "New Post" : title,
+                            title: title.isEmpty ? (languageManager.isChinese ? "新貼文" : "New Post") : title,
                             imageColor: .blue,
                             imageHeight: 200,
                             likes: 0,
@@ -463,7 +466,7 @@ struct PostBlogView: View {
                         onPost(newPost)
                         dismiss()
                     }) {
-                        Text("Post")
+                        Text(languageManager.isChinese ? "發布" : "Post")
                             .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.white)
                             .padding(.vertical, 12)

@@ -24,12 +24,12 @@ class InsuranceRepository {
     ]
     
     let products: [InsuranceProduct] = [
-        InsuranceProduct(id: 1, companyId: 1, nameEn: "Pawfect Care", nameZh: "完美呵护", description: "Comprehensive pet insurance with no sub-limits", targetSegment: "both", isActive: 1, notes: "OneDegree flagship product"),
-        InsuranceProduct(id: 2, companyId: 1, nameEn: "Pawfect Care (Entry)", nameZh: "完美呵护 (入门)", description: "Budget-friendly basic coverage", targetSegment: "both", isActive: 1, notes: "Entry-level product"),
-        InsuranceProduct(id: 3, companyId: 2, nameEn: "Ulti-mate Pet Insurance (Dog)", nameZh: "毛价保 (狗)", description: "Multi-tier coverage with annual limits", targetSegment: "dog", isActive: 1, notes: "Popular MSIG dog insurance"),
-        InsuranceProduct(id: 4, companyId: 2, nameEn: "Ulti-mate Pet Insurance (Cat)", nameZh: "毛价保 (猫)", description: "Specialized cat coverage", targetSegment: "cat", isActive: 1, notes: "MSIG cat-specific insurance"),
-        InsuranceProduct(id: 5, companyId: 3, nameEn: "AIA Pet Insurance", nameZh: "AIA 宠物保险", description: "Bundled with health screening", targetSegment: "both", isActive: 1, notes: "AIA partnership product"),
-        InsuranceProduct(id: 6, companyId: 4, nameEn: "Pamper U", nameZh: "毛孩 宠爱", description: "Comprehensive accident & illness coverage", targetSegment: "both", isActive: 1, notes: "Zurich premium offering")
+        InsuranceProduct(id: 1, companyId: 1, nameEn: "Pawfect Care", nameZh: "完美呵護", description: "Comprehensive pet insurance with no sub-limits", targetSegment: "both", isActive: 1, notes: "OneDegree flagship product"),
+        InsuranceProduct(id: 2, companyId: 1, nameEn: "Pawfect Care (Entry)", nameZh: "完美呵護 (入門)", description: "Budget-friendly basic coverage", targetSegment: "both", isActive: 1, notes: "Entry-level product"),
+        InsuranceProduct(id: 3, companyId: 2, nameEn: "Ulti-mate Pet Insurance (Dog)", nameZh: "毛價保 (狗)", description: "Multi-tier coverage with annual limits", targetSegment: "dog", isActive: 1, notes: "Popular MSIG dog insurance"),
+        InsuranceProduct(id: 4, companyId: 2, nameEn: "Ulti-mate Pet Insurance (Cat)", nameZh: "毛價保 (貓)", description: "Specialized cat coverage", targetSegment: "cat", isActive: 1, notes: "MSIG cat-specific insurance"),
+        InsuranceProduct(id: 5, companyId: 3, nameEn: "AIA Pet Insurance", nameZh: "AIA 寵物保險", description: "Bundled with health screening", targetSegment: "both", isActive: 1, notes: "AIA partnership product"),
+        InsuranceProduct(id: 6, companyId: 4, nameEn: "Pamper U", nameZh: "毛孩 寵愛", description: "Comprehensive accident & illness coverage", targetSegment: "both", isActive: 1, notes: "Zurich premium offering")
     ]
     
     let profiles: [ProductCoverageProfile] = [
@@ -73,6 +73,7 @@ struct ComparisonItem: Identifiable {
 
 struct InsuranceCompareView: View {
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var languageManager: LanguageManager
     
     // State management for selected plans
     @State private var leftPlanId: Int = 1 // OneDegree Pawfect Care
@@ -152,12 +153,12 @@ struct InsuranceCompareView: View {
     
     private func planHeader(company: InsuranceCompany, product: InsuranceProduct, isLeft: Bool) -> some View {
         VStack(spacing: 8) {
-            Text(company.nameEn)
+            Text(languageManager.isChinese ? (company.nameZh ?? company.nameEn) : company.nameEn)
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .textCase(.uppercase)
             
-            Text(product.nameEn)
+            Text(languageManager.isChinese ? (product.nameZh ?? product.nameEn) : product.nameEn)
                 .font(.headline)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
@@ -167,7 +168,7 @@ struct InsuranceCompareView: View {
                 isSelectingLeft = isLeft
                 showSelectionSheet = true
             }) {
-                Text("Change")
+                Text(languageManager.isChinese ? "更換" : "Change")
                     .font(.system(size: 12, weight: .medium))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
@@ -198,23 +199,23 @@ struct InsuranceCompareView: View {
     
     private func summarySection(left: ComparisonItem, right: ComparisonItem) -> some View {
         VStack(spacing: 0) {
-            rowHeader("Costs & Limits")
+            rowHeader(languageManager.isChinese ? "費用與限額" : "Costs & Limits")
             
-            comparisonRow(title: "Annual Annual Limit",
+            comparisonRow(title: languageManager.isChinese ? "年度限額" : "Annual Limit",
                           left: formatCurrency(left.profile.annualLimitAmount),
                           right: formatCurrency(right.profile.annualLimitAmount),
                           isHighlight: true)
             
-            comparisonRow(title: "Est. Monthly Premium",
+            comparisonRow(title: languageManager.isChinese ? "預計月費" : "Est. Monthly Premium",
                           left: formatCurrency(left.profile.typicalMonthlyPremium),
                           right: formatCurrency(right.profile.typicalMonthlyPremium))
             
-            comparisonRow(title: "Reimbursement",
+            comparisonRow(title: languageManager.isChinese ? "賠償比例" : "Reimbursement",
                           left: "\(left.profile.reimbursementPercent ?? 0)%",
                           right: "\(right.profile.reimbursementPercent ?? 0)%",
                           isHighlight: true)
             
-            comparisonRow(title: "Deductible",
+            comparisonRow(title: languageManager.isChinese ? "自付額" : "Deductible",
                           left: formatDeductible(amount: left.profile.deductibleAmount),
                           right: formatDeductible(amount: right.profile.deductibleAmount))
         }
@@ -225,7 +226,7 @@ struct InsuranceCompareView: View {
     
     private func prosConsSection(left: ComparisonItem, right: ComparisonItem) -> some View {
         VStack(spacing: 0) {
-            rowHeader("Key Pros & Cons")
+            rowHeader(languageManager.isChinese ? "優缺點比較" : "Key Pros & Cons")
             
             HStack(alignment: .top, spacing: 0) {
                 prosConsCell(pros: left.profile.keyPros, cons: left.profile.keyCons)
@@ -243,7 +244,7 @@ struct InsuranceCompareView: View {
         VStack(alignment: .leading, spacing: 12) {
             if let pros = pros {
                 VStack(alignment: .leading, spacing: 4) {
-                    Label("Pros", systemImage: "hand.thumbsup.fill")
+                    Label(languageManager.isChinese ? "優點" : "Pros", systemImage: "hand.thumbsup.fill")
                         .font(.caption)
                         .foregroundColor(.green)
                     Text(pros)
@@ -254,7 +255,7 @@ struct InsuranceCompareView: View {
             
             if let cons = cons {
                 VStack(alignment: .leading, spacing: 4) {
-                    Label("Cons", systemImage: "hand.thumbsdown.fill")
+                    Label(languageManager.isChinese ? "缺點" : "Cons", systemImage: "hand.thumbsdown.fill")
                         .font(.caption)
                         .foregroundColor(.red)
                     Text(cons)
@@ -270,21 +271,21 @@ struct InsuranceCompareView: View {
     
     private func coverageDetailsSection(left: ComparisonItem, right: ComparisonItem) -> some View {
         VStack(spacing: 0) {
-            rowHeader("Policy Details")
+            rowHeader(languageManager.isChinese ? "保單詳情" : "Policy Details")
             
-            comparisonRow(title: "Sub-Limits",
-                          left: left.profile.hasSubLimits == 1 ? (left.profile.subLimitStructure ?? "Yes") : "None",
-                          right: right.profile.hasSubLimits == 1 ? (right.profile.subLimitStructure ?? "Yes") : "None")
+            comparisonRow(title: languageManager.isChinese ? "細項限額" : "Sub-Limits",
+                          left: left.profile.hasSubLimits == 1 ? (left.profile.subLimitStructure ?? (languageManager.isChinese ? "有" : "Yes")) : (languageManager.isChinese ? "無" : "None"),
+                          right: right.profile.hasSubLimits == 1 ? (right.profile.subLimitStructure ?? (languageManager.isChinese ? "有" : "Yes")) : (languageManager.isChinese ? "無" : "None"))
             
-            comparisonRow(title: "Chronic Conditions",
-                          left: left.profile.chronicIllnessSupported == 1 ? "Covered" : "Excluded",
-                          right: right.profile.chronicIllnessSupported == 1 ? "Covered" : "Excluded")
+            comparisonRow(title: languageManager.isChinese ? "慢性疾病" : "Chronic Conditions",
+                          left: left.profile.chronicIllnessSupported == 1 ? (languageManager.isChinese ? "承保" : "Covered") : (languageManager.isChinese ? "不承保" : "Excluded"),
+                          right: right.profile.chronicIllnessSupported == 1 ? (languageManager.isChinese ? "承保" : "Covered") : (languageManager.isChinese ? "不承保" : "Excluded"))
             
-            comparisonRow(title: "Waiting Periods",
+            comparisonRow(title: languageManager.isChinese ? "等候期" : "Waiting Periods",
                           left: left.profile.waitingPeriodDescription ?? "-",
                           right: right.profile.waitingPeriodDescription ?? "-")
                           
-            comparisonRow(title: "Hereditary Conditions",
+            comparisonRow(title: languageManager.isChinese ? "遺傳疾病" : "Hereditary Conditions",
                           left: left.profile.hereditaryDiseasePolicy ?? "-",
                           right: right.profile.hereditaryDiseasePolicy ?? "-")
         }
@@ -295,13 +296,13 @@ struct InsuranceCompareView: View {
     
     private func claimsSection(left: ComparisonItem, right: ComparisonItem) -> some View {
         VStack(spacing: 0) {
-            rowHeader("Claims Experience")
+            rowHeader(languageManager.isChinese ? "理賠體驗" : "Claims Experience")
             
-            comparisonRow(title: "Online Claims",
-                          left: left.profile.onlineClaimSupported == 1 ? "Yes (App/Web)" : "No (Paper)",
-                          right: right.profile.onlineClaimSupported == 1 ? "Yes (App/Web)" : "No (Paper)")
+            comparisonRow(title: languageManager.isChinese ? "網上理賠" : "Online Claims",
+                          left: left.profile.onlineClaimSupported == 1 ? (languageManager.isChinese ? "有 (App/Web)" : "Yes (App/Web)") : (languageManager.isChinese ? "無 (需填表)" : "No (Paper)"),
+                          right: right.profile.onlineClaimSupported == 1 ? (languageManager.isChinese ? "有 (App/Web)" : "Yes (App/Web)") : (languageManager.isChinese ? "無 (需填表)" : "No (Paper)"))
                           
-            comparisonRow(title: "Processing Time",
+            comparisonRow(title: languageManager.isChinese ? "處理時間" : "Processing Time",
                           left: left.profile.claimProcessSpeedNote ?? "-",
                           right: right.profile.claimProcessSpeedNote ?? "-")
         }
@@ -397,13 +398,14 @@ extension Color {
 // MARK: - Selection Views
 
 struct CompanySelectionView: View {
+    @EnvironmentObject var languageManager: LanguageManager
     @Binding var isPresented: Bool
     let onSelect: (Int) -> Void
 
     var body: some View {
         NavigationView {
             List(InsuranceRepository.shared.companies, id: \.id) { company in
-                NavigationLink(destination: ProductSelectionView(companyId: company.id, isPresented: $isPresented, onSelect: onSelect)) {
+                NavigationLink(destination: ProductSelectionView(companyId: company.id, isPresented: $isPresented, onSelect: onSelect).environmentObject(languageManager)) {
                     HStack {
                         if let logo = company.logoUrl {
                              // Placeholder for AsyncImage or similar if needed, using text for now
@@ -413,15 +415,14 @@ struct CompanySelectionView: View {
                                  .clipShape(Circle())
                         }
                         VStack(alignment: .leading) {
-                            Text(company.nameEn).font(.headline)
-                            Text(company.nameZh ?? "").font(.caption).foregroundColor(.secondary)
+                            Text(languageManager.isChinese ? (company.nameZh ?? company.nameEn) : company.nameEn).font(.headline)
                         }
                     }
                     .padding(.vertical, 4)
                 }
             }
-            .navigationTitle("Select Company")
-            .navigationBarItems(trailing: Button("Cancel") {
+            .navigationTitle(languageManager.isChinese ? "選擇保險公司" : "Select Company")
+            .navigationBarItems(trailing: Button(languageManager.isChinese ? "取消" : "Cancel") {
                 isPresented = false
             })
         }
@@ -429,6 +430,7 @@ struct CompanySelectionView: View {
 }
 
 struct ProductSelectionView: View {
+    @EnvironmentObject var languageManager: LanguageManager
     let companyId: Int
     @Binding var isPresented: Bool
     let onSelect: (Int) -> Void
@@ -444,12 +446,12 @@ struct ProductSelectionView: View {
                 isPresented = false
             }) {
                 VStack(alignment: .leading) {
-                    Text(product.nameEn).font(.headline).foregroundColor(.primary)
+                    Text(languageManager.isChinese ? (product.nameZh ?? product.nameEn) : product.nameEn).font(.headline).foregroundColor(.primary)
                     Text(product.description ?? "").font(.caption).foregroundColor(.secondary)
                 }
                 .padding(.vertical, 4)
             }
         }
-        .navigationTitle("Select Product")
+        .navigationTitle(languageManager.isChinese ? "選擇產品" : "Select Product")
     }
 }

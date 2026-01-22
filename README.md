@@ -1,40 +1,68 @@
 # PetWell - Pet Healthcare Management App
 
+## 📝 Update Log
+
+| Date | Location | Description |
+|------|----------|-------------|
+| 2026-01-22 | **System-wide** | Fully localized app to English & Traditional Chinese. Removed Simplified Chinese. |
+| 2026-01-22 | `PetWellApp.swift`<br>`RecordsView.swift`| Implemented `LanguageManager` and added Language Toggle in Profile. |
+| 2026-01-22 | `InsuranceService.swift`<br>`insurance_list_test.sql` | Corrected insurance product data (OneDegree, MSIG, Zurich, AIA) with verified real-world names and costs. |
+
 ## Project Overview
 PetWell is a comprehensive iOS application designed to help pet owners manage their furry friends' healthcare needs. The app integrates insurance comparison, medical records management, a shopping experience for health products, and a community blog for sharing pet stories.
 
+**✨ NEW: App is now fully localized in English and Traditional Chinese (繁體中文).**
+
 ## Status Report (Frontend)
 
-### 1. Blog (Home Tab)
-*   **Status:** ✅ Implemented (RedNote / Xiaohongshu Style)
+### 1. Blog (Home Tab) <mark> name pending modification</mark>
+*   **Status:** ✅ Implemented (RedNote / Xiaohongshu Style) | **✅ Localized**
 *   **Description:** The main entry point of the app. It features a masonry grid layout for browsing community posts.
 *   **Key Features:**
     *   **Feed:** "Explore" tab with staggered grid layout.
     *   **Create Post:** Custom "Add Post" sheet with title, content, image picker placeholder, and tag options (#Topic, @User, Poll, Location).
     *   **Styling:** Follows a modern social media aesthetic.
+    *   <mark>**New Feature:** consider adding the nearby facilities... </mark>
 
-### 2. Shop
-*   **Status:** 🚧 MVP Stub
+### 2. Shop <mark> added implementation</mark>
+*   **Status:** 🚧 MVP Stub | **✅ Localized**
 *   **Description:** Placeholder for the e-commerce section focus on pet health products.
+*   **Implementation:** Initial launch with dropshipping pattern for pet supplies (gear), expanding to pet food later. Food items will include ingredient details to match pet profiles for personalized recommendations.
+
+    ## Pet Gear Examples
+    | English | Traditional Chinese | Description |
+    |---------|-------------------|-------------|
+    | Leash | 狗帶 / 貓帶 | Durable nylon or leather for walking |
+    | Collar | 項圈 | Adjustable with tag slot |
+    | Carrier | 寵物籠 / 背包 | Airline certified for travel |
+    | Bowl | 食盆 | Stainless steel anti-tip design |
+    | Toys | 玩具 | Durable rubber balls or plush squeakers |
 
 ### 3. Medical
-*   **Status:** 🚧 MVP Stub
-*   **Description:** Placeholder for managing vaccinations, clinic visits, and booking appointments.
+*   **Status:** 🚧 MVP Stub | **✅ Localized**
+*   **Description:** The main function is about the medical consultation assistant. Placeholder for managing vaccinations, clinic visits, and booking appointments. <mark>consider the comet, this is the large language model but at the same time, it is the browser, consider using talk style to manage the booking, medical services... </mark>
 
 ### 4. Insurance
-*   **Status:** ⚠️ Basic UI Done (Needs Refinement)
+*   **Status:** ⚠️ Basic UI Done | **✅ Fully Localized**
 *   **Description:** A dedicated section to educate users on insurance value and compare plans.
 *   **Key Features:**
     *   **Landing View:** Displays "The Real Cost of Pet Parenthood" with lifetime cost estimates for dogs and cats. Highlights medical risks.
-    *   **Compare View:** Side-by-side comparison interface (e.g., comparing Bowtie vs OneDegree). Currently displays Annual Limits and coverage properties (Surgery, Hospitalization, etc.).
+    *   **Compare View:** Side-by-side comparison interface (e.g., comparing Bowtie vs OneDegree). Currently displays Annual Limits and coverage properties.
+    *   **Localization:** Product names, coverage details, and UI elements switch automatically between English and Traditional Chinese.
 
 ### 5. Profile (Formerly Records)
-*   **Status:** ✅ Basic Implementation
+*   **Status:** ✅ Basic Implementation | **✨ New Language Switcher**
 *   **Description:** User and pet profile management. Access to "Records" and other personal settings.
+*   **Key Features:**
+    *   **Language Settings:** Toggle between English (en) and Traditional Chinese (zh-HK).
 
 ---
 
 ## 📝 Roadmap & TODOs
+
+### Completed (Jan 2026)
+- [x] **Localization:** Implemented `LanguageManager` and translated all key views to Traditional Chinese. Removed Simplified Chinese.
+- [x] **Insurance Data:** Verified real market product names (OneDegree, MSIG, etc.).
 
 ### Immediate Priorities (Insurance Module)
 We are currently focusing on refining the Insurance features to ensure the comparison tool is accurate and user-friendly.

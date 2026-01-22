@@ -154,12 +154,12 @@ final class InsuranceService {
 
 		INSERT OR IGNORE INTO insurance_products (id, company_id, name_en, name_zh, description, target_segment, is_active, notes)
 		VALUES
-		  (1, 1, 'Pawfect Care', '完美呵护', 'Comprehensive pet insurance with no sub-limits', 'both', 1, 'OneDegree flagship product'),
-		  (2, 1, 'Pawfect Care (Entry)', '完美呵护 (入门)', 'Budget-friendly basic coverage', 'both', 1, 'Entry-level product for cost-conscious owners'),
-		  (3, 2, 'Ulti-mate Pet Insurance (Dog)', '毛价保 (狗)', 'Multi-tier coverage with annual limits', 'dog', 1, 'Popular MSIG dog insurance'),
-		  (4, 2, 'Ulti-mate Pet Insurance (Cat)', '毛价保 (猫)', 'Specialized cat coverage', 'cat', 1, 'MSIG cat-specific insurance'),
-		  (5, 3, 'AIA Pet Insurance', 'AIA 宠物保险', 'Bundled with health screening', 'both', 1, 'AIA partnership product'),
-		  (6, 4, 'Pamper U', '毛孩 宠爱', 'Comprehensive accident & illness coverage', 'both', 1, 'Zurich premium offering');
+		  (1, 1, 'Pawfect Care', '完美呵護', 'Comprehensive pet insurance with no sub-limits', 'both', 1, 'OneDegree flagship product'),
+		  (2, 1, 'Pawfect Care (Entry)', '完美呵護 (入門)', 'Budget-friendly basic coverage', 'both', 1, 'Entry-level product for cost-conscious owners'),
+		  (3, 2, 'Ulti-mate Pet Insurance (Dog)', '毛價保 (狗)', 'Multi-tier coverage with annual limits', 'dog', 1, 'Popular MSIG dog insurance'),
+		  (4, 2, 'Ulti-mate Pet Insurance (Cat)', '毛價保 (貓)', 'Specialized cat coverage', 'cat', 1, 'MSIG cat-specific insurance'),
+		  (5, 3, 'AIA Pet Insurance', 'AIA 寵物保險', 'Bundled with health screening', 'both', 1, 'AIA partnership product'),
+		  (6, 4, 'Pamper U', '毛孩 寵愛', 'Comprehensive accident & illness coverage', 'both', 1, 'Zurich premium offering');
 
 		INSERT OR IGNORE INTO product_coverage_profiles (product_id, typical_surgery_covered, chronic_illness_supported, coverage_vs_cost_notes, annual_limit_amount, has_sub_limits, no_sub_limit_marketing_tag, preexisting_excluded, typical_monthly_premium, reimbursement_percent, has_deductible, deductible_amount, copay_percent, online_claim_supported, claim_process_speed_note, brand_reputation_summary, key_pros, key_cons)
 		VALUES

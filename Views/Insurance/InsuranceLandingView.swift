@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct InsuranceLandingView: View {
+	@EnvironmentObject var languageManager: LanguageManager
 	@State private var showCompareView = false
 
 	var body: some View {
@@ -16,11 +17,11 @@ struct InsuranceLandingView: View {
 				VStack(alignment: .leading, spacing: 24) {
 					// Hero Section
 					VStack(alignment: .leading, spacing: 12) {
-						Text("Pet Insurance")
+						Text(languageManager.isChinese ? "寵物保險" : "Pet Insurance")
 							.font(.system(.title, design: .default).weight(.bold))
 							.foregroundStyle(.primary)
 
-						Text("Protect Your Furry Friend's Health")
+						Text(languageManager.isChinese ? "守護毛孩健康" : "Protect Your Furry Friend's Health")
 							.font(.system(.headline, design: .default))
 							.foregroundStyle(.secondary)
 					}
@@ -33,35 +34,35 @@ struct InsuranceLandingView: View {
 
 					// Why Insurance Section
 					VStack(alignment: .leading, spacing: 16) {
-						Text("Why Pet Insurance?")
+						Text(languageManager.isChinese ? "為什麼需要寵物保險？" : "Why Pet Insurance?")
 							.font(.system(.headline, design: .default).weight(.semibold))
 							.foregroundStyle(.primary)
 							.padding(.horizontal, 16)
 
 						// 1. Cost of Raising a Pet Section
 						VStack(alignment: .leading, spacing: 12) {
-							Text("The Real Cost of Pet Parenthood")
+							Text(languageManager.isChinese ? "養寵物的真實成本" : "The Real Cost of Pet Parenthood")
 								.font(.subheadline)
 								.fontWeight(.bold)
 								.foregroundColor(.secondary)
 							
 							HStack(spacing: 16) {
-								costCard(petType: "Dog", lifetimeCost: "$650k+", monthlyAvg: "~$20k/yr")
-								costCard(petType: "Cat", lifetimeCost: "$500k+", monthlyAvg: "~$12.5k/yr")
+								costCard(petType: languageManager.isChinese ? "狗" : "Dog", lifetimeCost: "$650k+", monthlyAvg: "~$20k/yr")
+								costCard(petType: languageManager.isChinese ? "貓" : "Cat", lifetimeCost: "$500k+", monthlyAvg: "~$12.5k/yr")
 							}
 							
 							VStack(alignment: .leading, spacing: 8) {
 								HStack(alignment: .top) {
 									Image(systemName: "exclamationmark.triangle.fill")
 										.foregroundColor(.orange)
-									Text("Unexpected surgeries can cost HKD 30,000 - 100,000+")
+									Text(languageManager.isChinese ? "意外手術費可達 HKD 30,000 - 100,000+" : "Unexpected surgeries can cost HKD 30,000 - 100,000+")
 										.font(.caption)
 										.fontWeight(.medium)
 								}
 								HStack(alignment: .top) {
 									Image(systemName: "chart.line.uptrend.xyaxis")
 										.foregroundColor(.blue)
-									Text("Medical inflation is rising every year.")
+									Text(languageManager.isChinese ? "醫療通脹逐年上升" : "Medical inflation is rising every year.")
 										.font(.caption)
 										.fontWeight(.medium)
 								}
@@ -84,26 +85,26 @@ struct InsuranceLandingView: View {
 						VStack(alignment: .leading, spacing: 12) {
 							benefitCard(
 								icon: "heart.fill",
-								title: "Unexpected Medical Costs",
-								description: "Veterinary care can be expensive. Insurance helps you afford the best treatment for your pet without financial stress."
+								title: languageManager.isChinese ? "意外醫療費用" : "Unexpected Medical Costs",
+								description: languageManager.isChinese ? "獸醫費用高昂，保險助您減輕負擔，給予寵物最佳治療。" : "Veterinary care can be expensive. Insurance helps you afford the best treatment for your pet without financial stress."
 							)
 
 							benefitCard(
 								icon: "bolt.fill",
-								title: "Peace of Mind",
-								description: "Focus on your pet's recovery, not the cost. Insurance gives you confidence to make the best healthcare decisions."
+								title: languageManager.isChinese ? "安心無憂" : "Peace of Mind",
+								description: languageManager.isChinese ? "專注寵物康復，無需擔憂費用。保險給您信心做最佳醫療決策。" : "Focus on your pet's recovery, not the cost. Insurance gives you confidence to make the best healthcare decisions."
 							)
 
 							benefitCard(
 								icon: "checkmark.circle.fill",
-								title: "Comprehensive Coverage",
-								description: "From accidents and illnesses to surgeries and specialist visits, we've got your pet covered."
+								title: languageManager.isChinese ? "全面保障" : "Comprehensive Coverage",
+								description: languageManager.isChinese ? "從意外受傷到疾病手術，我們為您的寵物提供全面保障。" : "From accidents and illnesses to surgeries and specialist visits, we've got your pet covered."
 							)
 
 							benefitCard(
 								icon: "heart.text.square.fill",
-								title: "Early Protection",
-								description: "Insure your pet while young to avoid pre-existing condition exclusions and get better rates."
+								title: languageManager.isChinese ? "及早投保" : "Early Protection",
+								description: languageManager.isChinese ? "趁年輕投保，避免既有病症不保，並享受更優惠保費。" : "Insure your pet while young to avoid pre-existing condition exclusions and get better rates."
 							)
 						}
 						.padding(.horizontal, 16)
@@ -112,23 +113,23 @@ struct InsuranceLandingView: View {
 
 					// Plans Overview
 					VStack(alignment: .leading, spacing: 16) {
-						Text("Our Plans")
+						Text(languageManager.isChinese ? "精選計劃" : "Our Plans")
 							.font(.system(.headline, design: .default).weight(.semibold))
 							.foregroundStyle(.primary)
 							.padding(.horizontal, 16)
 
 						HStack(spacing: 12) {
 							planOverviewCard(
-								name: "Essential",
+								name: languageManager.isChinese ? "基本計劃" : "Essential",
 								price: "HKD 196/mo",
-								highlight: "Basic coverage",
+								highlight: languageManager.isChinese ? "基本保障" : "Basic coverage",
 								color: .gray
 							)
 
 							planOverviewCard(
-								name: "Plus",
+								name: languageManager.isChinese ? "升級計劃" : "Plus",
 								price: "HKD 270/mo",
-								highlight: "Maximum coverage",
+								highlight: languageManager.isChinese ? "最高保障" : "Maximum coverage",
 								color: .blue
 							)
 						}
@@ -139,7 +140,7 @@ struct InsuranceLandingView: View {
 					// CTA Button
 					NavigationLink(destination: InsuranceCompareView()) {
 						HStack {
-							Text("Compare Plans")
+							Text(languageManager.isChinese ? "比較計劃" : "Compare Plans")
 								.font(.system(.body, design: .default).weight(.semibold))
 								.foregroundStyle(.white)
 

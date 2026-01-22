@@ -122,24 +122,24 @@ VALUES
 -- Insert products for OneDegree
 INSERT OR IGNORE INTO insurance_products (id, company_id, name_en, name_zh, description, target_segment, is_active, notes)
 VALUES
-  (1, 1, 'Pawfect Care', '完美呵护', 'Comprehensive pet insurance with no sub-limits', 'both', 1, 'OneDegree flagship product'),
-  (2, 1, 'Pawfect Care (Entry)', '完美呵护 (入门)', 'Budget-friendly basic coverage', 'both', 1, 'Entry-level product for cost-conscious owners');
+  (1, 1, 'Pawfect Care', '完美呵護', 'Comprehensive pet insurance with no sub-limits', 'both', 1, 'OneDegree flagship product'),
+  (2, 1, 'Pawfect Care (Entry)', '完美呵護 (入門)', 'Budget-friendly basic coverage', 'both', 1, 'Entry-level product for cost-conscious owners');
 
 -- Insert products for MSIG
 INSERT OR IGNORE INTO insurance_products (id, company_id, name_en, name_zh, description, target_segment, is_active, notes)
 VALUES
-  (3, 2, 'Ulti-mate Pet Insurance (Dog)', '毛价保 (狗)', 'Multi-tier coverage with annual limits', 'dog', 1, 'Popular MSIG dog insurance'),
-  (4, 2, 'Ulti-mate Pet Insurance (Cat)', '毛价保 (猫)', 'Specialized cat coverage', 'cat', 1, 'MSIG cat-specific insurance');
+  (3, 2, 'Ulti-mate Pet Insurance (Dog)', '毛價保 (狗)', 'Multi-tier coverage with annual limits', 'dog', 1, 'Popular MSIG dog insurance'),
+  (4, 2, 'Ulti-mate Pet Insurance (Cat)', '毛價保 (貓)', 'Specialized cat coverage', 'cat', 1, 'MSIG cat-specific insurance');
 
 -- Insert products for AIA
 INSERT OR IGNORE INTO insurance_products (id, company_id, name_en, name_zh, description, target_segment, is_active, notes)
 VALUES
-  (5, 3, 'AIA Pet Insurance', 'AIA 宠物保险', 'Bundled with health screening', 'both', 1, 'AIA partnership product');
+  (5, 3, 'AIA Pet Insurance', 'AIA 寵物保險', 'Bundled with health screening', 'both', 1, 'AIA partnership product');
 
 -- Insert products for Zurich
 INSERT OR IGNORE INTO insurance_products (id, company_id, name_en, name_zh, description, target_segment, is_active, notes)
 VALUES
-  (6, 4, 'Pamper U', '毛孩 宠爱', 'Comprehensive accident & illness coverage', 'both', 1, 'Zurich premium offering');
+  (6, 4, 'Pamper U', '毛孩 寵愛', 'Comprehensive accident & illness coverage', 'both', 1, 'Zurich premium offering');
 
 -- ============================================================================
 -- SAMPLE DATA: Product Coverage Profiles
@@ -299,7 +299,7 @@ INSERT OR IGNORE INTO product_coverage_profiles (
 -- SAMPLE DATA: Plan Levels (for products that offer multiple tiers)
 -- ============================================================================
 
--- OneDegree - Pawfect Care plan levels
+-- Onedegree - Pawfect Care plan levels
 INSERT OR IGNORE INTO insurance_plans (
   product_id, name, annual_limit_amount, reimbursement_percent,
   has_sub_limits, sub_limit_structure, typical_monthly_premium, notes
@@ -308,7 +308,7 @@ INSERT OR IGNORE INTO insurance_plans (
   (1, 'Plus', 100000, 85, 0, NULL, 270, 'Higher annual limit; better for older/higher-risk pets'),
   (1, 'Premium', 150000, 90, 0, NULL, 380, 'Maximum coverage; best for comprehensive protection');
 
--- MSIG - Pet Care Plus plan levels
+-- MSIG - Ulti-mate Pet Insurance plan levels
 INSERT OR IGNORE INTO insurance_plans (
   product_id, name, annual_limit_amount, reimbursement_percent,
   has_sub_limits, sub_limit_structure, typical_monthly_premium, notes
@@ -317,7 +317,7 @@ INSERT OR IGNORE INTO insurance_plans (
   (3, 'Standard', 80000, 75, 1, 'Per-incident: HKD 12,000; Hospitalization: HKD 25,000', 178, 'Mid-tier most popular'),
   (3, 'Premium', 120000, 85, 0, NULL, 250, 'No sub-limits; comprehensive');
 
--- Zurich - PetShield plan levels
+-- Zurich - Pamper U plan levels
 INSERT OR IGNORE INTO insurance_plans (
   product_id, name, annual_limit_amount, reimbursement_percent,
   has_sub_limits, sub_limit_structure, typical_monthly_premium, notes

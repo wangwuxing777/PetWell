@@ -15,6 +15,7 @@ import UIKit
 
 struct RecordsView: View {
 
+    @EnvironmentObject var languageManager: LanguageManager
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \PetModel.name) private var pets: [PetModel]
 
@@ -40,14 +41,28 @@ struct RecordsView: View {
                             .foregroundStyle(.secondary)
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Profile")
+                            Text(languageManager.isChinese ? "個人檔案" : "Profile")
                                 .font(.title2).bold()
-                            Text("Manage your pets and health records")
+                            Text(languageManager.isChinese ? "管理您的寵物和健康記錄" : "Manage your pets and health records")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
 
                         Spacer()
+                        
+                        Menu {
+                            Picker("Language", selection: $languageManager.currentLanguage) {
+                                ForEach(AppLanguage.allCases) { language in
+                                    Text(language.displayName).tag(language)
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "globe")
+                                .font(.system(size: 20))
+                                .padding(8)
+                                .background(Color.secondary.opacity(0.1))
+                                .clipShape(Circle())
+                        }
 
                         Button {
                             showAddPet = true
