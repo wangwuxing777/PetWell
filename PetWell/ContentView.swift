@@ -26,7 +26,7 @@ struct ContentView: View {
                         .tabItem { Label(languageManager.isChinese ? "商店" : "Shop", systemImage: "bag") }
                         .tag(Tab.shop)
 
-                    ClinicView()
+                    VaccineView()
                         .tabItem { Label(languageManager.isChinese ? "醫療" : "Medical", systemImage: "cross.case") }
                         .tag(Tab.medical)
 
