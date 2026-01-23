@@ -4,6 +4,8 @@
 
 | Date | Location | Description |
 |------|----------|-------------|
+| 2026-01-23 | `InsuranceLandingView.swift` | Implemented sticky mini header with scroll-away animation. Added frosted glass effect and "For Me" recommendation button placeholder. |
+| 2026-01-23 | `PetDetailView.swift`<br>`Views/Social/` | Added Share Pet Profile feature with time-limited access. Created `SocialSearchView.swift` for future friend/places search. |
 | 2026-01-22 | **System-wide** | Fully localized app to English & Traditional Chinese. Removed Simplified Chinese. |
 | 2026-01-22 | `PetWellApp.swift`<br>`RecordsView.swift`| Implemented `LanguageManager` and added Language Toggle in Profile. |
 | 2026-01-22 | `InsuranceService.swift`<br>`insurance_list_test.sql` | Corrected insurance product data (OneDegree, MSIG, Zurich, AIA) with verified real-world names and costs. |
@@ -47,6 +49,7 @@ PetWell is a comprehensive iOS application designed to help pet owners manage th
 *   **Description:** A dedicated section to educate users on insurance value and compare plans.
 *   **Key Features:**
     *   **Landing View:** Displays "The Real Cost of Pet Parenthood" with lifetime cost estimates for dogs and cats. Highlights medical risks.
+    *   **Sticky Mini Header:** Scroll-away hero header with Apple-style frosted glass mini header that appears when scrolling. Includes "For Me" recommendation button (placeholder for AI-powered insurance matching).
     *   **Compare View:** Side-by-side comparison interface (e.g., comparing Bowtie vs OneDegree). Currently displays Annual Limits and coverage properties.
     *   **Localization:** Product names, coverage details, and UI elements switch automatically between English and Traditional Chinese.
 
@@ -55,10 +58,22 @@ PetWell is a comprehensive iOS application designed to help pet owners manage th
 *   **Description:** User and pet profile management. Access to "Records" and other personal settings.
 *   **Key Features:**
     *   **Language Settings:** Toggle between English (en) and Traditional Chinese (zh-HK).
+    *   **Share Pet Profile:** Share button in toolbar allows time-limited profile sharing with friends.
 
 ---
 
-### 6. Logs
+### 7. Social Features (Planned)
+
+*   **Status:** 🔮 Future Development
+*   **Description:** Social networking features for pet owners.
+*   **Planned Features:**
+    *   **Find Friends & Places:** Search functionality for friends, pet shops, and veterinary clinics. *(UI designed in `SocialSearchView.swift`, not yet integrated into main navigation)*
+    *   **Friend System:** Add friends, manage friend list, share pet profiles.
+    *   **Location-based Discovery:** Find nearby pet services and connect with local pet owners.
+
+---
+
+### 8. Logs
 
 #### 2026-01-21 - Medical Module & Backend Integration
 *   **Backend Architecture**:

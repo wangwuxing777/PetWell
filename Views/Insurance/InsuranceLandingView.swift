@@ -3,35 +3,162 @@
 //  PetWell
 //
 //  Created by Yu Fang on 2026/1/12.
+//  Updated with scroll-away header + sticky mini header.
 //
 
 import SwiftUI
 
+// MARK: - Scroll Offset Preference Key
+private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 struct InsuranceLandingView: View {
-	@EnvironmentObject var languageManager: LanguageManager
-	@State private var showCompareView = false
+    @EnvironmentObject var languageManager: LanguageManager
+    @State private var scrollOffset: CGFloat = 0
+    
+    // MARK: - Header Configuration
+    private let fullHeaderHeight: CGFloat = 280
+    private var miniHeaderHeight: CGFloat { fullHeaderHeight * 2 / 5 } // ≈ 112px
+    
+    // Show mini header when full header scrolls out of view
+    private var showMiniHeader: Bool {
+        scrollOffset > fullHeaderHeight
+    }
 
-	var body: some View {
-		NavigationStack {
-			ScrollView {
-				VStack(alignment: .leading, spacing: 24) {
-					// Hero Section
-					VStack(alignment: .leading, spacing: 12) {
-						Text(languageManager.isChinese ? "寵物保險" : "Pet Insurance")
-							.font(.system(.title, design: .default).weight(.bold))
-							.foregroundStyle(.primary)
-
-						Text(languageManager.isChinese ? "守護毛孩健康" : "Protect Your Furry Friend's Health")
-							.font(.system(.headline, design: .default))
-							.foregroundStyle(.secondary)
-					}
-					.frame(maxWidth: .infinity, alignment: .leading)
-					.padding(16)
-					.background(Color.blue.opacity(0.1))
-					.cornerRadius(12)
-					.padding(.horizontal, 16)
-					.padding(.top, 16)
-
+    var body: some View {
+        NavigationStack {
+            ZStack(alignment: .top) {
+                Color(.systemBackground)
+                    .ignoresSafeArea()
+                
+                // Main scrollable content (header scrolls with content)
+                ScrollView(.vertical, showsIndicators: true) {
+                    VStack(spacing: 0) {
+                        // Full Header (scrolls with content)
+                        fullHeader
+                        
+                        // Main content
+                        mainContent
+                            .background(Color(.systemBackground))
+                    }
+                    .overlay(alignment: .top) {
+                        GeometryReader { geo in
+                            Color.clear
+                                .preference(
+                                    key: ScrollOffsetPreferenceKey.self,
+                                    value: -geo.frame(in: .named("scroll")).origin.y
+                                )
+                        }
+                    }
+                }
+                .coordinateSpace(name: "scroll")
+                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                    scrollOffset = value
+                }
+                
+                // Mini Header (appears and sticks at top when full header scrolls out)
+                if showMiniHeader {
+                    miniHeader
+                        .transition(.asymmetric(
+                            insertion: .move(edge: .top).combined(with: .opacity),
+                            removal: .move(edge: .top).combined(with: .opacity)
+                        ))
+                        .zIndex(100)
+                }
+            }
+            .animation(.easeInOut(duration: 0.25), value: showMiniHeader)
+            .ignoresSafeArea(edges: .top)
+            .navigationBarHidden(true)
+        }
+    }
+    
+    // MARK: - Full Header (Scrolls with content)
+    private var fullHeader: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .bottomLeading) {
+                // Hero Image
+                Image("InsuranceHero")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geometry.size.width, height: fullHeaderHeight)
+                    .clipped()
+                
+                // Dark gradient overlay for text readability
+                LinearGradient(
+                    colors: [
+                        Color.black.opacity(0.0),
+                        Color.black.opacity(0.3),
+                        Color.black.opacity(0.6)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                
+                // Title and subtitle
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(languageManager.isChinese ? "寵物保險" : "Pet Insurance")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.4), radius: 2, x: 0, y: 1)
+                    
+                    Text(languageManager.isChinese ? "為毛孩的健康保障第一步" : "The first step to protect your pet's health")
+                        .font(.system(size: 16))
+                        .foregroundStyle(.white.opacity(0.9))
+                        .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+            }
+        }
+        .frame(height: fullHeaderHeight)
+    }
+    
+    // MARK: - Mini Header (Sticks at top when scrolled past full header)
+    private var miniHeader: some View {
+        HStack {
+            // Title (left side)
+            Text(languageManager.isChinese ? "寵物保險" : "Pet Insurance")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(.primary)
+            
+            Spacer()
+            
+            // Recommend button (right side) - placeholder for future recommendation feature
+            Button(action: {
+                // TODO: 跳转到宠物保险推荐页面
+            }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 14, weight: .semibold))
+                    Text(languageManager.isChinese ? "為我推薦" : "For Me")
+                        .font(.system(size: 14, weight: .semibold))
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(Color.blue)
+                .cornerRadius(18)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 54) // Safe area top
+        .padding(.bottom, 12)
+        .frame(maxWidth: .infinity)
+        .background(
+            // Apple-style frosted glass effect
+            Color(.systemGray6)
+                .opacity(0.85)
+        )
+        .background(.ultraThinMaterial) // Additional blur/glass effect
+    }
+    
+    // MARK: - Main Content
+    private var mainContent: some View {
+        VStack(alignment: .leading, spacing: 24) {
 					// Why Insurance Section
 					VStack(alignment: .leading, spacing: 16) {
 						Text(languageManager.isChinese ? "為什麼需要寵物保險？" : "Why Pet Insurance?")
@@ -155,10 +282,7 @@ struct InsuranceLandingView: View {
 					.padding(.horizontal, 16)
 					.padding(.bottom, 32)
 				}
-			}
-			.navigationTitle("Insurance")
-			.navigationBarTitleDisplayMode(.inline)
-		}
+                .padding(.top, 16)
 	}
 
 	@ViewBuilder
@@ -236,4 +360,5 @@ struct InsuranceLandingView: View {
 
 #Preview {
 	InsuranceLandingView()
+		.environmentObject(LanguageManager())
 }
