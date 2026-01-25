@@ -407,7 +407,7 @@ struct CompanySelectionView: View {
             List(InsuranceRepository.shared.companies, id: \.id) { company in
                 NavigationLink(destination: ProductSelectionView(companyId: company.id, isPresented: $isPresented, onSelect: onSelect).environmentObject(languageManager)) {
                     HStack {
-                        if let logo = company.logoUrl {
+                        if company.logoUrl != nil {
                              // Placeholder for AsyncImage or similar if needed, using text for now
                              Text(String(company.nameEn.prefix(1)))
                                  .frame(width: 30, height: 30)

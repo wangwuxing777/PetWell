@@ -115,7 +115,7 @@ init(config: Config, session: URLSession = .shared) {
     /// Extract structured medical slots from free text (NO diagnosis, NO advice)
     func extractSlots(from text: String) async throws -> SlotExtractionResult {
         switch config.endpoint {
-        case .backend(let url):
+        case .backend:
             throw AIServiceError.invalidResponse // backend extraction not implemented yet
         case .openAI(let apiKey):
             return try await callOpenAIExtract(apiKey: apiKey, text: text)

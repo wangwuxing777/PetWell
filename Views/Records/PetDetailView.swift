@@ -14,6 +14,7 @@ struct PetDetailView: View {
     @Bindable var pet: PetModel
 
     @State private var showEdit = false
+    @State private var showShareSheet = false
 
     var body: some View {
         ScrollView {
@@ -89,13 +90,24 @@ struct PetDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Edit") {
-                    showEdit = true
+                HStack(spacing: 12) {
+                    Button {
+                        showShareSheet = true
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    
+                    Button("Edit") {
+                        showEdit = true
+                    }
                 }
             }
         }
         .navigationDestination(isPresented: $showEdit) {
             AddPetView(petToEdit: pet)
+        }
+        .sheet(isPresented: $showShareSheet) {
+            SharePetProfileView(petName: pet.name)
         }
     }
 

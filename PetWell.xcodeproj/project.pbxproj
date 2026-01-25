@@ -29,6 +29,8 @@
 		5254A2072F14D0AA002C6BFB /* InsuranceCompareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A2062F14D0A1002C6BFB /* InsuranceCompareView.swift */; };
 		5254A2082F14D0AA002C6BFB /* InsuranceLandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A2092F14D0AA002C6BFB /* InsuranceLandingView.swift */; };
 		5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */; };
+		20SOCIAL012F42B000004CAA54 /* SharePetProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */; };
+		20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,6 +59,8 @@
 		5254A2062F14D0A1002C6BFB /* InsuranceCompareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceCompareView.swift; sourceTree = "<group>"; };
 		5254A2092F14D0AA002C6BFB /* InsuranceLandingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceLandingView.swift; sourceTree = "<group>"; };
 		5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceService.swift; sourceTree = "<group>"; };
+		20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePetProfileView.swift; sourceTree = "<group>"; };
+		20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialSearchView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,8 +150,18 @@
 				5254A2052F14D091002C6BFB /* Insurance */,
 				2066065B2EFBE5FE004CAA54 /* Guardian */,
 				2066065A2EFBE5ED004CAA54 /* Records */,
+				20SOCIAL052F42B000004CAA54 /* Social */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		20SOCIAL052F42B000004CAA54 /* Social */ = {
+			isa = PBXGroup;
+			children = (
+				20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */,
+				20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */,
+			);
+			path = Social;
 			sourceTree = "<group>";
 		};
 		2066065A2EFBE5ED004CAA54 /* Records */ = {
@@ -298,6 +312,8 @@
 				2066066A2EFBEF8C004CAA54 /* GuardianChatView.swift in Sources */,
 				206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */,
 				200650282F20B1F1004900F1 /* VaccineService.swift in Sources */,
+				20SOCIAL012F42B000004CAA54 /* SharePetProfileView.swift in Sources */,
+				20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

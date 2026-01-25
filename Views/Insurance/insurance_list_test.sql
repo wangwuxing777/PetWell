@@ -1,3 +1,6 @@
+-- need to modify the file based on the finalized excel file.
+
+
 -- ============================================================================
 -- PetWell Insurance Database Schema
 -- For: Pet insurance comparison & coverage analysis (HK market)

@@ -1,0 +1,2 @@
+- [ ] search for the indurance, and summarize info to the excel file in data to finalize the insurance compare page
+- [ ] search the info about the importance of the pet insurance, and work on the ui design. make it clear and attractive
