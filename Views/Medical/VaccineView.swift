@@ -73,8 +73,13 @@ struct VaccineView: View {
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 16) {
-                                        ServiceCard(title: "24h Medical", subtitle: "Support", imageName: "cross.case.fill", color: .red)
-                                        ServiceCard(title: "Health Check", subtitle: "Regular", imageName: "stethoscope", color: .blue)
+                                        NavigationLink(destination: EmergencyClinicsView()) {
+                                            ServiceCard(title: "24h Medical", subtitle: "Support", imageName: "cross.case.fill", color: .red)
+
+                                        }
+                                        NavigationLink(destination: HealthCheckView()) {
+                                            ServiceCard(title: "Health Check", subtitle: "Regular", imageName: "stethoscope", color: .blue)
+                                        }
                                         ServiceCard(title: "Deworming", subtitle: "Treatment", imageName: "pills.fill", color: .green)
                                     }
                                     .padding(.horizontal)

@@ -128,16 +128,15 @@ struct VaccineDetailView: View {
                     }
                     
                     // Button (Scrollable)
-                    Button(action: {
-                        // Action for booking
-                    }) {
+                    NavigationLink(destination: ClinicSelectionView(vaccine: vaccine)) {
                         Text("Book Appointment")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(Color.blue)
+                            .foregroundColor(Color.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(Color.blue.opacity(0.1))
+                            .background(Color.blue)
                             .cornerRadius(18)
+                            .shadow(color: Color.blue.opacity(0.3), radius: 10, x: 0, y: 5)
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 40)
