@@ -23,6 +23,14 @@
 		2066066D2EFBEF9F004CAA54 /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206606602EFBE6AD004CAA54 /* AIService.swift */; };
 		206606702EFE6F67004CAA54 /* ConsultationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2066066F2EFE5F68004CAA54 /* ConsultationEngine.swift */; };
 		206606722F03CE4C004CAA54 /* ChatHistoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206606712F03CE37004CAA54 /* ChatHistoryModels.swift */; };
+		2075191C2F251CB900B1FD1A /* clinics.csv in Resources */ = {isa = PBXBuildFile; fileRef = 2075191B2F251CB900B1FD1A /* clinics.csv */; };
+		2075191E2F251CD000B1FD1A /* Clinic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2075191D2F251CD000B1FD1A /* Clinic.swift */; };
+		207519202F251CEA00B1FD1A /* ClinicService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2075191F2F251CEA00B1FD1A /* ClinicService.swift */; };
+		207519222F251CFD00B1FD1A /* EmergencyClinicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519212F251CFD00B1FD1A /* EmergencyClinicsView.swift */; };
+		207519242F2520B400B1FD1A /* ClinicDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519232F2520B400B1FD1A /* ClinicDetailView.swift */; };
+		207519262F25232400B1FD1A /* HealthCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519252F25232400B1FD1A /* HealthCheckView.swift */; };
+		207519282F2524A800B1FD1A /* VaccineBookingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519272F2524A800B1FD1A /* VaccineBookingView.swift */; };
+		2075192A2F25289700B1FD1A /* ClinicSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519292F25289700B1FD1A /* ClinicSelectionView.swift */; };
 		20833D5A2F20B39A00D59583 /* VaccineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20833D592F20B39A00D59583 /* VaccineDetailView.swift */; };
 		20CCB5FF2F0418F300CE57E7 /* AddPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */; };
 		20CCB6012F04190E00CE57E7 /* PetDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB6002F04190A00CE57E7 /* PetDetailView.swift */; };
@@ -53,6 +61,14 @@
 		206606652EFBEBB5004CAA54 /* PetWellApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetWellApp.swift; sourceTree = "<group>"; };
 		2066066F2EFE5F68004CAA54 /* ConsultationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsultationEngine.swift; sourceTree = "<group>"; };
 		206606712F03CE37004CAA54 /* ChatHistoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryModels.swift; sourceTree = "<group>"; };
+		2075191B2F251CB900B1FD1A /* clinics.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = clinics.csv; sourceTree = "<group>"; };
+		2075191D2F251CD000B1FD1A /* Clinic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clinic.swift; sourceTree = "<group>"; };
+		2075191F2F251CEA00B1FD1A /* ClinicService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicService.swift; sourceTree = "<group>"; };
+		207519212F251CFD00B1FD1A /* EmergencyClinicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmergencyClinicsView.swift; sourceTree = "<group>"; };
+		207519232F2520B400B1FD1A /* ClinicDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicDetailView.swift; sourceTree = "<group>"; };
+		207519252F25232400B1FD1A /* HealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCheckView.swift; sourceTree = "<group>"; };
+		207519272F2524A800B1FD1A /* VaccineBookingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineBookingView.swift; sourceTree = "<group>"; };
+		207519292F25289700B1FD1A /* ClinicSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicSelectionView.swift; sourceTree = "<group>"; };
 		20833D592F20B39A00D59583 /* VaccineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineDetailView.swift; sourceTree = "<group>"; };
 		20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPetView.swift; sourceTree = "<group>"; };
 		20CCB6002F04190A00CE57E7 /* PetDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDetailView.swift; sourceTree = "<group>"; };
@@ -95,6 +111,11 @@
 		2006501C2F20B102004900F1 /* Medical */ = {
 			isa = PBXGroup;
 			children = (
+				207519292F25289700B1FD1A /* ClinicSelectionView.swift */,
+				207519272F2524A800B1FD1A /* VaccineBookingView.swift */,
+				207519252F25232400B1FD1A /* HealthCheckView.swift */,
+				207519232F2520B400B1FD1A /* ClinicDetailView.swift */,
+				207519212F251CFD00B1FD1A /* EmergencyClinicsView.swift */,
 				20833D592F20B39A00D59583 /* VaccineDetailView.swift */,
 				2006501B2F20B102004900F1 /* VaccineView.swift */,
 			);
@@ -104,6 +125,7 @@
 		200650242F20B144004900F1 /* Backend */ = {
 			isa = PBXGroup;
 			children = (
+				2075191B2F251CB900B1FD1A /* clinics.csv */,
 				200650222F20B144004900F1 /* server.py */,
 				200650232F20B144004900F1 /* vaccines.json */,
 			);
@@ -134,6 +156,7 @@
 		206606582EFBE5CB004CAA54 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				2075191D2F251CD000B1FD1A /* Clinic.swift */,
 				200650252F20B195004900F1 /* Vaccine.swift */,
 				206606712F03CE37004CAA54 /* ChatHistoryModels.swift */,
 				2066065D2EFBE648004CAA54 /* PetModels.swift */,
@@ -185,6 +208,7 @@
 		2066065C2EFBE621004CAA54 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				2075191F2F251CEA00B1FD1A /* ClinicService.swift */,
 				200650272F20B1F1004900F1 /* VaccineService.swift */,
 				206606602EFBE6AD004CAA54 /* AIService.swift */,
 				5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */,
@@ -281,6 +305,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				206606692EFBEBB5004CAA54 /* Assets.xcassets in Resources */,
+				2075191C2F251CB900B1FD1A /* clinics.csv in Resources */,
 				2006501D2F20B102004900F1 /* insurance_list_test.sql in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -299,16 +324,23 @@
 				206606722F03CE4C004CAA54 /* ChatHistoryModels.swift in Sources */,
 				2006501E2F20B102004900F1 /* VaccineView.swift in Sources */,
 				2006501F2F20B102004900F1 /* InsuranceCompareView.swift in Sources */,
+				2075192A2F25289700B1FD1A /* ClinicSelectionView.swift in Sources */,
 				200650202F20B102004900F1 /* BlogView.swift in Sources */,
 				200650212F20B102004900F1 /* InsuranceLandingView.swift in Sources */,
+				207519242F2520B400B1FD1A /* ClinicDetailView.swift in Sources */,
 				2066066D2EFBEF9F004CAA54 /* AIService.swift in Sources */,
 				200650262F20B195004900F1 /* Vaccine.swift in Sources */,
 				20CCB5FF2F0418F300CE57E7 /* AddPetView.swift in Sources */,
 				206606672EFBEBB5004CAA54 /* ContentView.swift in Sources */,
+				207519202F251CEA00B1FD1A /* ClinicService.swift in Sources */,
 				2066066B2EFBEF92004CAA54 /* RecordsView.swift in Sources */,
 				5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */,
+				207519222F251CFD00B1FD1A /* EmergencyClinicsView.swift in Sources */,
+				2075191E2F251CD000B1FD1A /* Clinic.swift in Sources */,
 				5254A2082F14D0AA002C6BFB /* InsuranceLandingView.swift in Sources */,
+				207519262F25232400B1FD1A /* HealthCheckView.swift in Sources */,
 				5254A2072F14D0AA002C6BFB /* InsuranceCompareView.swift in Sources */,
+				207519282F2524A800B1FD1A /* VaccineBookingView.swift in Sources */,
 				2066066A2EFBEF8C004CAA54 /* GuardianChatView.swift in Sources */,
 				206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */,
 				200650282F20B1F1004900F1 /* VaccineService.swift in Sources */,
