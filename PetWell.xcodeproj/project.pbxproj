@@ -10,6 +10,7 @@
 		2006501D2F20B102004900F1 /* insurance_list_test.sql in Resources */ = {isa = PBXBuildFile; fileRef = 200650172F20B102004900F1 /* insurance_list_test.sql */; };
 		2006501E2F20B102004900F1 /* VaccineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2006501B2F20B102004900F1 /* VaccineView.swift */; };
 		2006501F2F20B102004900F1 /* InsuranceCompareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650182F20B102004900F1 /* InsuranceCompareView.swift */; };
+		206606402EFBB4B2004CAA54 /* BlogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2066063F2EFBB4B2004CAA54 /* BlogService.swift */; };
 		200650202F20B102004900F1 /* BlogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650152F20B102004900F1 /* BlogView.swift */; };
 		200650212F20B102004900F1 /* InsuranceLandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650192F20B102004900F1 /* InsuranceLandingView.swift */; };
 		200650262F20B195004900F1 /* Vaccine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650252F20B195004900F1 /* Vaccine.swift */; };
@@ -34,14 +35,14 @@
 		20833D5A2F20B39A00D59583 /* VaccineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20833D592F20B39A00D59583 /* VaccineDetailView.swift */; };
 		20CCB5FF2F0418F300CE57E7 /* AddPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */; };
 		20CCB6012F04190E00CE57E7 /* PetDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB6002F04190A00CE57E7 /* PetDetailView.swift */; };
-		5254A2072F14D0AA002C6BFB /* InsuranceCompareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A2062F14D0A1002C6BFB /* InsuranceCompareView.swift */; };
-		5254A2082F14D0AA002C6BFB /* InsuranceLandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A2092F14D0AA002C6BFB /* InsuranceLandingView.swift */; };
+
 		5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */; };
 		20SOCIAL012F42B000004CAA54 /* SharePetProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */; };
 		20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2066063F2EFBB4B2004CAA54 /* BlogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogService.swift; sourceTree = "<group>"; };
 		200650152F20B102004900F1 /* BlogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogView.swift; sourceTree = "<group>"; };
 		200650172F20B102004900F1 /* insurance_list_test.sql */ = {isa = PBXFileReference; lastKnownFileType = text; path = insurance_list_test.sql; sourceTree = "<group>"; };
 		200650182F20B102004900F1 /* InsuranceCompareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceCompareView.swift; sourceTree = "<group>"; };
@@ -170,7 +171,7 @@
 				200650162F20B102004900F1 /* Blog */,
 				2006501A2F20B102004900F1 /* Insurance */,
 				2006501C2F20B102004900F1 /* Medical */,
-				5254A2052F14D091002C6BFB /* Insurance */,
+
 				2066065B2EFBE5FE004CAA54 /* Guardian */,
 				2066065A2EFBE5ED004CAA54 /* Records */,
 				20SOCIAL052F42B000004CAA54 /* Social */,
@@ -210,6 +211,7 @@
 			children = (
 				2075191F2F251CEA00B1FD1A /* ClinicService.swift */,
 				200650272F20B1F1004900F1 /* VaccineService.swift */,
+				2066063F2EFBB4B2004CAA54 /* BlogService.swift */,
 				206606602EFBE6AD004CAA54 /* AIService.swift */,
 				5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */,
 			);
@@ -272,11 +274,11 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2620;
-				LastUpgradeCheck = 2620;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					2066063C2EFBB4B2004CAA54 = {
-						CreatedOnToolsVersion = 26.2;
+						CreatedOnToolsVersion = 16.0;
 					};
 				};
 			};
@@ -326,6 +328,7 @@
 				2006501F2F20B102004900F1 /* InsuranceCompareView.swift in Sources */,
 				2075192A2F25289700B1FD1A /* ClinicSelectionView.swift in Sources */,
 				200650202F20B102004900F1 /* BlogView.swift in Sources */,
+				206606402EFBB4B2004CAA54 /* BlogService.swift in Sources */,
 				200650212F20B102004900F1 /* InsuranceLandingView.swift in Sources */,
 				207519242F2520B400B1FD1A /* ClinicDetailView.swift in Sources */,
 				2066066D2EFBEF9F004CAA54 /* AIService.swift in Sources */,
@@ -337,9 +340,9 @@
 				5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */,
 				207519222F251CFD00B1FD1A /* EmergencyClinicsView.swift in Sources */,
 				2075191E2F251CD000B1FD1A /* Clinic.swift in Sources */,
-				5254A2082F14D0AA002C6BFB /* InsuranceLandingView.swift in Sources */,
+
 				207519262F25232400B1FD1A /* HealthCheckView.swift in Sources */,
-				5254A2072F14D0AA002C6BFB /* InsuranceCompareView.swift in Sources */,
+
 				207519282F2524A800B1FD1A /* VaccineBookingView.swift in Sources */,
 				2066066A2EFBEF8C004CAA54 /* GuardianChatView.swift in Sources */,
 				206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */,
@@ -405,12 +408,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -463,11 +467,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
