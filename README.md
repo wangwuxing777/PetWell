@@ -13,7 +13,7 @@
 ## Project Overview
 PetWell is a comprehensive iOS application designed to help pet owners manage their furry friends' healthcare needs. The app integrates insurance comparison, medical records management, a shopping experience for health products, and a community blog for sharing pet stories.
 
-**✨ NEW: App is now fully localized in English and Traditional Chinese (繁體中文).**
+**✨ NEW: App is now partly localized in English and Traditional Chinese (繁體中文).**
 
 ## Status Report (Frontend)
 
