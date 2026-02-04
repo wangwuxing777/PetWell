@@ -39,6 +39,7 @@
 		5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */; };
 		20SOCIAL012F42B000004CAA54 /* SharePetProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */; };
 		20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */; };
+		20INSMOD012F51A000004CAA54 /* InsuranceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20INSMOD022F51A000004CAA54 /* InsuranceModels.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,6 +79,7 @@
 		5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceService.swift; sourceTree = "<group>"; };
 		20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePetProfileView.swift; sourceTree = "<group>"; };
 		20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialSearchView.swift; sourceTree = "<group>"; };
+		20INSMOD022F51A000004CAA54 /* InsuranceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceModels.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,6 +163,7 @@
 				200650252F20B195004900F1 /* Vaccine.swift */,
 				206606712F03CE37004CAA54 /* ChatHistoryModels.swift */,
 				2066065D2EFBE648004CAA54 /* PetModels.swift */,
+				20INSMOD022F51A000004CAA54 /* InsuranceModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -349,6 +352,7 @@
 				200650282F20B1F1004900F1 /* VaccineService.swift in Sources */,
 				20SOCIAL012F42B000004CAA54 /* SharePetProfileView.swift in Sources */,
 				20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */,
+				20INSMOD012F51A000004CAA54 /* InsuranceModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
