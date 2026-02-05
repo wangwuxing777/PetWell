@@ -368,7 +368,7 @@ struct InsuranceCompareView: View {
   }
 
   private func coverageCard(item: CoverageItem) -> some View {
-    // Hoisted Sub-coverage fetching logic
+    // 1. Calculate Sub-Limits for both products
     let leftSubLimits =
       leftProductId.map {
         insuranceService.getSubCoverageLimits(productId: $0, parentCoverageId: item.coverageId)
@@ -378,95 +378,124 @@ struct InsuranceCompareView: View {
         insuranceService.getSubCoverageLimits(productId: $0, parentCoverageId: item.coverageId)
       } ?? []
 
-    let allNames = Set(
-      leftSubLimits.compactMap { $0.subCoverageName }
-        + rightSubLimits.compactMap { $0.subCoverageName })
-    let sortedNames = Array(allNames).sorted()
+    // 2. Identify relevant sub-coverage names (Union of *present* data)
+    // We only want to show a sub-coverage if at least one side has a valid entry for it.
+    // "Valid" means it exists and displayMode is not .notCovered (unless we want to show strict misses).
+    // The requirement is: "if product 5 do not have coverage_id 6,7,8 ... those not appeared term should not appear"
+    // So we filter based on whether the limit actually exists in the DB response for that product.
+
+    let leftNames = Set(leftSubLimits.map { $0.subCoverageName ?? "" })
+    let rightNames = Set(rightSubLimits.map { $0.subCoverageName ?? "" })
+    let allNames = leftNames.union(rightNames)
+
+    // Sort names for consistent order
+    let sortedNames = Array(allNames).filter { !$0.isEmpty }.sorted()
     let hasSubItems = !sortedNames.isEmpty
 
-    return VStack(alignment: .leading, spacing: 8) {
-      // 1. Title Outside the Box
-      Text(item.coverageType)
-        .font(.system(size: 16, weight: .bold))
-        .foregroundColor(.primary)
-        .padding(.horizontal)
+    // 3. Check Main Limit Existence
+    // Similarly for the main coverage item, checks if either side has data.
+    let leftMainLimit = leftProductId.flatMap {
+      insuranceService.getCoverageLimit(productId: $0, coverageId: item.coverageId)
+    }
+    let rightMainLimit = rightProductId.flatMap {
+      insuranceService.getCoverageLimit(productId: $0, coverageId: item.coverageId)
+    }
 
-      // 2. White Box Container
-      VStack(spacing: 0) {
+    // If neither side has main limits AND neither side has sub-limits, hide the entire card.
+    let hasLeftMain = leftMainLimit != nil
+    let hasRightMain = rightMainLimit != nil
 
-        // Main Limits
-        HStack(alignment: .center, spacing: 12) {
-          // Left Status
-          if let leftId = leftProductId {
-            coverageStatusCell(productId: leftId, coverageId: item.coverageId, isLeft: true)
+    if !hasLeftMain && !hasRightMain && !hasSubItems {
+      return AnyView(EmptyView())
+    }
+
+    return AnyView(
+      VStack(alignment: .leading, spacing: 8) {
+        // 1. Title Outside the Box
+        Text(item.coverageType)
+          .font(.system(size: 16, weight: .bold))
+          .foregroundColor(.primary)
+          .padding(.horizontal)
+
+        // 2. White Box Container
+        VStack(spacing: 0) {
+
+          // Main Limits
+          // Only show main limits row if meaningful?
+          // Usually main limits are always shown if the section exists.
+          HStack(alignment: .center, spacing: 12) {
+            // Left Status
+            if let leftId = leftProductId {
+              coverageStatusCell(productId: leftId, coverageId: item.coverageId, isLeft: true)
+            }
+
+            // Right Status
+            if let rightId = rightProductId {
+              coverageStatusCell(productId: rightId, coverageId: item.coverageId, isLeft: false)
+            }
           }
+          .padding(.top, hasSubItems ? 32 : 24)
+          .padding(.bottom, hasSubItems ? 16 : 24)
+          .padding(.horizontal, 16)
 
-          // Right Status
-          if let rightId = rightProductId {
-            coverageStatusCell(productId: rightId, coverageId: item.coverageId, isLeft: false)
-          }
-        }
-        // Conditional Padding Logic for Visual Centering
-        .padding(.top, hasSubItems ? 32 : 24)
-        .padding(.bottom, hasSubItems ? 16 : 24)
-        .padding(.horizontal, 16)
-
-        // Sub-coverages Display
-        if hasSubItems {
-          VStack(spacing: 0) {
-            ForEach(sortedNames, id: \.self) { subName in
-              // Dashed Divider
-              Line()
-                .stroke(style: StrokeStyle(lineWidth: 1, dash: [4]))
-                .frame(height: 1)
-                .foregroundColor(Color.gray.opacity(0.3))
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-                .padding(.bottom, 8)
-
-              VStack(spacing: 8) {
-                // Sub-coverage Name
-                Text(subName)
-                  .font(.system(size: 13, weight: .semibold))
-                  .foregroundColor(.primary.opacity(0.8))
-                  .frame(maxWidth: .infinity, alignment: .leading)
+          // Sub-coverages Display
+          if hasSubItems {
+            VStack(spacing: 0) {
+              ForEach(sortedNames, id: \.self) { subName in
+                // Dashed Divider
+                Line()
+                  .stroke(style: StrokeStyle(lineWidth: 1, dash: [4]))
+                  .frame(height: 1)
+                  .foregroundColor(Color.gray.opacity(0.3))
                   .padding(.horizontal, 16)
-                  .padding(.bottom, 4)
+                  .padding(.top, 16)
+                  .padding(.bottom, 8)
 
-                // Sub-coverage Values
-                HStack(alignment: .center, spacing: 12) {
-                  // Left Value
-                  if let leftId = leftProductId {
-                    subCoverageStatusCell(
-                      productId: leftId,
-                      subName: subName,
-                      limits: leftSubLimits,
-                      isLeft: true
-                    )
-                  }
+                VStack(spacing: 8) {
+                  // Sub-coverage Name - CENTERED
+                  Text(subName)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(.primary.opacity(0.8))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity, alignment: .center)  // Force Center
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 4)
 
-                  // Right Value
-                  if let rightId = rightProductId {
-                    subCoverageStatusCell(
-                      productId: rightId,
-                      subName: subName,
-                      limits: rightSubLimits,
-                      isLeft: false
-                    )
+                  // Sub-coverage Values
+                  HStack(alignment: .center, spacing: 12) {
+                    // Left Value
+                    if let leftId = leftProductId {
+                      subCoverageStatusCell(
+                        productId: leftId,
+                        subName: subName,
+                        limits: leftSubLimits,
+                        isLeft: true
+                      )
+                    }
+
+                    // Right Value
+                    if let rightId = rightProductId {
+                      subCoverageStatusCell(
+                        productId: rightId,
+                        subName: subName,
+                        limits: rightSubLimits,
+                        isLeft: false
+                      )
+                    }
                   }
+                  .padding(.horizontal, 16)
+                  .padding(.bottom, 24)
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 24)
               }
             }
           }
         }
+        .background(Color.white)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+        .padding(.horizontal)
       }
-      .background(Color.white)
-      .cornerRadius(16)
-      .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-      .padding(.horizontal)
-    }
+    )
   }
 
   // Helper for Sub-Coverage Cells
@@ -478,29 +507,20 @@ struct InsuranceCompareView: View {
 
     return VStack(alignment: .center, spacing: 4) {
       HStack {
-        Spacer()
-        if displayMode == .checkmark {
-          Image(systemName: "checkmark")  // Simple checkmark for sub-items?
-            .font(.system(size: 12, weight: .bold))  // Slightly smaller
-            .foregroundColor(.green)
-        } else if case .value(let amount) = displayMode {
-          Text(amount)
-            .font(.system(size: 12))
-            .foregroundColor(.gray)
-        } else {
-          Text("-")
-            .font(.system(size: 12))
-            .foregroundColor(.gray.opacity(0.3))
+        // Status Box
+        ZStack {
+          RoundedRectangle(cornerRadius: 12)
+            .fill(backgroundColor(for: displayMode))
+
+          content(for: displayMode)
         }
-        Spacer()
+        .frame(height: 56)  // Fixed height for consistency
       }
-      // Note: Sub-coverages typically don't have separate remarks in this design?
-      // If they do, we can add info button here too.
       .overlay(alignment: .trailing) {
         if let remark = limit?.subCoverageRemark, !remark.isEmpty {
           Button(action: {
             selectedRemark = remark
-            selectedRemarkData = nil  // Usually no JSON for sub-remarks yet? Or simple string
+            selectedRemarkData = nil
             selectedRemarkTitle =
               isLeft ? (leftProduct?.insuranceName ?? "") : (rightProduct?.insuranceName ?? "")
             showRemarkSheet = true
@@ -508,6 +528,7 @@ struct InsuranceCompareView: View {
             Image(systemName: "info.circle")
               .foregroundColor(.blue)
               .font(.system(size: 12))
+              .padding(8)  // Add padding to make touch target larger
           }
         }
       }
@@ -529,30 +550,22 @@ struct InsuranceCompareView: View {
     let displayMode = insuranceService.getDisplayMode(productId: productId, coverageId: coverageId)
     let limit = insuranceService.getCoverageLimit(productId: productId, coverageId: coverageId)
 
-    // Determine color based on whether it's covered
-    let isCovered = displayMode != .notCovered
-    let highlightColor: Color = isCovered ? .blue : .gray
-
     return VStack(alignment: .center, spacing: 4) {
       HStack {
-        Spacer()
+        // Status Box
+        ZStack {
+          RoundedRectangle(cornerRadius: 12)
+            .fill(backgroundColor(for: displayMode))
 
-        // Checkmark or Dash
-        if displayMode == .checkmark {
-          Image(systemName: "checkmark.circle.fill")
-            .font(.system(size: 14, weight: .bold))
-            .foregroundColor(.green)
-        } else if case .value(let amount) = displayMode {
-          Text(limit?.formattedLimitValue ?? amount)
-            .font(.system(size: 13, weight: .bold))
-            .foregroundColor(.gray)
-        } else {
-          Text("-")
-            .font(.system(size: 14, weight: .bold))
-            .foregroundColor(.gray.opacity(0.3))
+          if case .value(let amount) = displayMode {
+            Text(limit?.formattedLimitValue ?? amount)
+              .font(.system(size: 16, weight: .bold))  // Slightly Larger
+              .foregroundColor(.blue)
+          } else {
+            content(for: displayMode)
+          }
         }
-
-        Spacer()
+        .frame(height: 56)  // Fixed height for main cells
       }
       .overlay(alignment: .trailing) {
         // Info Button for Remark
@@ -567,13 +580,43 @@ struct InsuranceCompareView: View {
             Image(systemName: "info.circle")
               .foregroundColor(.blue)
               .font(.system(size: 14))
+              .padding(8)
           }
         }
       }
-
-      // Progress Bar Removed as per request
     }
     .frame(maxWidth: .infinity)
+  }
+
+  // MARK: - Box Styling Helpers
+
+  private func backgroundColor(for mode: CoverageDisplayMode) -> Color {
+    switch mode {
+    case .checkmark:
+      return Color(hex: "F0FFF4")  // Light Green
+    case .value:
+      return Color(hex: "F0F7FF")  // Light Blue
+    case .notCovered:
+      return Color(hex: "F8F9FA")  // Light Grey
+    }
+  }
+
+  @ViewBuilder
+  private func content(for mode: CoverageDisplayMode) -> some View {
+    switch mode {
+    case .checkmark:
+      Image(systemName: "checkmark.circle")  // Simple checkmark inside circle
+        .font(.system(size: 20, weight: .bold))  // Larger icon
+        .foregroundColor(Color(hex: "00B050"))  // Strong Green
+    case .value(let amount):
+      Text(amount)
+        .font(.system(size: 16, weight: .bold))
+        .foregroundColor(Color(hex: "0052FF"))  // Strong Blue
+    case .notCovered:
+      Text("—")  // Dash
+        .font(.system(size: 20, weight: .medium))
+        .foregroundColor(Color.gray.opacity(0.3))
+    }
   }
 
   // MARK: - 3. AI Interpretation
