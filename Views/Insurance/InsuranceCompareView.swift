@@ -270,11 +270,6 @@ struct InsuranceCompareView: View {
 
       // Provider Name
       VStack(spacing: 4) {
-        Text("INSURANCE PROVIDER")
-          .font(.system(size: 10, weight: .bold))
-          .foregroundColor(.secondary)
-          .tracking(0.5)
-
         Text(company.companyName)
           .font(.system(size: 14, weight: .semibold))
           .multilineTextAlignment(.center)
@@ -286,56 +281,33 @@ struct InsuranceCompareView: View {
           .multilineTextAlignment(.center)
           .lineLimit(1)
           .frame(height: 20)
-
-        Button(action: {
-          isSelectingLeft = isLeft
-          showSelectionSheet = true
-        }) {
-          Text("Change")
-            .font(.caption)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(8)
-        }
       }
 
-      Divider()
+      // Product Tags
+      productTagsView(product: product)
+        .padding(.top, 2)
 
-      // Total Limit (Usually Coverage ID 1 or sum of limits - logic may vary)
-      VStack(spacing: 2) {
-        Text("TOTAL LIMIT")
-          .font(.system(size: 10, weight: .bold))
-          .foregroundColor(.secondary)
-
-        // Assuming Coverage ID 5 is the total annual limit based on previous data inspection
-        // Adjust ID based on actual data. For now iterating to find "Annual Limit" or similar
-        // Or just using the first coverage limit which is usually the main one.
-        // Let's use getCategoryLimit with a known ID or the first one.
-        // Based on earlier sqlite dump: 1|Medical Coverage, 5|Overseas...
-        // Wait, earlier dump:
-        // 1|5|60000 -> Coverage ID 1 (Medical), Product 5
-
-        if let limit = insuranceService.getCoverageLimit(
-          productId: product.insuranceId, coverageId: 1)
-        {  // 1 = Medical Coverage / Total?
-          if let formattedValue = limit.formattedLimitValue {
-            Text(formattedValue)
-              .font(.system(size: 16, weight: .bold))
-              .foregroundColor(.primary)
-          } else {
-            Text("See Details")
-              .font(.system(size: 16, weight: .bold))
-              .foregroundColor(.primary)
-          }
-        } else {
-          Text("-")
-            .font(.system(size: 16, weight: .bold))
-        }
+      Button(action: {
+        isSelectingLeft = isLeft
+        showSelectionSheet = true
+      }) {
+        Text("Change")
+          .font(.caption)
+          .fontWeight(.medium)
+          .padding(.horizontal, 16)
+          .padding(.vertical, 8)
+          .background(Color.white)
+          .foregroundColor(.black)
+          .cornerRadius(20)
+          .overlay(
+            RoundedRectangle(cornerRadius: 20)
+              .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+          )
+          .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
       }
-      .padding(.bottom, 16)
+      .padding(.bottom, 16)  // Padding from bottom edge
     }
-    .frame(maxWidth: .infinity)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)  // Fill available space
   }
 
   private func emptyHeaderCell(isLeft: Bool) -> some View {
@@ -347,6 +319,37 @@ struct InsuranceCompareView: View {
     }
     .frame(maxWidth: .infinity)
     .padding()
+  }
+
+  // MARK: - Product Tags Helper
+
+  private func productTagsView(product: InsuranceProduct) -> some View {
+    VStack(alignment: .center, spacing: 8) {
+      if let minAge = product.minAge, let maxAge = product.maxAge {
+        let ageTag = "\(minAge)-\(maxAge)"
+        let tagList = (product.tag?.components(separatedBy: " ").filter { !$0.isEmpty } ?? [])
+
+        // Combine age + tags
+        let allItems = [ageTag] + tagList
+
+        // Use VStack to ensure tags are centered
+        ForEach(allItems, id: \.self) { item in
+          tagView(text: item)
+        }
+      }
+    }
+  }
+
+  private func tagView(text: String) -> some View {
+    Text(text)
+      .font(.system(size: 11, weight: .medium))
+      .foregroundColor(Color(hex: "4A5568"))
+      .padding(.horizontal, 8)
+      .padding(.vertical, 4)
+      .background(Color(hex: "EDF2F7"))
+      .cornerRadius(6)
+      .lineLimit(1)
+      .fixedSize()
   }
 
   // MARK: - 2. Coverage Breakdown
@@ -677,28 +680,46 @@ struct ProviderSelectionView: View {
 
   var body: some View {
     NavigationView {
-      List(service.products) { product in
-        Button(action: {
-          onSelect(product.insuranceId)
-          isPresented = false
-        }) {
-          HStack {
-            VStack(alignment: .leading) {
-              if let company = service.getCompany(forProduct: product) {
-                Text(company.companyName)
-                  .font(.headline)
-              }
-              Text(product.insuranceName)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            }
-            Spacer()
-            // Can add badges here if we have logic for them
+      List(service.companies) { company in
+        NavigationLink(destination: productSelectionList(for: company)) {
+          VStack(alignment: .leading, spacing: 4) {
+            Text(company.companyName)
+              .font(.headline)
+              .foregroundColor(.primary)
+
+            Text("Modify in future!!")
+              .font(.subheadline)
+              .foregroundColor(.secondary)
+              .lineLimit(2)
           }
+          .padding(.vertical, 4)
         }
       }
-      .navigationTitle("Select Insurance")
+      .navigationTitle("Select Provider")
       .navigationBarItems(trailing: Button("Cancel") { isPresented = false })
+    }
+  }
+
+  private func productSelectionList(for company: InsuranceCompany) -> some View {
+    List(service.getProducts(forCompanyId: company.companyId)) { product in
+      Button(action: {
+        onSelect(product.insuranceId)
+        isPresented = false
+      }) {
+        HStack {
+          Text(product.insuranceName)
+            .font(.body)
+            .foregroundColor(.primary)
+          Spacer()
+        }
+        .padding(.vertical, 8)
+      }
+    }
+    .navigationTitle(company.companyName)
+    .toolbar {
+      ToolbarItem(placement: .navigationBarTrailing) {
+        Button("Cancel") { isPresented = false }
+      }
     }
   }
 }

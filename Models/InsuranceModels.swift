@@ -66,6 +66,8 @@ struct InsuranceProduct: Codable, Identifiable {
   let informationLink: String?
   let informationLinkZh: String?
   let updateTime: String?
+  let tag: String?
+  let tagZh: String?
 
   var id: Int { insuranceId }
 
@@ -97,6 +99,8 @@ struct InsuranceProduct: Codable, Identifiable {
     case informationLink = "information_link"
     case informationLinkZh = "information_link_zh"
     case updateTime = "update_time"
+    case tag
+    case tagZh = "tag_zh"
   }
 }
 
@@ -126,7 +130,7 @@ struct CoverageLimit: Codable, Identifiable {
   let coverageLimit: String?  // Can be nil, numeric string, or "yes"
   let remark: String?
   let remarkZh: String?
-  
+
   // Pre-parsed JSON data (decoded during init)
   let parsedRemark: RemarkData?
 
@@ -139,7 +143,7 @@ struct CoverageLimit: Codable, Identifiable {
     case remark
     case remarkZh = "remark_zh"
   }
-  
+
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     coverageId = try container.decode(Int.self, forKey: .coverageId)
@@ -147,7 +151,7 @@ struct CoverageLimit: Codable, Identifiable {
     coverageLimit = try container.decodeIfPresent(String.self, forKey: .coverageLimit)
     remark = try container.decodeIfPresent(String.self, forKey: .remark)
     remarkZh = try container.decodeIfPresent(String.self, forKey: .remarkZh)
-    
+
     // Attempt to parse JSON string
     if let r = remark, let data = r.data(using: .utf8) {
       // Decode directly into RemarkData
@@ -256,19 +260,19 @@ struct RemarkData: Codable {
   let coverageScopes: [RemarkScope]?
   let highlights: RemarkHighlight?
   let rawText: String?
-  
+
   // New Polymorphic Fields
-  let type: String? // "benefit_header", "eligibility_detail", "special_coverage"
-  let category: String? // For eligibility/special coverage
-  
+  let type: String?  // "benefit_header", "eligibility_detail", "special_coverage"
+  let category: String?  // For eligibility/special coverage
+
   // "benefit_header" fields
   let content: RemarkContent?
-  
+
   // "eligibility_detail" fields
   let eligibility: RemarkEligibility?
   let limits: RemarkLimits?
   let uiHints: RemarkUIHints?
-  
+
   // "special_coverage" fields
   let targetSpecies: String?
   let rules: [RemarkRule]?
@@ -308,7 +312,7 @@ struct RemarkContent: Codable {
   let title: String?
   let badgeText: String?
   let icon: String?
-  
+
   enum CodingKeys: String, CodingKey {
     case title, icon
     case badgeText = "badge_text"
@@ -320,7 +324,7 @@ struct RemarkEligibility: Codable {
   let species: [String]?
   let ageRange: String?
   let preExistingCondition: String?
-  
+
   enum CodingKeys: String, CodingKey {
     case species
     case ageRange = "age_range"
@@ -331,7 +335,7 @@ struct RemarkEligibility: Codable {
 struct RemarkLimits: Codable {
   let frequency: String?
   let payoutType: String?
-  
+
   enum CodingKeys: String, CodingKey {
     case frequency
     case payoutType = "payout_type"
@@ -341,7 +345,7 @@ struct RemarkLimits: Codable {
 struct RemarkUIHints: Codable {
   let tags: [String]?
   let themeColor: String?
-  
+
   enum CodingKeys: String, CodingKey {
     case tags
     case themeColor = "theme_color"
@@ -355,7 +359,7 @@ struct RemarkRule: Codable, Identifiable {
   let value: String
   let isRequirement: Bool?
   let highlight: Bool?
-  
+
   enum CodingKeys: String, CodingKey {
     case label, value, highlight
     case isRequirement = "is_requirement"
