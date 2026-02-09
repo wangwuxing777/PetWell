@@ -647,15 +647,28 @@ struct InsuranceCompareView: View {
 
       Button(action: {}) {
         HStack {
+          Image(systemName: "sparkles")  // Added Sparkle to match AI theme
           Text("Get Recommendation for My Pet")
           Image(systemName: "chevron.right")
         }
         .font(.system(size: 14, weight: .semibold))
-        .foregroundColor(.white)
+        .foregroundColor(.blue)
         .padding()
         .frame(maxWidth: .infinity)
-        .background(Color.blue)
+        .background(Color.white)
         .cornerRadius(12)
+        .overlay(
+          RoundedRectangle(cornerRadius: 12)
+            .stroke(
+              LinearGradient(
+                colors: [.blue, .purple],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+              ),
+              lineWidth: 1.5
+            )
+        )
+        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
       }
 
       Text("// API integration pending")
@@ -782,10 +795,31 @@ struct RemarkSheetView: View {
           Text("Ask AI for Explanation")
             .font(.system(size: 16, weight: .semibold))
         }
-        .foregroundColor(.white)
+        .foregroundColor(.blue)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
-        .background(Color.blue)
+        .background(Color.white)
+        .overlay(  // Overlay needs to separate for safe area top edge usually, but here it's bottom sheet
+          // Since it fills width, maybe just top border or localized glow?
+          // Let's frame it locally
+          EmptyView()
+        )
+        // Wait, this button is full width at bottom of sheet. Corner radius is usually 0 or top rounded?
+        // Current implementation has no corner radius.
+        // Let's add top highlight.
+        .overlay(
+          Rectangle()
+            .frame(height: 1.5)
+            .foregroundColor(.clear)
+            .background(
+              LinearGradient(
+                colors: [.blue, .purple],
+                startPoint: .leading,
+                endPoint: .trailing
+              )
+            ),
+          alignment: .top
+        )
       }
     }
     .presentationDetents([.medium, .large])

@@ -10,11 +10,11 @@
 		2006501D2F20B102004900F1 /* insurance_list_test.sql in Resources */ = {isa = PBXBuildFile; fileRef = 200650172F20B102004900F1 /* insurance_list_test.sql */; };
 		2006501E2F20B102004900F1 /* VaccineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2006501B2F20B102004900F1 /* VaccineView.swift */; };
 		2006501F2F20B102004900F1 /* InsuranceCompareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650182F20B102004900F1 /* InsuranceCompareView.swift */; };
-		206606402EFBB4B2004CAA54 /* BlogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2066063F2EFBB4B2004CAA54 /* BlogService.swift */; };
 		200650202F20B102004900F1 /* BlogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650152F20B102004900F1 /* BlogView.swift */; };
 		200650212F20B102004900F1 /* InsuranceLandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650192F20B102004900F1 /* InsuranceLandingView.swift */; };
 		200650262F20B195004900F1 /* Vaccine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650252F20B195004900F1 /* Vaccine.swift */; };
 		200650282F20B1F1004900F1 /* VaccineService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650272F20B1F1004900F1 /* VaccineService.swift */; };
+		206606402EFBB4B2004CAA54 /* BlogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2066063F2EFBB4B2004CAA54 /* BlogService.swift */; };
 		206606672EFBEBB5004CAA54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206606642EFBEBB5004CAA54 /* ContentView.swift */; };
 		206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206606652EFBEBB5004CAA54 /* PetWellApp.swift */; };
 		206606692EFBEBB5004CAA54 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 206606632EFBEBB5004CAA54 /* Assets.xcassets */; };
@@ -35,15 +35,17 @@
 		20833D5A2F20B39A00D59583 /* VaccineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20833D592F20B39A00D59583 /* VaccineDetailView.swift */; };
 		20CCB5FF2F0418F300CE57E7 /* AddPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */; };
 		20CCB6012F04190E00CE57E7 /* PetDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB6002F04190A00CE57E7 /* PetDetailView.swift */; };
-
-		5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */; };
+		20INSMOD012F51A000004CAA54 /* InsuranceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20INSMOD022F51A000004CAA54 /* InsuranceModels.swift */; };
 		20SOCIAL012F42B000004CAA54 /* SharePetProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */; };
 		20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */; };
-		20INSMOD012F51A000004CAA54 /* InsuranceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20INSMOD022F51A000004CAA54 /* InsuranceModels.swift */; };
+		3595376D11423AB92286AB6C /* ShopModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */; };
+		4BD507E91F23FAEA1C409E43 /* ShopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E82FE411E0D702F3C5C8687 /* ShopView.swift */; };
+		5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */; };
+		9832EC2E43DAA4D24B69C514 /* ShopifyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84900EA374F123F44735A689 /* ShopifyService.swift */; };
+		CC19638A2F386A8E00FA8CF3 /* Buy in Frameworks */ = {isa = PBXBuildFile; productRef = CC1963892F386A8E00FA8CF3 /* Buy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2066063F2EFBB4B2004CAA54 /* BlogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogService.swift; sourceTree = "<group>"; };
 		200650152F20B102004900F1 /* BlogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogView.swift; sourceTree = "<group>"; };
 		200650172F20B102004900F1 /* insurance_list_test.sql */ = {isa = PBXFileReference; lastKnownFileType = text; path = insurance_list_test.sql; sourceTree = "<group>"; };
 		200650182F20B102004900F1 /* InsuranceCompareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceCompareView.swift; sourceTree = "<group>"; };
@@ -54,6 +56,7 @@
 		200650252F20B195004900F1 /* Vaccine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vaccine.swift; sourceTree = "<group>"; };
 		200650272F20B1F1004900F1 /* VaccineService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineService.swift; sourceTree = "<group>"; };
 		2066063D2EFBB4B2004CAA54 /* PetWell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PetWell.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2066063F2EFBB4B2004CAA54 /* BlogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogService.swift; sourceTree = "<group>"; };
 		2066065D2EFBE648004CAA54 /* PetModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetModels.swift; sourceTree = "<group>"; };
 		2066065E2EFBE668004CAA54 /* RecordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsView.swift; sourceTree = "<group>"; };
 		2066065F2EFBE68A004CAA54 /* GuardianChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuardianChatView.swift; sourceTree = "<group>"; };
@@ -74,12 +77,13 @@
 		20833D592F20B39A00D59583 /* VaccineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineDetailView.swift; sourceTree = "<group>"; };
 		20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPetView.swift; sourceTree = "<group>"; };
 		20CCB6002F04190A00CE57E7 /* PetDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDetailView.swift; sourceTree = "<group>"; };
-		5254A2062F14D0A1002C6BFB /* InsuranceCompareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceCompareView.swift; sourceTree = "<group>"; };
-		5254A2092F14D0AA002C6BFB /* InsuranceLandingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceLandingView.swift; sourceTree = "<group>"; };
-		5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceService.swift; sourceTree = "<group>"; };
+		20INSMOD022F51A000004CAA54 /* InsuranceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceModels.swift; sourceTree = "<group>"; };
 		20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePetProfileView.swift; sourceTree = "<group>"; };
 		20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialSearchView.swift; sourceTree = "<group>"; };
-		20INSMOD022F51A000004CAA54 /* InsuranceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceModels.swift; sourceTree = "<group>"; };
+		5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceService.swift; sourceTree = "<group>"; };
+		84900EA374F123F44735A689 /* ShopifyService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopifyService.swift; sourceTree = "<group>"; };
+		9E82FE411E0D702F3C5C8687 /* ShopView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopView.swift; sourceTree = "<group>"; };
+		F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopModels.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +91,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC19638A2F386A8E00FA8CF3 /* Buy in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,6 +169,7 @@
 				206606712F03CE37004CAA54 /* ChatHistoryModels.swift */,
 				2066065D2EFBE648004CAA54 /* PetModels.swift */,
 				20INSMOD022F51A000004CAA54 /* InsuranceModels.swift */,
+				F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -174,21 +180,12 @@
 				200650162F20B102004900F1 /* Blog */,
 				2006501A2F20B102004900F1 /* Insurance */,
 				2006501C2F20B102004900F1 /* Medical */,
-
 				2066065B2EFBE5FE004CAA54 /* Guardian */,
 				2066065A2EFBE5ED004CAA54 /* Records */,
 				20SOCIAL052F42B000004CAA54 /* Social */,
+				9E82FE411E0D702F3C5C8687 /* ShopView.swift */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		20SOCIAL052F42B000004CAA54 /* Social */ = {
-			isa = PBXGroup;
-			children = (
-				20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */,
-				20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */,
-			);
-			path = Social;
 			sourceTree = "<group>";
 		};
 		2066065A2EFBE5ED004CAA54 /* Records */ = {
@@ -217,6 +214,7 @@
 				2066063F2EFBB4B2004CAA54 /* BlogService.swift */,
 				206606602EFBE6AD004CAA54 /* AIService.swift */,
 				5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */,
+				84900EA374F123F44735A689 /* ShopifyService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -239,13 +237,13 @@
 			path = Consultation;
 			sourceTree = "<group>";
 		};
-		5254A2052F14D091002C6BFB /* Insurance */ = {
+		20SOCIAL052F42B000004CAA54 /* Social */ = {
 			isa = PBXGroup;
 			children = (
-				5254A2092F14D0AA002C6BFB /* InsuranceLandingView.swift */,
-				5254A2062F14D0A1002C6BFB /* InsuranceCompareView.swift */,
+				20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */,
+				20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */,
 			);
-			path = Insurance;
+			path = Social;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -264,8 +262,6 @@
 			dependencies = (
 			);
 			name = PetWell;
-			packageProductDependencies = (
-			);
 			productName = PetWell;
 			productReference = 2066063D2EFBB4B2004CAA54 /* PetWell.app */;
 			productType = "com.apple.product-type.application";
@@ -294,6 +290,9 @@
 			);
 			mainGroup = 206606342EFBB4B2004CAA54;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CC1963882F386A8E00FA8CF3 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2066063E2EFBB4B2004CAA54 /* Products */;
 			projectDirPath = "";
@@ -343,9 +342,7 @@
 				5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */,
 				207519222F251CFD00B1FD1A /* EmergencyClinicsView.swift in Sources */,
 				2075191E2F251CD000B1FD1A /* Clinic.swift in Sources */,
-
 				207519262F25232400B1FD1A /* HealthCheckView.swift in Sources */,
-
 				207519282F2524A800B1FD1A /* VaccineBookingView.swift in Sources */,
 				2066066A2EFBEF8C004CAA54 /* GuardianChatView.swift in Sources */,
 				206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */,
@@ -353,6 +350,9 @@
 				20SOCIAL012F42B000004CAA54 /* SharePetProfileView.swift in Sources */,
 				20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */,
 				20INSMOD012F51A000004CAA54 /* InsuranceModels.swift in Sources */,
+				4BD507E91F23FAEA1C409E43 /* ShopView.swift in Sources */,
+				9832EC2E43DAA4D24B69C514 /* ShopifyService.swift in Sources */,
+				3595376D11423AB92286AB6C /* ShopModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -568,6 +568,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CC1963882F386A8E00FA8CF3 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Shopify/mobile-buy-sdk-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2025.7.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CC1963892F386A8E00FA8CF3 /* Buy */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CC1963882F386A8E00FA8CF3 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */;
+			productName = Buy;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 206606352EFBB4B2004CAA54 /* Project object */;
 }

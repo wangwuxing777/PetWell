@@ -28,7 +28,7 @@ struct ContentView: View {
             }
             .tag(Tab.blog)
 
-          ProductsView()
+          ShopView()
             .tabItem { Label(languageManager.isChinese ? "商店" : "Shop", systemImage: "bag") }
             .tag(Tab.shop)
 
@@ -158,23 +158,7 @@ private struct InsuranceView: View {
   }
 }
 
-private struct ProductsView: View {
-  var body: some View {
-    NavigationStack {
-      VStack(alignment: .leading, spacing: 12) {
-        Text("Products (MVP stub)")
-          .font(.title2).bold()
 
-        Text("Next: health products list + details.")
-          .foregroundStyle(.secondary)
-
-        Spacer()
-      }
-      .padding()
-      .navigationTitle("Shop")
-    }
-  }
-}
 
 #Preview {
   ContentView()
@@ -224,9 +208,6 @@ struct BlogView: View {
       VStack(spacing: 0) {
         // Top Custom Navigation Bar
         HStack(spacing: 20) {
-          // Left-aligned title or logo could go here
-          Text(languageManager.isChinese ? "寵物日誌" : "Pet Blog")
-            .font(.system(size: 20, weight: .bold))
 
           Spacer()
 
