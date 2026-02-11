@@ -33,6 +33,8 @@ struct InsuranceCompareView: View {
   @State private var selectedRemark: String = ""
   @State private var selectedRemarkData: RemarkData?
   @State private var selectedRemarkTitle: String = ""
+  @State private var selectedCoverageTerm: String = ""
+  @State private var selectedSubCoverageTerm: String? = nil
 
   // Scroll tracking
   @State private var scrollOffset: CGFloat = 0
@@ -42,6 +44,10 @@ struct InsuranceCompareView: View {
   private var showMiniHeader: Bool {
     scrollOffset > providerHeaderHeight / 2
   }
+
+  // MARK: - RAG Chat Integration
+  @State private var showRAGChat = false
+  @State private var ragInitialPrompt: String = ""
 
   // Helpers to get current product and company
   var leftProduct: InsuranceProduct? {
@@ -127,6 +133,8 @@ struct InsuranceCompareView: View {
         title: selectedRemarkTitle,
         remark: selectedRemark,
         remarkData: selectedRemarkData,
+        coverageTerm: selectedCoverageTerm,
+        subCoverageTerm: selectedSubCoverageTerm,
         isPresented: $showRemarkSheet
       )
     }
@@ -429,13 +437,24 @@ struct InsuranceCompareView: View {
           HStack(alignment: .center, spacing: 12) {
             // Left Status
             if let leftId = leftProductId {
-              coverageStatusCell(productId: leftId, coverageId: item.coverageId, isLeft: true)
+              coverageStatusCell(
+                productId: leftId,
+                coverageId: item.coverageId,
+                coverageTerm: item.coverageType,
+                isLeft: true
+              )
             }
 
             // Right Status
             if let rightId = rightProductId {
-              coverageStatusCell(productId: rightId, coverageId: item.coverageId, isLeft: false)
+              coverageStatusCell(
+                productId: rightId,
+                coverageId: item.coverageId,
+                coverageTerm: item.coverageType,
+                isLeft: false
+              )
             }
+
           }
           .padding(.top, hasSubItems ? 32 : 24)
           .padding(.bottom, hasSubItems ? 16 : 24)
@@ -472,6 +491,7 @@ struct InsuranceCompareView: View {
                         productId: leftId,
                         subName: subName,
                         limits: leftSubLimits,
+                        coverageTerm: item.coverageType,
                         isLeft: true
                       )
                     }
@@ -482,9 +502,11 @@ struct InsuranceCompareView: View {
                         productId: rightId,
                         subName: subName,
                         limits: rightSubLimits,
+                        coverageTerm: item.coverageType,
                         isLeft: false
                       )
                     }
+
                   }
                   .padding(.horizontal, 16)
                   .padding(.bottom, 24)
@@ -503,8 +525,9 @@ struct InsuranceCompareView: View {
 
   // Helper for Sub-Coverage Cells
   private func subCoverageStatusCell(
-    productId: Int, subName: String, limits: [SubCoverageLimit], isLeft: Bool
+    productId: Int, subName: String, limits: [SubCoverageLimit], coverageTerm: String, isLeft: Bool
   ) -> some View {
+
     let limit = limits.first { $0.subCoverageName == subName }
     let displayMode = limit?.displayMode ?? .notCovered
 
@@ -526,8 +549,11 @@ struct InsuranceCompareView: View {
             selectedRemarkData = nil
             selectedRemarkTitle =
               isLeft ? (leftProduct?.insuranceName ?? "") : (rightProduct?.insuranceName ?? "")
+            selectedCoverageTerm = coverageTerm
+            selectedSubCoverageTerm = subName
             showRemarkSheet = true
           }) {
+
             Image(systemName: "info.circle")
               .foregroundColor(.blue)
               .font(.system(size: 12))
@@ -549,7 +575,10 @@ struct InsuranceCompareView: View {
     }
   }
 
-  private func coverageStatusCell(productId: Int, coverageId: Int, isLeft: Bool) -> some View {
+  private func coverageStatusCell(
+    productId: Int, coverageId: Int, coverageTerm: String, isLeft: Bool
+  ) -> some View {
+
     let displayMode = insuranceService.getDisplayMode(productId: productId, coverageId: coverageId)
     let limit = insuranceService.getCoverageLimit(productId: productId, coverageId: coverageId)
 
@@ -578,8 +607,11 @@ struct InsuranceCompareView: View {
             selectedRemarkData = limit?.parsedRemark
             selectedRemarkTitle =
               isLeft ? (leftProduct?.insuranceName ?? "") : (rightProduct?.insuranceName ?? "")
+            selectedCoverageTerm = coverageTerm
+            selectedSubCoverageTerm = nil
             showRemarkSheet = true
           }) {
+
             Image(systemName: "info.circle")
               .foregroundColor(.blue)
               .font(.system(size: 14))
@@ -739,13 +771,15 @@ struct ProviderSelectionView: View {
 
 // MARK: - Remark Sheet View
 
-// MARK: - Remark Sheet View
-
 struct RemarkSheetView: View {
   let title: String
   let remark: String
   let remarkData: RemarkData?  // Pre-parsed data passed in
+  let coverageTerm: String
+  let subCoverageTerm: String?
+
   @Binding var isPresented: Bool
+  @State private var showRAGChat = false
 
   var body: some View {
     VStack(spacing: 0) {
@@ -787,7 +821,7 @@ struct RemarkSheetView: View {
 
       // AI Button
       Button(action: {
-        // TODO: Future AI API Integration
+        showRAGChat = true
       }) {
         HStack(spacing: 8) {
           Image(systemName: "sparkles")
@@ -795,6 +829,7 @@ struct RemarkSheetView: View {
           Text("Ask AI for Explanation")
             .font(.system(size: 16, weight: .semibold))
         }
+
         .foregroundColor(.blue)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
@@ -824,6 +859,28 @@ struct RemarkSheetView: View {
     }
     .presentationDetents([.medium, .large])
     .presentationDragIndicator(.visible)
+    .fullScreenCover(isPresented: $showRAGChat) {
+      RAGChatView(contextString: constructContextString(), isPresented: $showRAGChat)
+    }
+  }
+
+  private func constructContextString() -> String {
+    let term = coverageTerm
+    let subTerm = subCoverageTerm ?? ""
+    let policy = resolveTitle()
+
+    var context = """
+      Context:
+      - Coverage Term: \(term)
+      """
+
+    if !subTerm.isEmpty {
+      context += "\n- Sub Coverage Term: \(subTerm)"
+    }
+
+    context += "\n- Policy Type: \(policy)"
+
+    return context
   }
 
   private func resolveTitle() -> String {
