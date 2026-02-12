@@ -34,7 +34,9 @@ struct InsuranceCompareView: View {
   @State private var selectedRemarkData: RemarkData?
   @State private var selectedRemarkTitle: String = ""
   @State private var selectedCoverageTerm: String = ""
-  @State private var selectedSubCoverageTerm: String? = nil
+  @State private var selectedSubCoverageTerm: String?
+
+  @State private var showRAGChat = false
 
   // Scroll tracking
   @State private var scrollOffset: CGFloat = 0
@@ -44,10 +46,6 @@ struct InsuranceCompareView: View {
   private var showMiniHeader: Bool {
     scrollOffset > providerHeaderHeight / 2
   }
-
-  // MARK: - RAG Chat Integration
-  @State private var showRAGChat = false
-  @State private var ragInitialPrompt: String = ""
 
   // Helpers to get current product and company
   var leftProduct: InsuranceProduct? {
@@ -137,6 +135,9 @@ struct InsuranceCompareView: View {
         subCoverageTerm: selectedSubCoverageTerm,
         isPresented: $showRemarkSheet
       )
+    }
+    .fullScreenCover(isPresented: $showRAGChat) {
+      RAGChatView(contextString: "General pet insurance comparison", isPresented: $showRAGChat)
     }
   }
 
@@ -438,23 +439,16 @@ struct InsuranceCompareView: View {
             // Left Status
             if let leftId = leftProductId {
               coverageStatusCell(
-                productId: leftId,
-                coverageId: item.coverageId,
-                coverageTerm: item.coverageType,
-                isLeft: true
-              )
+                productId: leftId, coverageId: item.coverageId, coverageType: item.coverageType,
+                isLeft: true)
             }
 
             // Right Status
             if let rightId = rightProductId {
               coverageStatusCell(
-                productId: rightId,
-                coverageId: item.coverageId,
-                coverageTerm: item.coverageType,
-                isLeft: false
-              )
+                productId: rightId, coverageId: item.coverageId, coverageType: item.coverageType,
+                isLeft: false)
             }
-
           }
           .padding(.top, hasSubItems ? 32 : 24)
           .padding(.bottom, hasSubItems ? 16 : 24)
@@ -491,7 +485,6 @@ struct InsuranceCompareView: View {
                         productId: leftId,
                         subName: subName,
                         limits: leftSubLimits,
-                        coverageTerm: item.coverageType,
                         isLeft: true
                       )
                     }
@@ -502,11 +495,9 @@ struct InsuranceCompareView: View {
                         productId: rightId,
                         subName: subName,
                         limits: rightSubLimits,
-                        coverageTerm: item.coverageType,
                         isLeft: false
                       )
                     }
-
                   }
                   .padding(.horizontal, 16)
                   .padding(.bottom, 24)
@@ -525,9 +516,8 @@ struct InsuranceCompareView: View {
 
   // Helper for Sub-Coverage Cells
   private func subCoverageStatusCell(
-    productId: Int, subName: String, limits: [SubCoverageLimit], coverageTerm: String, isLeft: Bool
+    productId: Int, subName: String, limits: [SubCoverageLimit], isLeft: Bool
   ) -> some View {
-
     let limit = limits.first { $0.subCoverageName == subName }
     let displayMode = limit?.displayMode ?? .notCovered
 
@@ -549,11 +539,10 @@ struct InsuranceCompareView: View {
             selectedRemarkData = nil
             selectedRemarkTitle =
               isLeft ? (leftProduct?.insuranceName ?? "") : (rightProduct?.insuranceName ?? "")
-            selectedCoverageTerm = coverageTerm
-            selectedSubCoverageTerm = subName
+            selectedCoverageTerm = subName
+            selectedSubCoverageTerm = nil
             showRemarkSheet = true
           }) {
-
             Image(systemName: "info.circle")
               .foregroundColor(.blue)
               .font(.system(size: 12))
@@ -576,9 +565,8 @@ struct InsuranceCompareView: View {
   }
 
   private func coverageStatusCell(
-    productId: Int, coverageId: Int, coverageTerm: String, isLeft: Bool
+    productId: Int, coverageId: Int, coverageType: String, isLeft: Bool
   ) -> some View {
-
     let displayMode = insuranceService.getDisplayMode(productId: productId, coverageId: coverageId)
     let limit = insuranceService.getCoverageLimit(productId: productId, coverageId: coverageId)
 
@@ -607,11 +595,10 @@ struct InsuranceCompareView: View {
             selectedRemarkData = limit?.parsedRemark
             selectedRemarkTitle =
               isLeft ? (leftProduct?.insuranceName ?? "") : (rightProduct?.insuranceName ?? "")
-            selectedCoverageTerm = coverageTerm
+            selectedCoverageTerm = coverageType
             selectedSubCoverageTerm = nil
             showRemarkSheet = true
           }) {
-
             Image(systemName: "info.circle")
               .foregroundColor(.blue)
               .font(.system(size: 14))
@@ -677,7 +664,9 @@ struct InsuranceCompareView: View {
       .foregroundColor(.white.opacity(0.9))
       .lineSpacing(4)
 
-      Button(action: {}) {
+      Button(action: {
+        showRAGChat = true
+      }) {
         HStack {
           Image(systemName: "sparkles")  // Added Sparkle to match AI theme
           Text("Get Recommendation for My Pet")
@@ -716,58 +705,9 @@ struct InsuranceCompareView: View {
   }
 }
 
-// MARK: - Selection View (Use New Models)
+// ProviderSelectionView moved to ProviderSelectionView.swift
 
-struct ProviderSelectionView: View {
-  @Binding var isPresented: Bool
-  let onSelect: (Int) -> Void
-  @ObservedObject var service = InsuranceService.shared
-
-  var body: some View {
-    NavigationView {
-      List(service.companies) { company in
-        NavigationLink(destination: productSelectionList(for: company)) {
-          VStack(alignment: .leading, spacing: 4) {
-            Text(company.companyName)
-              .font(.headline)
-              .foregroundColor(.primary)
-
-            Text("Modify in future!!")
-              .font(.subheadline)
-              .foregroundColor(.secondary)
-              .lineLimit(2)
-          }
-          .padding(.vertical, 4)
-        }
-      }
-      .navigationTitle("Select Provider")
-      .navigationBarItems(trailing: Button("Cancel") { isPresented = false })
-    }
-  }
-
-  private func productSelectionList(for company: InsuranceCompany) -> some View {
-    List(service.getProducts(forCompanyId: company.companyId)) { product in
-      Button(action: {
-        onSelect(product.insuranceId)
-        isPresented = false
-      }) {
-        HStack {
-          Text(product.insuranceName)
-            .font(.body)
-            .foregroundColor(.primary)
-          Spacer()
-        }
-        .padding(.vertical, 8)
-      }
-    }
-    .navigationTitle(company.companyName)
-    .toolbar {
-      ToolbarItem(placement: .navigationBarTrailing) {
-        Button("Cancel") { isPresented = false }
-      }
-    }
-  }
-}
+// MARK: - Remark Sheet View
 
 // MARK: - Remark Sheet View
 
@@ -829,19 +769,13 @@ struct RemarkSheetView: View {
           Text("Ask AI for Explanation")
             .font(.system(size: 16, weight: .semibold))
         }
-
         .foregroundColor(.blue)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
         .background(Color.white)
-        .overlay(  // Overlay needs to separate for safe area top edge usually, but here it's bottom sheet
-          // Since it fills width, maybe just top border or localized glow?
-          // Let's frame it locally
+        .overlay(
           EmptyView()
         )
-        // Wait, this button is full width at bottom of sheet. Corner radius is usually 0 or top rounded?
-        // Current implementation has no corner radius.
-        // Let's add top highlight.
         .overlay(
           Rectangle()
             .frame(height: 1.5)

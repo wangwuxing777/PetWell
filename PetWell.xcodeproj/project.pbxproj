@@ -45,6 +45,7 @@
 		9832EC2E43DAA4D24B69C514 /* ShopifyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84900EA374F123F44735A689 /* ShopifyService.swift */; };
 		CC19638A2F386A8E00FA8CF3 /* Buy in Frameworks */ = {isa = PBXBuildFile; productRef = CC1963892F386A8E00FA8CF3 /* Buy */; };
 		F1640ED1E7E136CAF64BAC4A /* RAGChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DBB5D947F0DD76560408AA /* RAGChatView.swift */; };
+		F17000012F20B102004900F1 /* ProviderSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17000022F20B102004900F1 /* ProviderSelectionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +89,7 @@
 		84900EA374F123F44735A689 /* ShopifyService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopifyService.swift; sourceTree = "<group>"; };
 		9E82FE411E0D702F3C5C8687 /* ShopView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopView.swift; sourceTree = "<group>"; };
 		F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopModels.swift; sourceTree = "<group>"; };
+		F17000022F20B102004900F1 /* ProviderSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderSelectionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +118,7 @@
 				200650172F20B102004900F1 /* insurance_list_test.sql */,
 				200650182F20B102004900F1 /* InsuranceCompareView.swift */,
 				200650192F20B102004900F1 /* InsuranceLandingView.swift */,
+				F17000022F20B102004900F1 /* ProviderSelectionView.swift */,
 			);
 			path = Insurance;
 			sourceTree = "<group>";
@@ -361,6 +364,7 @@
 				3595376D11423AB92286AB6C /* ShopModels.swift in Sources */,
 				F1640ED1E7E136CAF64BAC4A /* RAGChatView.swift in Sources */,
 				7B51BE35A6023BF6E1D1BDDD /* RAGService.swift in Sources */,
+				F17000012F20B102004900F1 /* ProviderSelectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
