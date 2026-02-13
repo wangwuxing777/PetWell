@@ -1,1 +1,9 @@
 .DS_Store
+
+# Xcode user data
+*.xcuserstate
+xcschememanagement.plist
+
+# Build logs
+build.log
+build_error.log
