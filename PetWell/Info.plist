@@ -14,10 +14,12 @@
 				<true/>
 				<key>NSIncludesSubdomains</key>
 				<true/>
-                <key>NSExceptionRequiresForwardSecrecy</key>
-                <false/>
+				<key>NSExceptionRequiresForwardSecrecy</key>
+				<false/>
 			</dict>
 		</dict>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to show vet clinics near you.</string>
 </dict>
 </plist>

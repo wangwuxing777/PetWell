@@ -35,11 +35,24 @@ struct VaccineView: View {
           VStack(spacing: 0) {
             // High-End Header
             VStack(alignment: .leading, spacing: 16) {
-              Text("Pet Health Center")
-                .font(.system(size: 34, weight: .bold, design: .rounded))
-                .foregroundColor(.primary)
-                .padding(.horizontal)
-                .padding(.top, 20)
+              HStack {
+                Text("Pet Health Center")
+                  .font(.system(size: 34, weight: .bold, design: .rounded))
+                  .foregroundColor(.primary)
+
+                Spacer()
+
+                NavigationLink(destination: VetMapContainerView()) {
+                  Image(systemName: "map.fill")
+                    .font(.title2)
+                    .foregroundColor(.blue)
+                    .padding(8)
+                    .background(Color.blue.opacity(0.1))
+                    .clipShape(Circle())
+                }
+              }
+              .padding(.horizontal)
+              .padding(.top, 20)
 
               HStack {
                 Image(systemName: "magnifyingglass")
@@ -151,24 +164,6 @@ struct VaccineView: View {
       }
       self.isLoading = false
     }
-  }
-}
-
-extension View {
-  func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-    clipShape(RoundedCorner(radius: radius, corners: corners))
-  }
-}
-
-struct RoundedCorner: Shape {
-  var radius: CGFloat = .infinity
-  var corners: UIRectCorner = .allCorners
-
-  func path(in rect: CGRect) -> Path {
-    let path = UIBezierPath(
-      roundedRect: rect, byRoundingCorners: corners,
-      cornerRadii: CGSize(width: radius, height: radius))
-    return Path(path.cgPath)
   }
 }
 
