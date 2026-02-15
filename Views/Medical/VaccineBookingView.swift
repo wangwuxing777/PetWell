@@ -81,7 +81,31 @@ struct VaccineBookingView: View {
                             }
                             Spacer()
                             
-                            if let mapUrlString = clinic.applemapUrl, !mapUrlString.isEmpty, let url = URL(string: mapUrlString) {
+                            if let placeId = clinic.googlePlaceId, !placeId.isEmpty {
+                                Button(action: {
+                                    let q = clinic.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "Clinic"
+                                    let urlString = "https://www.google.com/maps/search/?api=1&query=\(q)&query_place_id=\(placeId)"
+                                    if let url = URL(string: urlString) {
+                                        UIApplication.shared.open(url)
+                                    }
+                                }) {
+                                    Image(systemName: "location.circle.fill")
+                                        .font(.system(size: 28))
+                                        .foregroundColor(.blue)
+                                }
+                            } else if let lat = clinic.latitude, let lng = clinic.longitude {
+                                Button(action: {
+                                    let q = clinic.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                                    let urlString = "https://www.google.com/maps/search/?api=1&query=\(q)&center=\(lat),\(lng)"
+                                    if let url = URL(string: urlString) {
+                                        UIApplication.shared.open(url)
+                                    }
+                                }) {
+                                    Image(systemName: "location.circle.fill")
+                                        .font(.system(size: 28))
+                                        .foregroundColor(.blue)
+                                }
+                            } else if let mapUrlString = clinic.applemapUrl, !mapUrlString.isEmpty, let url = URL(string: mapUrlString) {
                                 Link(destination: url) {
                                     Image(systemName: "location.circle.fill")
                                         .font(.system(size: 28))

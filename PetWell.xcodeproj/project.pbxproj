@@ -14,6 +14,12 @@
 		200650212F20B102004900F1 /* InsuranceLandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650192F20B102004900F1 /* InsuranceLandingView.swift */; };
 		200650262F20B195004900F1 /* Vaccine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650252F20B195004900F1 /* Vaccine.swift */; };
 		200650282F20B1F1004900F1 /* VaccineService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200650272F20B1F1004900F1 /* VaccineService.swift */; };
+		20175E9C2F40D38E000A3910 /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20175E992F40D38E000A3910 /* ProductDetailView.swift */; };
+		20175E9D2F40D38E000A3910 /* ShopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20175E9A2F40D38E000A3910 /* ShopView.swift */; };
+		20175EA02F40E32C000A3910 /* RAGService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20175E9F2F40E32C000A3910 /* RAGService.swift */; };
+		20175EA12F40E32C000A3910 /* CachedImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20175E9E2F40E32C000A3910 /* CachedImageLoader.swift */; };
+		20175EA32F40F1A9000A3910 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20175EA22F40F1A9000A3910 /* LocationManager.swift */; };
+		20175EA52F40F1B4000A3910 /* ClinicFilters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20175EA42F40F1B4000A3910 /* ClinicFilters.swift */; };
 		206606402EFBB4B2004CAA54 /* BlogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2066063F2EFBB4B2004CAA54 /* BlogService.swift */; };
 		206606672EFBEBB5004CAA54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206606642EFBEBB5004CAA54 /* ContentView.swift */; };
 		206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206606652EFBEBB5004CAA54 /* PetWellApp.swift */; };
@@ -40,7 +46,6 @@
 		20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */; };
 		333BACED5C6923948F4FAF30 /* Vet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCDEA159103732D87EBD44C /* Vet.swift */; };
 		3595376D11423AB92286AB6C /* ShopModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */; };
-		4BD507E91F23FAEA1C409E43 /* ShopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E82FE411E0D702F3C5C8687 /* ShopView.swift */; };
 		5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */; };
 		5809467036E9C1D483F6EDF1 /* VetMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B48B43AC4603AD6BE6678259 /* VetMapViewModel.swift */; };
 		5D76E2067F9710ABED5E50F4 /* VetMapContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AAB46C63991E9ABB508494D /* VetMapContainerView.swift */; };
@@ -66,6 +71,12 @@
 		200650232F20B144004900F1 /* vaccines.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = vaccines.json; sourceTree = "<group>"; };
 		200650252F20B195004900F1 /* Vaccine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vaccine.swift; sourceTree = "<group>"; };
 		200650272F20B1F1004900F1 /* VaccineService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineService.swift; sourceTree = "<group>"; };
+		20175E992F40D38E000A3910 /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
+		20175E9A2F40D38E000A3910 /* ShopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopView.swift; sourceTree = "<group>"; };
+		20175E9E2F40E32C000A3910 /* CachedImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedImageLoader.swift; sourceTree = "<group>"; };
+		20175E9F2F40E32C000A3910 /* RAGService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAGService.swift; sourceTree = "<group>"; };
+		20175EA22F40F1A9000A3910 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		20175EA42F40F1B4000A3910 /* ClinicFilters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicFilters.swift; sourceTree = "<group>"; };
 		2066063D2EFBB4B2004CAA54 /* PetWell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PetWell.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2066063F2EFBB4B2004CAA54 /* BlogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogService.swift; sourceTree = "<group>"; };
 		2066065D2EFBE648004CAA54 /* PetModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetModels.swift; sourceTree = "<group>"; };
@@ -99,7 +110,6 @@
 		70BE189DFC88DA0CA634B870 /* VetClinic.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetClinic.swift; sourceTree = "<group>"; };
 		84900EA374F123F44735A689 /* ShopifyService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopifyService.swift; sourceTree = "<group>"; };
 		9333426B811F6EBE9D8C1337 /* VetService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetService.swift; sourceTree = "<group>"; };
-		9E82FE411E0D702F3C5C8687 /* ShopView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopView.swift; sourceTree = "<group>"; };
 		B08DBA259051C33E01E78244 /* MapViewWrapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapViewWrapper.swift; sourceTree = "<group>"; };
 		B48B43AC4603AD6BE6678259 /* VetMapViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetMapViewModel.swift; sourceTree = "<group>"; };
 		DBCDEA159103732D87EBD44C /* Vet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Vet.swift; sourceTree = "<group>"; };
@@ -163,6 +173,15 @@
 			path = Backend;
 			sourceTree = "<group>";
 		};
+		20175E9B2F40D38E000A3910 /* Shop */ = {
+			isa = PBXGroup;
+			children = (
+				20175E992F40D38E000A3910 /* ProductDetailView.swift */,
+				20175E9A2F40D38E000A3910 /* ShopView.swift */,
+			);
+			path = Shop;
+			sourceTree = "<group>";
+		};
 		206606342EFBB4B2004CAA54 = {
 			isa = PBXGroup;
 			children = (
@@ -191,6 +210,7 @@
 		206606582EFBE5CB004CAA54 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				20175EA42F40F1B4000A3910 /* ClinicFilters.swift */,
 				2075191D2F251CD000B1FD1A /* Clinic.swift */,
 				200650252F20B195004900F1 /* Vaccine.swift */,
 				206606712F03CE37004CAA54 /* ChatHistoryModels.swift */,
@@ -206,13 +226,13 @@
 		206606592EFBE5E1004CAA54 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				20175E9B2F40D38E000A3910 /* Shop */,
 				200650162F20B102004900F1 /* Blog */,
 				2006501A2F20B102004900F1 /* Insurance */,
 				2006501C2F20B102004900F1 /* Medical */,
 				2066065B2EFBE5FE004CAA54 /* Guardian */,
 				2066065A2EFBE5ED004CAA54 /* Records */,
 				20SOCIAL052F42B000004CAA54 /* Social */,
-				9E82FE411E0D702F3C5C8687 /* ShopView.swift */,
 				760CDEC3377ACF67218E22AB /* Map */,
 				8D054A418D9CF596E4D02090 /* Shared */,
 			);
@@ -240,6 +260,9 @@
 		2066065C2EFBE621004CAA54 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				20175EA22F40F1A9000A3910 /* LocationManager.swift */,
+				20175E9E2F40E32C000A3910 /* CachedImageLoader.swift */,
+				20175E9F2F40E32C000A3910 /* RAGService.swift */,
 				2075191F2F251CEA00B1FD1A /* ClinicService.swift */,
 				200650272F20B1F1004900F1 /* VaccineService.swift */,
 				2066063F2EFBB4B2004CAA54 /* BlogService.swift */,
@@ -392,6 +415,8 @@
 				206606702EFE6F67004CAA54 /* ConsultationEngine.swift in Sources */,
 				206606722F03CE4C004CAA54 /* ChatHistoryModels.swift in Sources */,
 				2006501E2F20B102004900F1 /* VaccineView.swift in Sources */,
+				20175EA02F40E32C000A3910 /* RAGService.swift in Sources */,
+				20175EA12F40E32C000A3910 /* CachedImageLoader.swift in Sources */,
 				2006501F2F20B102004900F1 /* InsuranceCompareView.swift in Sources */,
 				2075192A2F25289700B1FD1A /* ClinicSelectionView.swift in Sources */,
 				200650202F20B102004900F1 /* BlogView.swift in Sources */,
@@ -401,6 +426,8 @@
 				2066066D2EFBEF9F004CAA54 /* AIService.swift in Sources */,
 				200650262F20B195004900F1 /* Vaccine.swift in Sources */,
 				20CCB5FF2F0418F300CE57E7 /* AddPetView.swift in Sources */,
+				20175E9C2F40D38E000A3910 /* ProductDetailView.swift in Sources */,
+				20175E9D2F40D38E000A3910 /* ShopView.swift in Sources */,
 				206606672EFBEBB5004CAA54 /* ContentView.swift in Sources */,
 				207519202F251CEA00B1FD1A /* ClinicService.swift in Sources */,
 				2066066B2EFBEF92004CAA54 /* RecordsView.swift in Sources */,
@@ -412,10 +439,11 @@
 				2066066A2EFBEF8C004CAA54 /* GuardianChatView.swift in Sources */,
 				206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */,
 				200650282F20B1F1004900F1 /* VaccineService.swift in Sources */,
+				20175EA32F40F1A9000A3910 /* LocationManager.swift in Sources */,
+				20175EA52F40F1B4000A3910 /* ClinicFilters.swift in Sources */,
 				20SOCIAL012F42B000004CAA54 /* SharePetProfileView.swift in Sources */,
 				20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */,
 				20INSMOD012F51A000004CAA54 /* InsuranceModels.swift in Sources */,
-				4BD507E91F23FAEA1C409E43 /* ShopView.swift in Sources */,
 				9832EC2E43DAA4D24B69C514 /* ShopifyService.swift in Sources */,
 				3595376D11423AB92286AB6C /* ShopModels.swift in Sources */,
 				F1640ED1E7E136CAF64BAC4A /* RAGChatView.swift in Sources */,

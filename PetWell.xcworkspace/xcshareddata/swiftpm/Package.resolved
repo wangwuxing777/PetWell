@@ -1,0 +1,24 @@
+{
+  "originHash" : "fb2ef19a69320ea8accff7d196daa296c2644ec68b774c0510c36569037320ce",
+  "pins" : [
+    {
+      "identity" : "ios-maps-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/googlemaps/ios-maps-sdk",
+      "state" : {
+        "revision" : "f821a2ef5a3ffa7c704e6c98153da2592ba3049c",
+        "version" : "10.8.0"
+      }
+    },
+    {
+      "identity" : "mobile-buy-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Shopify/mobile-buy-sdk-ios",
+      "state" : {
+        "revision" : "47aeec5605e10db8acbaea176878657510c4cb21",
+        "version" : "2025.7.0"
+      }
+    }
+  ],
+  "version" : 3
+}
