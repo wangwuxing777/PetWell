@@ -73,7 +73,10 @@ struct ShopView: View {
             } else {
               LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(shopifyService.filteredProducts) { product in
-                  ProductCard(product: product)
+                  NavigationLink(destination: ProductDetailView(product: product)) {
+                    ProductCard(product: product)
+                  }
+                  .buttonStyle(PlainButtonStyle())
                 }
               }
               .padding()
@@ -97,15 +100,43 @@ struct ProductCard: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      // Image Placeholder
-      RoundedRectangle(cornerRadius: 12)
-        .fill(Color.gray.opacity(0.1))
-        .aspectRatio(1, contentMode: .fit)
-        .overlay(
-          Image(systemName: "photo")
-            .font(.largeTitle)
-            .foregroundColor(.gray)
-        )
+      // Product Image
+      if let url = product.imageUrl {
+        AsyncImage(url: url) { phase in
+          switch phase {
+          case .empty:
+            RoundedRectangle(cornerRadius: 12)
+              .fill(Color.gray.opacity(0.1))
+              .aspectRatio(1, contentMode: .fit)
+              .overlay(ProgressView())
+          case .success(let image):
+            image
+              .resizable()
+              .aspectRatio(contentMode: .fit)
+              .cornerRadius(12)
+          case .failure:
+            RoundedRectangle(cornerRadius: 12)
+              .fill(Color.gray.opacity(0.1))
+              .aspectRatio(1, contentMode: .fit)
+              .overlay(
+                 Image(systemName: "photo")
+                   .font(.largeTitle)
+                   .foregroundColor(.gray)
+              )
+          @unknown default:
+            EmptyView()
+          }
+        }
+      } else {
+        RoundedRectangle(cornerRadius: 12)
+          .fill(Color.gray.opacity(0.1))
+          .aspectRatio(1, contentMode: .fit)
+          .overlay(
+            Image(systemName: "photo")
+              .font(.largeTitle)
+              .foregroundColor(.gray)
+          )
+      }
 
       VStack(alignment: .leading, spacing: 4) {
         Text(product.title)

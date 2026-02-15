@@ -14,6 +14,8 @@ struct Clinic: Identifiable, Codable, Hashable {
     let latitude: String?
     let longitude: String?
     let rating: String?
+    let photoUrl: String?
+    let googlePlaceId: String?
     
     enum CodingKeys: String, CodingKey {
         case id = "clinic_id"
@@ -29,5 +31,7 @@ struct Clinic: Identifiable, Codable, Hashable {
         case latitude
         case longitude
         case rating
+        case photoUrl = "photo_url"
+        case googlePlaceId = "google_place_id"
     }
 }

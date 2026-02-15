@@ -52,10 +52,10 @@ class ShopifyService: ObservableObject {
   func fetchProducts() {
     isLoading = true
 
-    // defined query: request first 10 products
+    // defined query: request first 30 products, sorted by newest
     let query = Storefront.buildQuery {
       $0
-        .products(first: 10) {
+        .products(first: 30, reverse: true, sortKey: .createdAt) {
           $0
             .edges {
               $0
@@ -89,7 +89,7 @@ class ShopifyService: ObservableObject {
         }
     }
 
-    let task = client?.queryGraphWith(query) { response, error in
+    let task = client?.queryGraphWith(query, cachePolicy: .networkOnly) { response, error in
       if let error = error {
         print("Shopify Fetch Error: \(error)")
         DispatchQueue.main.async {
