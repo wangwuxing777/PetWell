@@ -12,217 +12,308 @@ struct RAGChatView: View {
   var contextString: String?
   @Binding var isPresented: Bool
 
-  @State private var showContextSheet = false
-  @ObservedObject var insuranceService = InsuranceService.shared
-  @State private var selectedContextProduct: InsuranceProduct?
-
   var body: some View {
-    VStack(spacing: 0) {
-      // Custom Header
-      HStack {
-        Button(action: {
-          isPresented = false
-        }) {
-          Image(systemName: "chevron.left")
-            .font(.system(size: 20, weight: .semibold))
-            .foregroundColor(.black)
-            .padding(12)
-            .background(Color.white)
-            .clipShape(Circle())
-            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-        }
-
-        Spacer()
-
-        VStack(spacing: 2) {
-          Text("PetWell Assistant")
-            .font(.headline)
-            .foregroundColor(.black)
-          if let product = selectedContextProduct {
-            Text("Context: \(product.insuranceName)")
-              .font(.caption2)
-              .foregroundColor(.blue)
-          }
-        }
-
-        Spacer()
-
-        // Placeholder for symmetry or menu
-        Color.clear.frame(width: 44, height: 44)
-      }
-      .padding(.horizontal)
-      .padding(.top, 16)  // Safe area adjustment if needed, usually handled by background
-      .padding(.bottom, 8)
-      .background(Color(UIColor.systemBackground))
-
-      // Chat Area
-      ScrollViewReader { proxy in
-        ScrollView {
-          LazyVStack(spacing: 20) {  // Increased spacing
-            // Error Display
-            if let error = ragService.errorMessage {
-              Text("Error: \(error)")
-                .foregroundColor(.red)
-                .padding()
-                .background(Color.red.opacity(0.1))
-                .cornerRadius(12)
-                .padding(.horizontal)
-            }
-
-            ForEach(ragService.messages) { message in
-              HStack(alignment: .bottom, spacing: 8) {
-                if message.isUser {
-                  Spacer()
-                  Text(message.content)
-                    .font(.body)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(bubbleColorUser)
-                    .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                  //.cornerRadius(20, corners: [.topLeft, .topRight, .bottomLeft])
-                } else {
-                  // AI Avatar
-                  Image(systemName: "sparkles")
-                    .font(.system(size: 14))
-                    .foregroundColor(.white)
-                    .padding(8)
-                    .background(
-                      LinearGradient(
-                        colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing
-                      )
-                    )
-                    .clipShape(Circle())
-
-                  Text(message.content)
-                    .font(.body)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(bubbleColorAI)
-                    .foregroundColor(.primary)
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                  //.cornerRadius(20, corners: [.topLeft, .topRight, .bottomRight])
-                  Spacer()
-                }
-              }
-              .padding(.horizontal, 16)  // Consistent side padding
-              .id(message.id)
-            }
-
-            if ragService.isLoading {
-              HStack {
-                ProgressView()
-                  .padding(8)
-                  .background(Color.white)
-                  .clipShape(Circle())
-                  .shadow(radius: 2)
-                Spacer()
-              }
-              .padding(.leading, 16)
-              .id("loading")
-            }
-
-            // Spacer for bottom content
-            Color.clear.frame(height: 20)
-              .id("bottom")
-          }
-          .padding(.vertical, 20)
-        }
-        .onChange(of: ragService.messages.count) { _ in
-          withAnimation {
-            proxy.scrollTo("bottom", anchor: .bottom)
-          }
-        }
-        .onChange(of: ragService.isLoading) { loading in
-          if loading {
-            withAnimation {
-              proxy.scrollTo("loading", anchor: .bottom)
-            }
-          }
-        }
-      }
-
-      // Input Area
+    NavigationView {
       VStack(spacing: 0) {
-        Divider()
-        HStack(spacing: 12) {
-          // Plus Button (Context Switch)
+        // ── CHAT AREA ──
+        chatScrollView
+
+        // ── INPUT AREA ──
+        inputAreaView
+      }
+      .background(Color.white.ignoresSafeArea())
+      .navigationTitle("PetWell Assistant")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .navigationBarLeading) {
           Button(action: {
-            showContextSheet = true
+            isPresented = false
           }) {
-            Image(systemName: "plus")
-              .font(.system(size: 20, weight: .medium))
-              .foregroundColor(.gray)
-              .frame(width: 40, height: 40)
-              .background(Color(UIColor.secondarySystemBackground))
-              .clipShape(Circle())
+            Image(systemName: "chevron.backward")
+              .font(.system(size: 17, weight: .medium))
+              .foregroundColor(.black)
           }
-          .sheet(isPresented: $showContextSheet) {
-            ProviderSelectionView(isPresented: $showContextSheet) { selectedId in
-              // Update context
-              if let product = insuranceService.products.first(where: {
-                $0.insuranceId == selectedId
-              }) {
-                selectedContextProduct = product
-                // Optionally send a system message to indicate context switch?
-                // Or just update the context used for next queries.
-              }
-            }
-          }
-
-          // Text Field
-          TextField("Ask anything...", text: $question)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(Color(UIColor.secondarySystemBackground))
-            .cornerRadius(24)
-            .frame(minHeight: 44)
-
-          // Mic Button (Visual Only for now)
-          Button(action: {}) {
-            Image(systemName: "mic")
-              .font(.system(size: 20))
-              .foregroundColor(.gray)
-          }
-
-          // Send/Wave Button
-          Button(action: sendMessage) {
-            Image(systemName: question.isEmpty ? "waveform" : "arrow.up.circle.fill")
-              .font(.system(size: 30))
-              .foregroundColor(.blue)  // Main Blue
-          }
-          .disabled(ragService.isLoading)
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 12)
-        .padding(.bottom, 8)  // Dynamic bottom padding handles safe area usually
-        .background(Color.white)
-
       }
     }
-    .background(Color.white.ignoresSafeArea())  // Ensure full background
     .onAppear {
       if ragService.messages.isEmpty {
         let greeting = ChatMessage(
           content: "Hello, I am your insurance assistant, how can I help you?", isUser: false)
         ragService.messages.append(greeting)
       }
+      ragService.createSession()
     }
   }
+
+  // MARK: - Chat Scroll View
+
+  private var chatScrollView: some View {
+    ScrollViewReader { proxy in
+      ScrollView {
+        LazyVStack(spacing: 20) {
+          // Error Display
+          if let error = ragService.errorMessage {
+            Text("Error: \(error)")
+              .foregroundColor(.red)
+              .padding()
+              .background(Color.red.opacity(0.1))
+              .cornerRadius(12)
+              .padding(.horizontal)
+          }
+
+          ForEach(ragService.messages) { message in
+            if message.isSystemNotice {
+              // ── SYSTEM NOTICE (provider switch) ──
+              systemNoticeView(message: message)
+            } else {
+              // ── CHAT BUBBLE ──
+              chatBubbleView(message: message)
+            }
+          }
+
+          if ragService.isLoading {
+            HStack {
+              ProgressView()
+                .padding(8)
+                .background(Color.white)
+                .clipShape(Circle())
+                .shadow(radius: 2)
+              Spacer()
+            }
+            .padding(.leading, 16)
+            .id("loading")
+          }
+
+          // Bottom spacer
+          Color.clear.frame(height: 20)
+            .id("bottom")
+        }
+        .padding(.vertical, 20)
+      }
+      .onChange(of: ragService.messages.count) { _ in
+        withAnimation {
+          proxy.scrollTo("bottom", anchor: .bottom)
+        }
+      }
+      .onChange(of: ragService.isLoading) { loading in
+        if loading {
+          withAnimation {
+            proxy.scrollTo("loading", anchor: .bottom)
+          }
+        }
+      }
+    }
+  }
+
+  // MARK: - System Notice View
+
+  private func systemNoticeView(message: ChatMessage) -> some View {
+    HStack {
+      Spacer()
+      HStack(spacing: 6) {
+        Image(systemName: "arrow.triangle.2.circlepath")
+          .font(.system(size: 11))
+        Text(message.content)
+          .font(.system(size: 12, weight: .medium))
+      }
+      .foregroundColor(.blue)
+      .padding(.horizontal, 14)
+      .padding(.vertical, 6)
+      .background(Color.blue.opacity(0.08))
+      .cornerRadius(16)
+      Spacer()
+    }
+    .padding(.horizontal, 16)
+  }
+
+  // MARK: - Chat Bubble View
+
+  private func chatBubbleView(message: ChatMessage) -> some View {
+    VStack(alignment: message.isUser ? .trailing : .leading, spacing: 4) {
+      // Active provider badge (above AI bubbles only)
+      if !message.isUser, let provider = message.activeProvider, !provider.isEmpty {
+        HStack(spacing: 4) {
+          Image(systemName: "magnifyingglass")
+            .font(.system(size: 10))
+          Text("Based on: \(provider)")
+            .font(.system(size: 11, weight: .medium))
+        }
+        .foregroundColor(.secondary)
+        .padding(.leading, 52)  // Align with bubble (after avatar)
+      }
+
+      // Bubble
+      HStack(alignment: .bottom, spacing: 8) {
+        if message.isUser {
+          Spacer()
+          Text(message.content)
+            .font(.body)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(bubbleColorUser)
+            .foregroundColor(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        } else {
+          // AI Avatar
+          Image(systemName: "sparkles")
+            .font(.system(size: 14))
+            .foregroundColor(.white)
+            .padding(8)
+            .background(
+              LinearGradient(
+                colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing
+              )
+            )
+            .clipShape(Circle())
+
+          Text(message.content)
+            .font(.body)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(bubbleColorAI)
+            .foregroundColor(.primary)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+          Spacer()
+        }
+      }
+    }
+    .padding(.horizontal, 16)
+    .id(message.id)
+  }
+
+  // MARK: - Input Area
+
+  private var inputAreaView: some View {
+    VStack(spacing: 0) {
+      Divider()
+
+      VStack(spacing: 10) {
+        // Text Field Row
+        HStack(spacing: 12) {
+          TextField("Ask Anything", text: $question)
+            .font(.system(size: 16))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color(UIColor.systemGray6))
+            .cornerRadius(24)
+            .frame(minHeight: 44)
+
+          // Send Button
+          Button(action: sendMessage) {
+            Image(systemName: question.isEmpty ? "arrow.up.circle" : "arrow.up.circle.fill")
+              .font(.system(size: 28))
+              .foregroundColor(question.isEmpty ? Color(UIColor.systemGray3) : .blue)
+          }
+          .disabled(ragService.isLoading || question.isEmpty)
+        }
+
+        // ── DROPDOWN PILLS ROW ──
+        HStack(spacing: 10) {
+          // Attachment icon (visual only)
+          Image(systemName: "paperclip")
+            .font(.system(size: 18, weight: .medium))
+            .foregroundColor(Color(UIColor.systemGray2))
+            .frame(width: 32, height: 32)
+
+          // Model Selector Pill
+          modelSelectorPill
+
+          // Provider Selector Pill
+          providerSelectorPill
+
+          Spacer()
+        }
+      }
+      .padding(.horizontal, 16)
+      .padding(.top, 10)
+      .padding(.bottom, 12)
+      .background(Color.white)
+    }
+  }
+
+  // MARK: - Model Selector Pill
+
+  private var modelSelectorPill: some View {
+    Menu {
+      ForEach(ChatModel.allCases) { model in
+        Button(action: {
+          ragService.selectedModel = model
+        }) {
+          Label(model.displayName, systemImage: model.icon)
+        }
+      }
+    } label: {
+      HStack(spacing: 5) {
+        Image(systemName: ragService.selectedModel.icon)
+          .font(.system(size: 12, weight: .medium))
+        Text(ragService.selectedModel.displayName)
+          .font(.system(size: 13, weight: .medium))
+        Image(systemName: "chevron.down")
+          .font(.system(size: 8, weight: .bold))
+      }
+      .foregroundColor(.primary)
+      .padding(.horizontal, 12)
+      .padding(.vertical, 8)
+      .background(
+        Capsule()
+          .stroke(Color(UIColor.systemGray4), lineWidth: 1)
+      )
+    }
+  }
+
+  // MARK: - Provider Selector Pill
+
+  private var providerSelectorPill: some View {
+    Menu {
+      ForEach(ChatProviderOption.allCases) { provider in
+        Button(action: {
+          ragService.selectProvider(provider)
+        }) {
+          HStack {
+            Text(provider.displayName)
+            if ragService.selectedProvider == provider {
+              Image(systemName: "checkmark")
+            }
+          }
+        }
+      }
+    } label: {
+      HStack(spacing: 5) {
+        Image(systemName: "shield.checkered")
+          .font(.system(size: 12, weight: .medium))
+        Text(
+          ragService.selectedProvider == .all
+            ? "Provider" : ragService.selectedProvider.displayName
+        )
+        .font(.system(size: 13, weight: .medium))
+        Image(systemName: "chevron.down")
+          .font(.system(size: 8, weight: .bold))
+      }
+      .foregroundColor(ragService.selectedProvider == .all ? .primary : .blue)
+      .padding(.horizontal, 12)
+      .padding(.vertical, 8)
+      .background(
+        Capsule()
+          .stroke(
+            ragService.selectedProvider == .all ? Color(UIColor.systemGray4) : Color.blue,
+            lineWidth: ragService.selectedProvider == .all ? 1 : 1.5
+          )
+      )
+    }
+  }
+
+  // MARK: - Actions
 
   private func sendMessage() {
     guard !question.isEmpty else { return }
     let currentQuestion = question
     question = ""
 
-    // Construct context
-    // If user selected a specific product, override the original context?
-    // Or append? The original context was specific coverage term.
-    // If user switches product, maybe they want to ask about THAT product generally?
-
     var currentContext = contextString
-    if let product = selectedContextProduct {
-      currentContext = "Context: Insurance Product - \(product.insuranceName)"
+    if ragService.selectedModel == .insurance && ragService.selectedProvider != .all {
+      currentContext =
+        "Context: Insurance Provider - \(ragService.selectedProvider.displayName)"
     }
 
     ragService.askQuestion(query: currentQuestion, context: currentContext)
