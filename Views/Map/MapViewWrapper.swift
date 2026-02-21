@@ -12,7 +12,8 @@ struct MapViewWrapper: UIViewRepresentable {
       longitude: viewModel.cameraLongitude,
       zoom: viewModel.zoomLevel
     )
-    let mapView = GMSMapView(frame: .zero, camera: camera)
+    let mapID = GMSMapID(identifier: "a644dbe938291feb93f79c1d")
+    let mapView = GMSMapView(frame: .zero, mapID: mapID, camera: camera)
     mapView.delegate = context.coordinator
     mapView.isMyLocationEnabled = true
     mapView.settings.myLocationButton = true
