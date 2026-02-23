@@ -18,3 +18,4 @@
 - **Color Distinctions:** To prevent blending, Advanced Coverage metrics use a purple overlay instead of the standard blue used in Core Coverage.
 - **Doodle UI Rotations:** Reduced hardcoded rotations (`rotation * 0.3` multiplier) inside `SketchCardModifier` because absolute values caused UI unbalance and exaggerated tilted appearance.
 - **Sticky Mini Header:** Updated Sticky Mini header mapping layout to have both an outlined blue "Compare" button and an active native-iOS style gradient background "For Me" (AI themed) Button. Reintroduced full width header.
+- **Sticky Mini Header:** Updated Sticky Mini header mapping layout to have both an outlined blue "Compare" button and an active native-iOS style gradient background "For Me" (AI themed) Button. Reintroduced full width header, and made sure full header scrolls out of view and pushes content, rather than overlapping it.

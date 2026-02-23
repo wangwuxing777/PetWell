@@ -108,21 +108,21 @@ struct InsuranceLandingView: View {
 
   // Header heights
   private let fullHeaderHeight: CGFloat = 280
-  private var miniHeaderHeight: CGFloat { fullHeaderHeight * 2 / 5 }
 
   private var showMiniHeader: Bool {
-    scrollOffset > fullHeaderHeight
+    scrollOffset > fullHeaderHeight - 80  // Show slightly before it fully disappears
   }
 
   var body: some View {
     NavigationStack {
       ZStack(alignment: .top) {
+        // Base background pattern
         DottedBackground()
           .ignoresSafeArea()
 
         ScrollView(.vertical, showsIndicators: false) {
           VStack(spacing: 0) {
-            // Old Layout's Scroll Away Hero Header
+            // Top level header that scrolls away
             fullHeader
 
             // New Sketch Style Content
@@ -168,15 +168,10 @@ struct InsuranceLandingView: View {
           scrollOffset = value
         }
 
-        // Sticky Mini Header
+        // Sticky Mini Header overlay
         if showMiniHeader {
           miniHeader
-            .transition(
-              .asymmetric(
-                insertion: .move(edge: .top).combined(with: .opacity),
-                removal: .move(edge: .top).combined(with: .opacity)
-              )
-            )
+            .transition(.move(edge: .top).combined(with: .opacity))
             .zIndex(100)
         }
       }
@@ -194,10 +189,18 @@ struct InsuranceLandingView: View {
   private var fullHeader: some View {
     GeometryReader { geometry in
       ZStack(alignment: .bottomLeading) {
+        // If dragging down, stretch the image (bouncy scroll effect)
+        let minY = geometry.frame(in: .global).minY
+        let isScrollingDown = minY > 0
+
         Image("InsuranceHero")
           .resizable()
           .scaledToFill()
-          .frame(width: geometry.size.width, height: fullHeaderHeight)
+          .frame(
+            width: geometry.size.width,
+            height: isScrollingDown ? fullHeaderHeight + minY : fullHeaderHeight
+          )
+          .offset(y: isScrollingDown ? -minY : 0)
           .clipped()
 
         LinearGradient(
@@ -209,6 +212,7 @@ struct InsuranceLandingView: View {
           startPoint: .top,
           endPoint: .bottom
         )
+        .frame(height: fullHeaderHeight)  // Gradient shouldn't stretch
 
         VStack(alignment: .leading, spacing: 6) {
           Text(languageManager.isChinese ? "寵物保險" : "Pet Insurance")
@@ -278,11 +282,10 @@ struct InsuranceLandingView: View {
       }
     }
     .padding(.horizontal, 20)
-    .padding(.top, 54)
+    .padding(.top, 54)  // Safe area inset
     .padding(.bottom, 12)
     .background(
-      Color(.systemGray6)
-        .opacity(0.85)
+      Color(.systemGray6).opacity(0.9)
     )
     .background(.ultraThinMaterial)
   }
