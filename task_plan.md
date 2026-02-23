@@ -1,24 +1,24 @@
-# Task Plan: Daily Progress Tracking - 2026-02-11
+# Insurance Landing Page Redesign Plan
 
-## Goal
-Document and track all development activities, research findings, and technical decisions made on February 11, 2026.
-
-## Current Phase
-Phase 1: Session Documentation
+## Focus
+We are redesigning `Views/Insurance/InsuranceLandingView.swift` to match the React template provided in `/Users/vfzzz/Desktop/PetWell/landing page design template/`.
+Crucially, the user requested to strictly keep the "For Me" upward sliding popup design.
 
 ## Phases
+### Phase 1: Understand current Swift code & React template
+- [x] Read React template components to understand styling and layout.
+- [x] Read existing `InsuranceLandingView.swift`.
+- **Status:** complete
 
-### Phase 1: Session Documentation
-- [x] Initialize planning files (task_plan.md, findings.md, progress.md)
-- [ ] Log RAG integration work
-- [ ] Log Git push to main
-- **Status:** in_progress
+### Phase 2: Design SwiftUI mapping
+- [x] Map the React layout to SwiftUI.
+- [x] Ensure "For Me" sliding popup behavior is retained.
+- **Status:** complete
 
-### Phase 2: Maintenance
-- [ ] Keep files updated as work continues
-- **Status:** pending
+### Phase 3: Implement SwiftUI code
+- [x] Rewrite `InsuranceLandingView.swift`.
+- **Status:** complete
 
-## Decisions Made
-| Decision | Rationale |
-|----------|-----------|
-| Use root directory for planning files | Standard Manus-style workflow for easy visibility and persistence. |
+### Phase 4: Test & Verify
+- [x] Build the project and verify layout visually using Xcode Preview or simulator.
+- **Status:** complete

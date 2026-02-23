@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .sketch-border-1 {
+    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  }
+  .sketch-border-2 {
+    border-radius: 15px 225px 15px 255px/255px 15px 225px 15px;
+  }
+  .sketch-border-3 {
+    border-radius: 225px 15px 255px 15px/15px 255px 15px 225px;
+  }
+  .sketch-border-4 {
+    border-radius: 15px 255px 15px 225px/225px 15px 255px 15px;
+  }
+  
+  .sketch-shadow {
+    box-shadow: 4px 4px 0px rgba(30, 58, 138, 1); /* blue-900 */
+  }
+  .sketch-shadow-sm {
+    box-shadow: 2px 2px 0px rgba(30, 58, 138, 1);
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+body {
+  background-color: #f8fafc;
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 20px 20px;
+}
