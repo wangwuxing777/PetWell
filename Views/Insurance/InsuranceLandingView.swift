@@ -178,11 +178,11 @@ struct InsuranceLandingView: View {
       .animation(.easeInOut(duration: 0.25), value: showMiniHeader)
       .ignoresSafeArea(edges: .top)
       .navigationBarHidden(true)
-      .fullScreenCover(isPresented: $isShowingRecommendation) {
-        RAGChatView(
-          contextString: languageManager.isChinese ? "為我推薦寵物保險" : "Pet Insurance Recommendation",
-          isPresented: $isShowingRecommendation)
-      }
+    }
+    .fullScreenCover(isPresented: $isShowingRecommendation) {
+      RAGChatView(
+        contextString: languageManager.isChinese ? "為我推薦寵物保險" : "Pet Insurance Recommendation",
+        isPresented: $isShowingRecommendation)
     }
   }
 
