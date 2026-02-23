@@ -50,7 +50,6 @@
 		5809467036E9C1D483F6EDF1 /* VetMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B48B43AC4603AD6BE6678259 /* VetMapViewModel.swift */; };
 		5D76E2067F9710ABED5E50F4 /* VetMapContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AAB46C63991E9ABB508494D /* VetMapContainerView.swift */; };
 		6A0296CEE0996BC91EA15904 /* VetClinic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70BE189DFC88DA0CA634B870 /* VetClinic.swift */; };
-		7B51BE35A6023BF6E1D1BDDD /* RAGService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC2066A898C6179FE49E014 /* RAGService.swift */; };
 		82E386E4958DE00A444D9CEE /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40938F3FFFB3538C4F3D6253 /* ViewModifiers.swift */; };
 		84306D6F5E9BD0F01109AC13 /* MapViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08DBA259051C33E01E78244 /* MapViewWrapper.swift */; };
 		9832EC2E43DAA4D24B69C514 /* ShopifyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84900EA374F123F44735A689 /* ShopifyService.swift */; };
@@ -102,7 +101,6 @@
 		20INSMOD022F51A000004CAA54 /* InsuranceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceModels.swift; sourceTree = "<group>"; };
 		20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePetProfileView.swift; sourceTree = "<group>"; };
 		20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialSearchView.swift; sourceTree = "<group>"; };
-		3EC2066A898C6179FE49E014 /* RAGService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RAGService.swift; path = Services/RAGService.swift; sourceTree = "<group>"; };
 		40938F3FFFB3538C4F3D6253 /* ViewModifiers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
 		4AAB46C63991E9ABB508494D /* VetMapContainerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetMapContainerView.swift; sourceTree = "<group>"; };
 		5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceService.swift; sourceTree = "<group>"; };
@@ -193,7 +191,6 @@
 				206606582EFBE5CB004CAA54 /* Models */,
 				2066063E2EFBB4B2004CAA54 /* Products */,
 				62DBB5D947F0DD76560408AA /* RAGChatView.swift */,
-				3EC2066A898C6179FE49E014 /* RAGService.swift */,
 				98B299DA0A09820E808069C0 /* Frameworks */,
 				529E110BBB60A43DC29593E7 /* ViewModels */,
 			);
@@ -447,7 +444,6 @@
 				9832EC2E43DAA4D24B69C514 /* ShopifyService.swift in Sources */,
 				3595376D11423AB92286AB6C /* ShopModels.swift in Sources */,
 				F1640ED1E7E136CAF64BAC4A /* RAGChatView.swift in Sources */,
-				7B51BE35A6023BF6E1D1BDDD /* RAGService.swift in Sources */,
 				F17000012F20B102004900F1 /* ProviderSelectionView.swift in Sources */,
 				333BACED5C6923948F4FAF30 /* Vet.swift in Sources */,
 				5809467036E9C1D483F6EDF1 /* VetMapViewModel.swift in Sources */,

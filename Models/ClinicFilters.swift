@@ -29,10 +29,3 @@ enum ClinicRegion: String, CaseIterable, Identifiable {
     }
   }
 }
-
-enum ClinicSortOption: String, CaseIterable, Identifiable {
-  case rating = "Rating"
-  case distance = "Distance"
-
-  var id: String { rawValue }
-}

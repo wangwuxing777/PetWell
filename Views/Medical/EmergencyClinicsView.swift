@@ -78,10 +78,16 @@ enum HKDistrict: String, CaseIterable {
 }
 
 // MARK: - Sort Selection
-enum SortSelection: Equatable {
-  case none
-  case rating
-  case distance
+struct SortSelection: Equatable {
+  var rating: Bool
+  var distance: Bool
+
+  static let none = SortSelection(rating: false, distance: false)
+
+  var isNone: Bool { !rating && !distance }
+  var isBoth: Bool { rating && distance }
+  var isRatingOnly: Bool { rating && !distance }
+  var isDistanceOnly: Bool { !rating && distance }
 }
 
 // MARK: - Sheet Position
@@ -108,8 +114,8 @@ struct EmergencyClinicsView: View {
   @State private var searchText = ""
 
   // Sort
-  @State private var sortSelection: SortSelection = .none
-  @State private var appliedSort: SortSelection = .none
+  @State private var sortSelection: SortSelection = SortSelection(rating: true, distance: true)
+  @State private var appliedSort: SortSelection = SortSelection(rating: true, distance: true)
   @State private var showSortSheet = false
 
   // Sheet drag
@@ -118,7 +124,6 @@ struct EmergencyClinicsView: View {
   // User feedback: "Card is too high". Lowering it significantly.
   // 0.48 was ~half. 0.62 puts it lower, revealing more map.
   @State private var currentSheetOffset: CGFloat = UIScreen.main.bounds.height * 0.62
-  @State private var showAIChat = false
 
   // Map markers: highest-rated clinic per district
   var topClinicPerDistrict: [Clinic] {
@@ -151,14 +156,49 @@ struct EmergencyClinicsView: View {
     }
 
     // Sort
-    switch appliedSort {
-    case .rating:
+    if appliedSort.isBoth {
+      // Combined weighted sort: 0.5 rating + 0.5 distance
+      if let userLoc = locationManager.location {
+        // Compute distances for normalization
+        let distances: [Double] = result.map { clinic in
+          let lat = Double(clinic.latitude ?? "0") ?? 0
+          let lon = Double(clinic.longitude ?? "0") ?? 0
+          return userLoc.distance(from: CLLocation(latitude: lat, longitude: lon))
+        }
+        let ratings: [Double] = result.map { Double($0.rating ?? "0") ?? 0 }
+
+        let minDist = distances.min() ?? 0
+        let maxDist = distances.max() ?? 1
+        let distRange = maxDist - minDist
+
+        let minRating = ratings.min() ?? 0
+        let maxRating = ratings.max() ?? 5
+        let ratingRange = maxRating - minRating
+
+        let indexed = result.enumerated().map { (index, clinic) -> (Clinic, Double) in
+          // Normalize rating to 0-1 (higher is better)
+          let normRating = ratingRange > 0 ? (ratings[index] - minRating) / ratingRange : 1.0
+          // Normalize distance to 0-1 (lower distance = higher score)
+          let normDist = distRange > 0 ? 1.0 - (distances[index] - minDist) / distRange : 1.0
+          let score = 0.5 * normRating + 0.5 * normDist
+          return (clinic, score)
+        }
+        result = indexed.sorted { $0.1 > $1.1 }.map { $0.0 }
+      } else {
+        // No location available, fall back to rating only
+        result.sort {
+          let r1 = Double($0.rating ?? "0") ?? 0
+          let r2 = Double($1.rating ?? "0") ?? 0
+          return r1 > r2
+        }
+      }
+    } else if appliedSort.isRatingOnly {
       result.sort {
         let r1 = Double($0.rating ?? "0") ?? 0
         let r2 = Double($1.rating ?? "0") ?? 0
         return r1 > r2
       }
-    case .distance:
+    } else if appliedSort.isDistanceOnly {
       if let userLoc = locationManager.location {
         result.sort {
           let lat1 = Double($0.latitude ?? "0") ?? 0
@@ -170,7 +210,8 @@ struct EmergencyClinicsView: View {
           return userLoc.distance(from: loc1) < userLoc.distance(from: loc2)
         }
       }
-    case .none:
+    } else {
+      // .none — default to rating
       result.sort {
         let r1 = Double($0.rating ?? "0") ?? 0
         let r2 = Double($1.rating ?? "0") ?? 0
@@ -264,7 +305,7 @@ struct EmergencyClinicsView: View {
           } else {
             ScrollView {
               LazyVStack(spacing: 16) {
-                ForEach(filteredClinics) { clinic in
+                ForEach(filteredClinics, id: \.self) { clinic in
                   NavigationLink(destination: ClinicDetailView(clinic: clinic)) {
                     ClinicCard(clinic: clinic, userLocation: locationManager.location)
                   }
@@ -273,28 +314,14 @@ struct EmergencyClinicsView: View {
               }
               .padding(.horizontal, 16)
               .padding(.top, 12)
-              .padding(.bottom, 24)
-            }
-            .overlay(alignment: .bottomTrailing) {
-              Button {
-                showAIChat = true
-              } label: {
-                Image(systemName: "sparkles")
-                  .font(.system(size: 24, weight: .semibold))
-                  .foregroundColor(.white)
-                  .frame(width: 56, height: 56)
-                  .background(Color.blue)
-                  .clipShape(Circle())
-                  .shadow(color: Color.blue.opacity(0.4), radius: 8, x: 0, y: 4)
-              }
-              .padding(.trailing, 20)
-              .padding(.bottom, 30)
+              .padding(.bottom, max(0, currentSheetOffset - 130) + 30)
             }
           }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
+        .frame(height: geo.size.height - 130)
         .background(Color.white)
-        .cornerRadius(16, corners: [.topLeft, .topRight])
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: -3)
         .offset(y: currentSheetOffset)
         .gesture(
@@ -336,17 +363,6 @@ struct EmergencyClinicsView: View {
           // Ensure this matches the initial state logic
           currentSheetOffset = UIScreen.main.bounds.height * 0.62
         }
-      }
-    }
-    .sheet(isPresented: $showAIChat) {
-      if #available(iOS 16.0, *) {
-        RAGChatView(
-          contextString: "Finding emergency vet clinics in Hong Kong", isPresented: $showAIChat
-        )
-        .presentationDetents([.medium, .large])
-      } else {
-        RAGChatView(
-          contextString: "Finding emergency vet clinics in Hong Kong", isPresented: $showAIChat)
       }
     }
     .navigationBarHidden(true)
@@ -442,14 +458,14 @@ struct EmergencyClinicsView: View {
           Image(systemName: "chevron.down")
             .font(.system(size: 10, weight: .medium))
         }
-        .foregroundColor(appliedSort != .none ? .blue : .black)
+        .foregroundColor(!appliedSort.isNone ? .blue : .black)
         .padding(.horizontal, 16)
         .frame(height: 36)
         .background(
           RoundedRectangle(cornerRadius: 20)
             .stroke(
-              appliedSort != .none ? Color.blue : Color(UIColor.systemGray4),
-              lineWidth: appliedSort != .none ? 1.5 : 1
+              !appliedSort.isNone ? Color.blue : Color(UIColor.systemGray4),
+              lineWidth: !appliedSort.isNone ? 1.5 : 1
             )
         )
       }
@@ -496,9 +512,6 @@ struct SortSheetView: View {
   @Binding var appliedSort: SortSelection
   var onDismiss: () -> Void
 
-  @State private var lastRatingTap: Date = .distantPast
-  @State private var lastDistanceTap: Date = .distantPast
-
   var body: some View {
     VStack(spacing: 0) {
       // Header
@@ -518,24 +531,22 @@ struct SortSheetView: View {
       .padding(.top, 20)
       .padding(.bottom, 16)
 
-      // Two options
+      // Two options (checkbox style, multi-select)
       VStack(spacing: 12) {
-        sortOptionRow(
+        sortCheckboxRow(
           icon: "star.fill",
           title: "Rating",
-          subtitle: "Highest rated first",
-          isSelected: selection == .rating
+          isSelected: selection.rating
         ) {
-          handleTap(for: .rating, lastTap: $lastRatingTap)
+          selection.rating.toggle()
         }
 
-        sortOptionRow(
+        sortCheckboxRow(
           icon: "location.fill",
           title: "Distance",
-          subtitle: "Nearest first",
-          isSelected: selection == .distance
+          isSelected: selection.distance
         ) {
-          handleTap(for: .distance, lastTap: $lastDistanceTap)
+          selection.distance.toggle()
         }
       }
       .padding(.horizontal, 20)
@@ -563,22 +574,8 @@ struct SortSheetView: View {
     .background(Color.white)
   }
 
-  private func handleTap(for option: SortSelection, lastTap: Binding<Date>) {
-    let now = Date()
-    let interval = now.timeIntervalSince(lastTap.wrappedValue)
-
-    if interval < 0.4 && selection == option {
-      // Double tap: deselect
-      selection = .none
-      lastTap.wrappedValue = .distantPast
-    } else {
-      selection = option
-      lastTap.wrappedValue = now
-    }
-  }
-
-  private func sortOptionRow(
-    icon: String, title: String, subtitle: String, isSelected: Bool, action: @escaping () -> Void
+  private func sortCheckboxRow(
+    icon: String, title: String, isSelected: Bool, action: @escaping () -> Void
   ) -> some View {
     Button(action: action) {
       HStack(spacing: 14) {
@@ -587,26 +584,21 @@ struct SortSheetView: View {
           .foregroundColor(isSelected ? .blue : .gray)
           .frame(width: 24)
 
-        VStack(alignment: .leading, spacing: 2) {
-          Text(title)
-            .font(.system(size: 15, weight: .medium))
-            .foregroundColor(.primary)
-          Text(subtitle)
-            .font(.system(size: 12))
-            .foregroundColor(.secondary)
-        }
+        Text(title)
+          .font(.system(size: 15, weight: .medium))
+          .foregroundColor(.primary)
 
         Spacer()
 
-        // Selection indicator ring
+        // Checkbox indicator
         ZStack {
-          Circle()
+          RoundedRectangle(cornerRadius: 5)
             .strokeBorder(isSelected ? Color.blue : Color(UIColor.systemGray4), lineWidth: 2)
             .frame(width: 22, height: 22)
           if isSelected {
-            Circle()
-              .fill(Color.blue)
-              .frame(width: 12, height: 12)
+            Image(systemName: "checkmark")
+              .font(.system(size: 12, weight: .bold))
+              .foregroundColor(.blue)
           }
         }
       }
@@ -750,7 +742,7 @@ struct ClinicCard: View {
             case .success(let image):
               image.resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(height: 200)
+                .frame(maxWidth: .infinity, minHeight: 140, maxHeight: 140)
                 .clipped()
             case .failure:
               ZStack {
@@ -787,10 +779,9 @@ struct ClinicCard: View {
             .padding(12)
         }
       }
-      .frame(height: 200)
+      .frame(height: 140)
       .frame(maxWidth: .infinity)
       .clipped()
-      .cornerRadius(14, corners: [.topLeft, .topRight])
 
       // Info Row
       HStack(alignment: .top) {
@@ -798,6 +789,7 @@ struct ClinicCard: View {
           Text(clinic.name)
             .font(.system(size: 15, weight: .bold))
             .foregroundColor(.primary)
+            .fixedSize(horizontal: false, vertical: true)
             .lineLimit(2)
             .multilineTextAlignment(.leading)
 
@@ -835,7 +827,7 @@ struct ClinicCard: View {
       .padding(.vertical, 12)
     }
     .background(Color.white)
-    .cornerRadius(14)
+    .clipShape(RoundedRectangle(cornerRadius: 14))
     .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 3)
   }
 }

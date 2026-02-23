@@ -10,7 +10,7 @@ struct ClinicSelectionView: View {
   // Filters
   @StateObject private var locationManager = LocationManager.shared
   @State private var selectedRegion: ClinicRegion = .all
-  @State private var sortOption: ClinicSortOption = .rating
+  @State private var sortOption: SortSelection = SortSelection(rating: true, distance: true)
 
   var filteredClinics: [Clinic] {
     var result = clinics
@@ -29,14 +29,45 @@ struct ClinicSelectionView: View {
     }
 
     // 3. Sort
-    switch sortOption {
-    case .rating:
+    if sortOption.isBoth {
+      // Combined weighted sort: 0.5 rating + 0.5 distance
+      if let userLoc = locationManager.location {
+        let distances: [Double] = result.map { clinic in
+          let lat = Double(clinic.latitude ?? "0") ?? 0
+          let lon = Double(clinic.longitude ?? "0") ?? 0
+          return userLoc.distance(from: CLLocation(latitude: lat, longitude: lon))
+        }
+        let ratings: [Double] = result.map { Double($0.rating ?? "0") ?? 0 }
+
+        let minDist = distances.min() ?? 0
+        let maxDist = distances.max() ?? 1
+        let distRange = maxDist - minDist
+
+        let minRating = ratings.min() ?? 0
+        let maxRating = ratings.max() ?? 5
+        let ratingRange = maxRating - minRating
+
+        let indexed = result.enumerated().map { (index, clinic) -> (Clinic, Double) in
+          let normRating = ratingRange > 0 ? (ratings[index] - minRating) / ratingRange : 1.0
+          let normDist = distRange > 0 ? 1.0 - (distances[index] - minDist) / distRange : 1.0
+          let score = 0.5 * normRating + 0.5 * normDist
+          return (clinic, score)
+        }
+        result = indexed.sorted { $0.1 > $1.1 }.map { $0.0 }
+      } else {
+        result.sort {
+          let r1 = Double($0.rating ?? "0") ?? 0
+          let r2 = Double($1.rating ?? "0") ?? 0
+          return r1 > r2
+        }
+      }
+    } else if sortOption.isRatingOnly {
       result.sort {
         let r1 = Double($0.rating ?? "0") ?? 0
         let r2 = Double($1.rating ?? "0") ?? 0
         return r1 > r2
       }
-    case .distance:
+    } else if sortOption.isDistanceOnly {
       if let userLoc = locationManager.location {
         result.sort {
           let lat1 = Double($0.latitude ?? "0") ?? 0
@@ -49,6 +80,12 @@ struct ClinicSelectionView: View {
 
           return userLoc.distance(from: loc1) < userLoc.distance(from: loc2)
         }
+      }
+    } else {
+      result.sort {
+        let r1 = Double($0.rating ?? "0") ?? 0
+        let r2 = Double($1.rating ?? "0") ?? 0
+        return r1 > r2
       }
     }
 
@@ -100,40 +137,40 @@ struct ClinicSelectionView: View {
           }
 
           // Rating Sort Button
-          Button(action: { sortOption = .rating }) {
+          Button(action: { sortOption.rating.toggle() }) {
             Text("Rating")
               .font(.subheadline)
               .padding(.horizontal, 16)
               .padding(.vertical, 8)
               .background(
-                sortOption == .rating
+                sortOption.rating
                   ? Color.orange.opacity(0.1) : Color(UIColor.secondarySystemBackground)
               )
-              .foregroundColor(sortOption == .rating ? .orange : .primary)
+              .foregroundColor(sortOption.rating ? .orange : .primary)
               .cornerRadius(20)
               .overlay(
                 RoundedRectangle(cornerRadius: 20)
                   .stroke(
-                    sortOption == .rating ? Color.orange : Color.gray.opacity(0.3), lineWidth: 1)
+                    sortOption.rating ? Color.orange : Color.gray.opacity(0.3), lineWidth: 1)
               )
           }
 
           // Distance Sort Button
-          Button(action: { sortOption = .distance }) {
+          Button(action: { sortOption.distance.toggle() }) {
             Text("Distance")
               .font(.subheadline)
               .padding(.horizontal, 16)
               .padding(.vertical, 8)
               .background(
-                sortOption == .distance
+                sortOption.distance
                   ? Color.blue.opacity(0.1) : Color(UIColor.secondarySystemBackground)
               )
-              .foregroundColor(sortOption == .distance ? .blue : .primary)
+              .foregroundColor(sortOption.distance ? .blue : .primary)
               .cornerRadius(20)
               .overlay(
                 RoundedRectangle(cornerRadius: 20)
                   .stroke(
-                    sortOption == .distance ? Color.blue : Color.gray.opacity(0.3), lineWidth: 1)
+                    sortOption.distance ? Color.blue : Color.gray.opacity(0.3), lineWidth: 1)
               )
           }
         }
