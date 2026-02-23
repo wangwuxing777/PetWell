@@ -106,41 +106,52 @@ struct InsuranceLandingView: View {
   @State private var scrollOffset: CGFloat = 0
   @State private var isShowingRecommendation = false
 
+  // Header heights
+  private let fullHeaderHeight: CGFloat = 280
+  private var miniHeaderHeight: CGFloat { fullHeaderHeight * 2 / 5 }
+
   private var showMiniHeader: Bool {
-    scrollOffset > 120
+    scrollOffset > fullHeaderHeight
   }
 
   var body: some View {
     NavigationStack {
       ZStack(alignment: .top) {
         DottedBackground()
+          .ignoresSafeArea()
 
         ScrollView(.vertical, showsIndicators: false) {
-          VStack(spacing: 50) {
-            headerSection
-              .padding(.top, 40)
+          VStack(spacing: 0) {
+            // Old Layout's Scroll Away Hero Header
+            fullHeader
 
-            coverageSection
+            // New Sketch Style Content
+            VStack(spacing: 50) {
+              headerSection
+                .padding(.top, 40)
 
-            threeStepsSection
+              coverageSection
 
-            keyTermsSection
+              threeStepsSection
 
-            notCoveredSection
+              keyTermsSection
 
-            whyInsuranceSection
+              notCoveredSection
 
-            // CTA CTA CTA
-            NavigationLink(destination: InsuranceCompareView()) {
-              Text(languageManager.isChinese ? "探索精選計劃" : "Explore Plans")
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(.white)
-                .padding(.vertical, 16)
-                .frame(maxWidth: .infinity)
-                .sketchCard(rotation: 0, bg: .sketchBlue600, border: .sketchBlue900, shadow: 4)
+              whyInsuranceSection
+
+              // CTA
+              NavigationLink(destination: InsuranceCompareView()) {
+                Text(languageManager.isChinese ? "探索精選計劃" : "Explore Plans")
+                  .font(.system(size: 18, weight: .bold))
+                  .foregroundColor(.white)
+                  .padding(.vertical, 16)
+                  .frame(maxWidth: .infinity)
+                  .sketchCard(rotation: 0, bg: .sketchBlue600, border: .sketchBlue900, shadow: 4)
+              }
+              .padding(.horizontal, 20)
+              .padding(.bottom, 60)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 60)
           }
           .background(
             GeometryReader { geo in
@@ -157,7 +168,7 @@ struct InsuranceLandingView: View {
           scrollOffset = value
         }
 
-        // Mini Header
+        // Sticky Mini Header
         if showMiniHeader {
           miniHeader
             .transition(
@@ -170,6 +181,7 @@ struct InsuranceLandingView: View {
         }
       }
       .animation(.easeInOut(duration: 0.25), value: showMiniHeader)
+      .ignoresSafeArea(edges: .top)
       .navigationBarHidden(true)
       .sheet(isPresented: $isShowingRecommendation) {
         RecommendationPopupView()
@@ -178,41 +190,101 @@ struct InsuranceLandingView: View {
     }
   }
 
+  // MARK: - Full Header (Scroll Away)
+  private var fullHeader: some View {
+    GeometryReader { geometry in
+      ZStack(alignment: .bottomLeading) {
+        Image("InsuranceHero")
+          .resizable()
+          .scaledToFill()
+          .frame(width: geometry.size.width, height: fullHeaderHeight)
+          .clipped()
+
+        LinearGradient(
+          colors: [
+            Color.black.opacity(0.0),
+            Color.black.opacity(0.3),
+            Color.black.opacity(0.6),
+          ],
+          startPoint: .top,
+          endPoint: .bottom
+        )
+
+        VStack(alignment: .leading, spacing: 6) {
+          Text(languageManager.isChinese ? "寵物保險" : "Pet Insurance")
+            .font(.system(size: 24, weight: .bold))
+            .foregroundStyle(.white)
+            .shadow(color: .black.opacity(0.4), radius: 2, x: 0, y: 1)
+
+          Text(
+            languageManager.isChinese
+              ? "為毛孩的健康保障第一步" : "The first step to protect your pet's health"
+          )
+          .font(.system(size: 16))
+          .foregroundStyle(.white.opacity(0.9))
+          .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 20)
+      }
+    }
+    .frame(height: fullHeaderHeight)
+  }
+
   // MARK: - Mini Header (Sticky)
   private var miniHeader: some View {
     HStack {
       Text(languageManager.isChinese ? "寵物保險" : "Pet Insurance")
-        .font(.system(size: 20, weight: .black))
-        .foregroundColor(.sketchBlue900)
+        .font(.system(size: 18, weight: .bold))
+        .foregroundColor(.primary)
 
       Spacer()
 
-      Button(action: {
-        isShowingRecommendation = true
-      }) {
-        HStack(spacing: 6) {
-          Image(systemName: "sparkles")
+      HStack(spacing: 8) {
+        // Compare Button
+        NavigationLink(destination: InsuranceCompareView()) {
+          Text(languageManager.isChinese ? "比較" : "Compare")
             .font(.system(size: 14, weight: .bold))
-          Text(languageManager.isChinese ? "為我推薦" : "For Me")
-            .font(.system(size: 14, weight: .bold))
+            .foregroundColor(.blue)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(Color.blue.opacity(0.1))
+            .cornerRadius(18)
         }
-        .foregroundColor(.sketchBlue900)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .sketchCard(rotation: -0.5, bg: .sketchYellow300, shadow: 2)
+
+        // For You Button (AI Style)
+        Button(action: {
+          isShowingRecommendation = true
+        }) {
+          HStack(spacing: 6) {
+            Image(systemName: "sparkles")
+              .font(.system(size: 14, weight: .semibold))
+            Text(languageManager.isChinese ? "為我推薦" : "For Me")
+              .font(.system(size: 14, weight: .semibold))
+          }
+          .foregroundColor(.white)
+          .padding(.horizontal, 14)
+          .padding(.vertical, 8)
+          .background(
+            LinearGradient(
+              colors: [.blue, .purple],
+              startPoint: .topLeading,
+              endPoint: .bottomTrailing
+            )
+          )
+          .cornerRadius(18)
+          .shadow(color: .purple.opacity(0.4), radius: 4, x: 0, y: 2)
+        }
       }
     }
     .padding(.horizontal, 20)
     .padding(.top, 54)
     .padding(.bottom, 12)
-    .background(Color.white.opacity(0.95))
-    .background(.ultraThinMaterial)
-    .overlay(
-      VStack {
-        Spacer()
-        Rectangle().frame(height: 2).foregroundColor(.sketchBlue900)
-      }
+    .background(
+      Color(.systemGray6)
+        .opacity(0.85)
     )
+    .background(.ultraThinMaterial)
   }
 
   // MARK: - Sections
