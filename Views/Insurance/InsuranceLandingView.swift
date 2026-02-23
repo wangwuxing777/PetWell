@@ -178,9 +178,10 @@ struct InsuranceLandingView: View {
       .animation(.easeInOut(duration: 0.25), value: showMiniHeader)
       .ignoresSafeArea(edges: .top)
       .navigationBarHidden(true)
-      .sheet(isPresented: $isShowingRecommendation) {
-        RecommendationPopupView()
-          .presentationDetents([.medium, .large])
+      .fullScreenCover(isPresented: $isShowingRecommendation) {
+        RAGChatView(
+          contextString: languageManager.isChinese ? "為我推薦寵物保險" : "Pet Insurance Recommendation",
+          isPresented: $isShowingRecommendation)
       }
     }
   }
@@ -800,48 +801,6 @@ struct InsuranceLandingView: View {
         alignment: .topTrailing
       )
     }
-  }
-}
-
-// MARK: - Recommendation Popup Placeholder
-struct RecommendationPopupView: View {
-  @EnvironmentObject var languageManager: LanguageManager
-
-  var body: some View {
-    VStack(spacing: 24) {
-      Image(systemName: "sparkles")
-        .font(.system(size: 40))
-        .foregroundColor(.sketchBlue600)
-
-      Text(languageManager.isChinese ? "為我推薦" : "For Me")
-        .font(.system(size: 28, weight: .black))
-        .foregroundColor(.sketchBlue900)
-
-      Text(
-        languageManager.isChinese
-          ? "告訴我們您的寶貝情況，我們為您推薦最適合的計劃！"
-          : "Tell us about your pet's age and health conditions, and we will recommend the best plans!"
-      )
-      .multilineTextAlignment(.center)
-      .font(.system(size: 16, weight: .medium))
-      .foregroundColor(.gray)
-      .padding(.horizontal, 20)
-
-      Button(action: {}) {
-        Text(languageManager.isChinese ? "開始" : "Start")
-          .font(.system(size: 18, weight: .bold))
-          .foregroundColor(.white)
-          .padding(.vertical, 14)
-          .frame(maxWidth: .infinity)
-          .sketchCard(rotation: 1, bg: .sketchBlue600, border: .sketchBlue900, shadow: 4)
-      }
-      .padding(.horizontal, 20)
-      .padding(.top, 20)
-
-      Spacer()
-    }
-    .padding(30)
-    .background(DottedBackground())
   }
 }
 
