@@ -69,6 +69,20 @@ final class InsuranceService: ObservableObject {
 
   private let baseURL = "http://127.0.0.1:8000"
 
+  enum NetworkError: LocalizedError {
+    case nonHTTPResponse
+    case httpError(statusCode: Int, body: String)
+
+    var errorDescription: String? {
+      switch self {
+      case .nonHTTPResponse:
+        return "Non-HTTP response"
+      case .httpError(let statusCode, let body):
+        return "HTTP \(statusCode): \(body)"
+      }
+    }
+  }
+
   // MARK: - Legacy Published Properties (for backward compatibility)
   @Published var providers: [InsuranceProvider] = []
   @Published var serviceSubcategories: [ServiceSubcategory] = []
@@ -287,61 +301,61 @@ final class InsuranceService: ObservableObject {
 
   // MARK: - Private API Methods (New Endpoints)
 
-  private func fetchCompanies() async throws -> [InsuranceCompany] {
-    guard let url = URL(string: "\(baseURL)/insurance-companies") else {
+  private func fetchJSON<T: Decodable>(_ path: String, as type: T.Type) async throws -> T {
+    guard let url = URL(string: "\(baseURL)\(path)") else {
       throw URLError(.badURL)
     }
-    let (data, _) = try await URLSession.shared.data(from: url)
-    return try JSONDecoder().decode([InsuranceCompany].self, from: data)
+
+    var request = URLRequest(url: url)
+    request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+    let (data, response) = try await URLSession.shared.data(for: request)
+    guard let http = response as? HTTPURLResponse else {
+      throw NetworkError.nonHTTPResponse
+    }
+
+    guard (200...299).contains(http.statusCode) else {
+      let body = String(data: data, encoding: .utf8) ?? "<non-utf8 \(data.count) bytes>"
+      print("❌ InsuranceService HTTP error: \(path) status=\(http.statusCode) body=\(body.prefix(300))")
+      throw NetworkError.httpError(statusCode: http.statusCode, body: body)
+    }
+
+    do {
+      return try JSONDecoder().decode(T.self, from: data)
+    } catch {
+      let body = String(data: data, encoding: .utf8) ?? "<non-utf8 \(data.count) bytes>"
+      print("❌ InsuranceService decode error: \(path) bodyPrefix=\(body.prefix(300))")
+      throw error
+    }
+  }
+
+  private func fetchCompanies() async throws -> [InsuranceCompany] {
+    try await fetchJSON("/insurance-companies", as: [InsuranceCompany].self)
   }
 
   private func fetchProducts() async throws -> [InsuranceProduct] {
-    guard let url = URL(string: "\(baseURL)/insurance-products") else {
-      throw URLError(.badURL)
-    }
-    let (data, _) = try await URLSession.shared.data(from: url)
-    return try JSONDecoder().decode([InsuranceProduct].self, from: data)
+    try await fetchJSON("/insurance-products", as: [InsuranceProduct].self)
   }
 
   private func fetchCoverageItems() async throws -> [CoverageItem] {
-    guard let url = URL(string: "\(baseURL)/coverage-list") else {
-      throw URLError(.badURL)
-    }
-    let (data, _) = try await URLSession.shared.data(from: url)
-    return try JSONDecoder().decode([CoverageItem].self, from: data)
+    try await fetchJSON("/coverage-list", as: [CoverageItem].self)
   }
 
   private func fetchCoverageLimits() async throws -> [CoverageLimit] {
-    guard let url = URL(string: "\(baseURL)/coverage-limits") else {
-      throw URLError(.badURL)
-    }
-    let (data, _) = try await URLSession.shared.data(from: url)
-    return try JSONDecoder().decode([CoverageLimit].self, from: data)
+    try await fetchJSON("/coverage-limits", as: [CoverageLimit].self)
   }
 
   private func fetchSubCoverageLimits() async throws -> [SubCoverageLimit] {
-    guard let url = URL(string: "\(baseURL)/sub-coverage-limits") else {
-      throw URLError(.badURL)
-    }
-    let (data, _) = try await URLSession.shared.data(from: url)
-    return try JSONDecoder().decode([SubCoverageLimit].self, from: data)
+    try await fetchJSON("/sub-coverage-limits", as: [SubCoverageLimit].self)
   }
 
   // MARK: - Legacy API Methods
 
   private func fetchProviders() async throws -> [InsuranceProvider] {
-    guard let url = URL(string: "\(baseURL)/insurance-providers") else {
-      throw URLError(.badURL)
-    }
-    let (data, _) = try await URLSession.shared.data(from: url)
-    return try JSONDecoder().decode([InsuranceProvider].self, from: data)
+    try await fetchJSON("/insurance-providers", as: [InsuranceProvider].self)
   }
 
   private func fetchServiceSubcategories() async throws -> [ServiceSubcategory] {
-    guard let url = URL(string: "\(baseURL)/service-subcategories") else {
-      throw URLError(.badURL)
-    }
-    let (data, _) = try await URLSession.shared.data(from: url)
-    return try JSONDecoder().decode([ServiceSubcategory].self, from: data)
+    try await fetchJSON("/service-subcategories", as: [ServiceSubcategory].self)
   }
 }
