@@ -15,6 +15,14 @@ private struct ScrollOffsetPreferenceKey: PreferenceKey {
   }
 }
 
+// MARK: - Remark Context
+struct RemarkSheetContext: Identifiable {
+  let id = UUID()
+  let title: String
+  let remark: String
+  let productName: String
+}
+
 struct InsuranceCompareView: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var languageManager: LanguageManager
@@ -29,12 +37,7 @@ struct InsuranceCompareView: View {
   @State private var isSelectingLeft = true
 
   // Remark sheet control
-  @State private var showRemarkSheet = false
-  @State private var selectedRemark: String = ""
-  @State private var selectedRemarkData: RemarkData?
-  @State private var selectedRemarkTitle: String = ""
-  @State private var selectedCoverageTerm: String = ""
-  @State private var selectedSubCoverageTerm: String?
+  @State private var remarkContext: RemarkSheetContext?
 
   @State private var showRAGChat = false
 
@@ -126,14 +129,11 @@ struct InsuranceCompareView: View {
         }
       }
     }
-    .sheet(isPresented: $showRemarkSheet) {
+    .sheet(item: $remarkContext) { context in
       RemarkSheetView(
-        title: selectedRemarkTitle,
-        remark: selectedRemark,
-        remarkData: selectedRemarkData,
-        coverageTerm: selectedCoverageTerm,
-        subCoverageTerm: selectedSubCoverageTerm,
-        isPresented: $showRemarkSheet
+        title: context.title,
+        remark: context.remark,
+        productName: context.productName
       )
     }
     .fullScreenCover(isPresented: $showRAGChat) {
@@ -535,13 +535,12 @@ struct InsuranceCompareView: View {
       .overlay(alignment: .trailing) {
         if let remark = limit?.subCoverageRemark, !remark.isEmpty {
           Button(action: {
-            selectedRemark = remark
-            selectedRemarkData = nil
-            selectedRemarkTitle =
-              isLeft ? (leftProduct?.insuranceName ?? "") : (rightProduct?.insuranceName ?? "")
-            selectedCoverageTerm = subName
-            selectedSubCoverageTerm = nil
-            showRemarkSheet = true
+            remarkContext = RemarkSheetContext(
+              title: subName,
+              remark: remark,
+              productName: isLeft
+                ? (leftProduct?.insuranceName ?? "") : (rightProduct?.insuranceName ?? "")
+            )
           }) {
             Image(systemName: "info.circle")
               .foregroundColor(.blue)
@@ -591,13 +590,12 @@ struct InsuranceCompareView: View {
         // Info Button for Remark
         if let remark = limit?.remark, !remark.isEmpty {
           Button(action: {
-            selectedRemark = remark
-            selectedRemarkData = limit?.parsedRemark
-            selectedRemarkTitle =
-              isLeft ? (leftProduct?.insuranceName ?? "") : (rightProduct?.insuranceName ?? "")
-            selectedCoverageTerm = coverageType
-            selectedSubCoverageTerm = nil
-            showRemarkSheet = true
+            remarkContext = RemarkSheetContext(
+              title: coverageType,
+              remark: remark,
+              productName: isLeft
+                ? (leftProduct?.insuranceName ?? "") : (rightProduct?.insuranceName ?? "")
+            )
           }) {
             Image(systemName: "info.circle")
               .foregroundColor(.blue)
@@ -712,86 +710,79 @@ struct InsuranceCompareView: View {
 // MARK: - Remark Sheet View
 
 struct RemarkSheetView: View {
+  @Environment(\.dismiss) var dismiss
   let title: String
   let remark: String
-  let remarkData: RemarkData?  // Pre-parsed data passed in
-  let coverageTerm: String
-  let subCoverageTerm: String?
+  let productName: String
 
-  @Binding var isPresented: Bool
   @State private var showRAGChat = false
 
   var body: some View {
     VStack(spacing: 0) {
       // Header
       HStack {
-        // Use title from parsed data if available and passed title is generic
-        Text(resolveTitle())
+        Text(title)
           .font(.headline)
         Spacer()
-        Button(action: { isPresented = false }) {
+        Button(action: { dismiss() }) {
           Image(systemName: "xmark.circle.fill")
-            .font(.system(size: 24))
-            .foregroundColor(.gray.opacity(0.6))
+            .font(.system(size: 28))
+            .foregroundColor(Color(UIColor.tertiaryLabel))
+            .symbolRenderingMode(.hierarchical)
         }
       }
-      .padding()
-      .background(Color(UIColor.systemBackground))
-
-      Divider()
+      .padding(.horizontal, 20)
+      .padding(.top, 24)
+      .padding(.bottom, 12)
 
       // Remark content
       ScrollView {
         VStack(alignment: .leading, spacing: 20) {
-          if let data = remarkData {
-            structuredContent(data)
-          } else {
-            // Fallback for plain text
-            Text(remark)
-              .font(.body)
-              .foregroundColor(.primary)
-              .frame(maxWidth: .infinity, alignment: .leading)
-          }
+          Text(remark)
+            .font(.body)
+            .foregroundColor(Color(UIColor.label))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .lineSpacing(6)
         }
-        .padding()
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 40)  // extra scroll padding
       }
       .frame(maxHeight: .infinity)
 
-      Spacer()
-
-      // AI Button
-      Button(action: {
-        showRAGChat = true
-      }) {
-        HStack(spacing: 8) {
-          Image(systemName: "sparkles")
-            .font(.system(size: 16, weight: .semibold))
-          Text("Ask AI for Explanation")
-            .font(.system(size: 16, weight: .semibold))
+      // AI Button Area
+      VStack {
+        Button(action: {
+          showRAGChat = true
+        }) {
+          HStack(spacing: 8) {
+            Image(systemName: "sparkles")
+            Text("Ask AI for Explanation")
+          }
+          .font(.system(size: 16, weight: .semibold))
+          .foregroundColor(.white)
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 16)
+          .background(
+            LinearGradient(
+              colors: [Color(hex: "0052FF"), Color.purple.opacity(0.8)],
+              startPoint: .leading,
+              endPoint: .trailing
+            )
+          )
+          .cornerRadius(16)
+          .shadow(color: Color.blue.opacity(0.2), radius: 8, x: 0, y: 4)
         }
-        .foregroundColor(.blue)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .background(Color.white)
-        .overlay(
-          EmptyView()
-        )
-        .overlay(
-          Rectangle()
-            .frame(height: 1.5)
-            .foregroundColor(.clear)
-            .background(
-              LinearGradient(
-                colors: [.blue, .purple],
-                startPoint: .leading,
-                endPoint: .trailing
-              )
-            ),
-          alignment: .top
-        )
       }
+      .padding(.horizontal, 20)
+      .padding(.vertical, 16)
+      .background(
+        Color(UIColor.systemBackground)
+          .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: -5)
+      )
     }
-    .presentationDetents([.medium, .large])
+    .background(Color(UIColor.systemBackground))
+    .presentationDetents([.fraction(0.4), .large])
     .presentationDragIndicator(.visible)
     .fullScreenCover(isPresented: $showRAGChat) {
       RAGChatView(contextString: constructContextString(), isPresented: $showRAGChat)
@@ -799,319 +790,11 @@ struct RemarkSheetView: View {
   }
 
   private func constructContextString() -> String {
-    let term = coverageTerm
-    let subTerm = subCoverageTerm ?? ""
-    let policy = resolveTitle()
-
-    var context = """
+    return """
       Context:
-      - Coverage Term: \(term)
+      - Coverage Term: \(title)
+      - Policy Type: \(productName)
       """
-
-    if !subTerm.isEmpty {
-      context += "\n- Sub Coverage Term: \(subTerm)"
-    }
-
-    context += "\n- Policy Type: \(policy)"
-
-    return context
-  }
-
-  private func resolveTitle() -> String {
-    if let t = remarkData?.title { return t }
-    if let t = remarkData?.content?.title { return t }
-    if let cat = remarkData?.category { return cat }
-    return title.isEmpty ? "Remark" : title
-  }
-
-  @ViewBuilder
-  private func structuredContent(_ data: RemarkData) -> some View {
-    if let type = data.type {
-      switch type {
-      case "benefit_header":
-        benefitHeaderView(data)
-      case "eligibility_detail":
-        eligibilityDetailView(data)
-      case "special_coverage":
-        specialCoverageView(data)
-      default:
-        genericRemarkView(data)
-      }
-    } else {
-      genericRemarkView(data)
-    }
-  }
-
-  // MARK: - Specialized Views
-
-  @ViewBuilder
-  private func benefitHeaderView(_ data: RemarkData) -> some View {
-    if let content = data.content {
-      VStack(spacing: 16) {
-        if let icon = content.icon {
-          Image(systemName: icon)
-            .font(.system(size: 48))
-            .foregroundColor(.blue)
-            .padding()
-            .background(Color.blue.opacity(0.1))
-            .clipShape(Circle())
-        }
-
-        VStack(spacing: 4) {
-          if let badge = content.badgeText {
-            Text(badge)
-              .font(.caption)
-              .fontWeight(.bold)
-              .foregroundColor(.secondary)
-              .padding(.horizontal, 8)
-              .padding(.vertical, 4)
-              .background(Color.gray.opacity(0.1))
-              .cornerRadius(4)
-          }
-
-          if let title = content.title {
-            Text(title)
-              .font(.title2)
-              .fontWeight(.bold)
-              .multilineTextAlignment(.center)
-          }
-        }
-      }
-      .frame(maxWidth: .infinity)
-      .padding()
-      .background(Color(UIColor.secondarySystemBackground))
-      .cornerRadius(16)
-    }
-  }
-
-  @ViewBuilder
-  private func eligibilityDetailView(_ data: RemarkData) -> some View {
-    VStack(alignment: .leading, spacing: 20) {
-      if let category = data.category {
-        Label(category, systemImage: "checklist")
-          .font(.headline)
-          .foregroundColor(.blue)
-      }
-
-      // Eligibility Grid
-      if let eligibility = data.eligibility {
-        VStack(alignment: .leading, spacing: 12) {
-          Text("Eligibility Requirements")
-            .font(.subheadline)
-            .fontWeight(.semibold)
-
-          if let species = eligibility.species {
-            infoRow(label: "Species", value: species.joined(separator: ", "))
-          }
-          if let age = eligibility.ageRange {
-            infoRow(label: "Age Range", value: age)
-          }
-          if let condition = eligibility.preExistingCondition {
-            infoRow(label: "Condition", value: condition)
-          }
-        }
-        .padding()
-        .background(Color.blue.opacity(0.05))
-        .cornerRadius(12)
-      }
-
-      // Limits
-      if let limits = data.limits {
-        HStack {
-          VStack(alignment: .leading) {
-            Text("Frequency")
-              .font(.caption)
-              .foregroundColor(.secondary)
-            Text(limits.frequency ?? "-")
-              .font(.subheadline)
-              .bold()
-          }
-          Spacer()
-          VStack(alignment: .trailing) {
-            Text("Payout Type")
-              .font(.caption)
-              .foregroundColor(.secondary)
-            Text(limits.payoutType ?? "-")
-              .font(.subheadline)
-              .bold()
-          }
-        }
-        .padding()
-        .background(Color.orange.opacity(0.05))
-        .cornerRadius(12)
-      }
-    }
-  }
-
-  @ViewBuilder
-  private func specialCoverageView(_ data: RemarkData) -> some View {
-    VStack(alignment: .leading, spacing: 16) {
-      if let category = data.category {
-        HStack {
-          Image(systemName: "exclamationmark.shield.fill")
-            .foregroundColor(.orange)
-          Text(category)
-            .font(.headline)
-        }
-      }
-
-      if let target = data.targetSpecies {
-        Text(target)
-          .font(.caption)
-          .fontWeight(.bold)
-          .padding(.horizontal, 8)
-          .padding(.vertical, 4)
-          .background(Color.gray.opacity(0.2))
-          .cornerRadius(4)
-      }
-
-      // Rules List
-      if let rules = data.rules {
-        VStack(alignment: .leading, spacing: 12) {
-          ForEach(rules) { rule in
-            HStack(alignment: .top) {
-              VStack(alignment: .leading) {
-                Text(rule.label)
-                  .font(.caption)
-                  .foregroundColor(.secondary)
-                Text(rule.value)
-                  .font(.body)
-                  .fontWeight(rule.highlight == true ? .bold : .regular)
-                  .foregroundColor(rule.highlight == true ? .primary : .secondary)
-              }
-              Spacer()
-              if rule.isRequirement == true {
-                Image(systemName: "checkmark.circle")
-                  .foregroundColor(.green)
-              }
-            }
-            Divider()
-          }
-        }
-      }
-
-      if let disclaimer = data.medicalDisclaimer {
-        HStack(alignment: .top) {
-          Image(systemName: "info.circle")
-            .foregroundColor(.gray)
-          Text(disclaimer)
-            .font(.caption)
-            .foregroundColor(.gray)
-        }
-        .padding(.top, 8)
-      }
-    }
-  }
-
-  // Generic Fallback (Reuse previous logic)
-  @ViewBuilder
-  private func genericRemarkView(_ data: RemarkData) -> some View {
-    // 1. Summary
-    if let summary = data.summary {
-      Text(summary)
-        .font(.body)
-        .foregroundColor(.secondary)
-        .lineSpacing(4)
-    }
-
-    // 2. Highlights (Top-up etc.)
-    if let highlight = data.highlights {
-      HStack(alignment: .top, spacing: 12) {
-        Image(systemName: "star.circle.fill")
-          .font(.title2)
-          .foregroundColor(.orange)
-          .padding(.top, 2)
-
-        VStack(alignment: .leading, spacing: 4) {
-          Text(highlight.label ?? "Highlight")
-            .font(.subheadline)
-            .bold()
-            .foregroundColor(.orange)
-
-          if let amount = highlight.amount, let currency = highlight.currency {
-            Text("\(currency) \(amount)")
-              .font(.title3)
-              .bold()
-              .foregroundColor(.primary)
-          }
-
-          if let condition = highlight.condition {
-            Text(condition)
-              .font(.caption)
-              .foregroundColor(.secondary)
-          }
-        }
-      }
-      .padding()
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.orange.opacity(0.1))
-      .cornerRadius(12)
-    }
-
-    // 3. Coverage Scopes
-    if let scopes = data.coverageScopes {
-      VStack(alignment: .leading, spacing: 12) {
-        Text("Coverage Detail")
-          .font(.headline)
-          .padding(.top, 8)
-
-        ForEach(scopes) { scope in
-          HStack(alignment: .top, spacing: 12) {
-            // Icon
-            ZStack {
-              Circle()
-                .fill(Color.blue.opacity(0.1))
-                .frame(width: 36, height: 36)
-              Image(systemName: scope.icon ?? "shield.fill")
-                .foregroundColor(.blue)
-                .font(.system(size: 16))
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-              Text(scope.category)
-                .font(.subheadline)
-                .fontWeight(.semibold)
-
-              // Bullet points for items
-              ForEach(scope.items, id: \.self) { item in
-                HStack(alignment: .top, spacing: 6) {
-                  Text("•")
-                    .foregroundColor(.secondary)
-                  Text(item)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                }
-              }
-            }
-          }
-          .padding(.vertical, 4)
-        }
-      }
-    }
-
-    // 4. Raw Text
-    if let raw = data.rawText {
-      Divider().padding(.vertical, 8)
-      Text("Original Text:")
-        .font(.caption2)
-        .foregroundColor(.gray)
-        .padding(.bottom, 2)
-      Text(raw)
-        .font(.caption)
-        .foregroundColor(.secondary)
-    }
-  }
-
-  private func infoRow(label: String, value: String) -> some View {
-    HStack(alignment: .top) {
-      Text(label)
-        .font(.caption)
-        .foregroundColor(.secondary)
-        .frame(width: 80, alignment: .leading)
-      Text(value)
-        .font(.caption)
-        .bold()
-    }
   }
 }
 
