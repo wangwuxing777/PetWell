@@ -41,6 +41,13 @@ struct InsuranceCompareView: View {
 
   @State private var showRAGChat = false
 
+  // Comparison Mode
+  enum CompareMode {
+    case byInsurance
+    case byScenario
+  }
+  @State private var compareMode: CompareMode = .byInsurance
+
   // Scroll tracking
   @State private var scrollOffset: CGFloat = 0
   private let providerHeaderHeight: CGFloat = 280
@@ -86,7 +93,23 @@ struct InsuranceCompareView: View {
           }
         }
       } else {
-        contentView
+        VStack(spacing: 0) {
+          // Toggle Picker
+          Picker("Comparison Mode", selection: $compareMode) {
+            Text("By Insurance").tag(CompareMode.byInsurance)
+            Text("By Scenario").tag(CompareMode.byScenario)
+          }
+          .pickerStyle(SegmentedPickerStyle())
+          .padding(.horizontal)
+          .padding(.vertical, 8)
+          .background(Color.white)
+
+          if compareMode == .byInsurance {
+            contentView
+          } else {
+            ScenarioCompareHomeView()
+          }
+        }
       }
 
       // Mini sticky header (appears when scrolled)
@@ -652,14 +675,14 @@ struct InsuranceCompareView: View {
 
         Text("Which is better?")
           .font(.headline)
-          .foregroundColor(.white)
+          .foregroundColor(.primary)
       }
 
       Text(
         "Compare coverage limits and remarks to make the best choice for your pet."
       )
       .font(.system(size: 15))
-      .foregroundColor(.white.opacity(0.9))
+      .foregroundColor(.secondary)
       .lineSpacing(4)
 
       Button(action: {
@@ -696,10 +719,10 @@ struct InsuranceCompareView: View {
         .frame(maxWidth: .infinity, alignment: .center)
     }
     .padding(24)
-    .background(Color(hex: "1A1A1A"))  // Dark card
+    .background(Color.white)
     .cornerRadius(24)
     .padding(.horizontal)
-    .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
+    .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
   }
 }
 

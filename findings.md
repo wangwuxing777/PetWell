@@ -1,21 +1,5 @@
-# Findings & Decisions - 2026-02-11
+# Findings
 
-## Research Findings
-- **RAG Integration**: Successfully integrated a new `RAGService` in Swift to handle AI-powered chat queries.
-- **UI Updates**: Implemented `RAGChatView` and integrated it into `InsuranceCompareView` via a sparkle icon/button.
-- **Git State**: The repository was in a dirty state with several untracked files before the final push.
-
-## Technical Decisions
-| Decision | Rationale |
-|----------|-----------|
-| Integrated RAG in InsuranceCompareView | To provide users with AI-powered insurance comparison assistance. |
-| Pushed to main directly | User requested a direct push to the main branch for current updates. |
-
-## Resources
-- `Services/RAGService.swift`
-- `Views/Insurance/RAGChatView.swift`
-- `Views/Insurance/InsuranceCompareView.swift`
-- **Color Distinctions:** To prevent blending, Advanced Coverage metrics use a purple overlay instead of the standard blue used in Core Coverage.
-- **Doodle UI Rotations:** Reduced hardcoded rotations (`rotation * 0.3` multiplier) inside `SketchCardModifier` because absolute values caused UI unbalance and exaggerated tilted appearance.
-- **Sticky Mini Header:** Updated Sticky Mini header mapping layout to have both an outlined blue "Compare" button and an active native-iOS style gradient background "For Me" (AI themed) Button. Reintroduced full width header.
-- **Sticky Mini Header:** Updated Sticky Mini header mapping layout to have both an outlined blue "Compare" button and an active native-iOS style gradient background "For Me" (AI themed) Button. Reintroduced full width header, and made sure full header scrolls out of view and pushes content, rather than overlapping it.
+- **Models**: Currently exist under `Models/InsuranceModels.swift`. We should introduce the `Scenario` models in a designated file `Models/ScenarioModels.swift`.
+- **Services**: The insurance data is managed by `InsuranceService.swift`. The `/scenarios` endpoint should be handled similarly by a `ScenarioService.swift` or an extension of `InsuranceService`.
+- **Compare View**: The existing `Views/Insurance/InsuranceCompareView.swift` has a solid foundation. We need to introduce a generic selection state (e.g. `compareMode`) using a Segmented Picker (`By Insurance`, `By Scenario`) to conditionally render the current structure vs the newly proposed `ScenarioCompareHomeView`.

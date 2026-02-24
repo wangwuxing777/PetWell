@@ -46,6 +46,8 @@
 		20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */; };
 		333BACED5C6923948F4FAF30 /* Vet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCDEA159103732D87EBD44C /* Vet.swift */; };
 		3595376D11423AB92286AB6C /* ShopModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */; };
+		3904708AABD9C0D051D8403E /* ScenarioDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179F5F3575FDE3DBE576028D /* ScenarioDetailView.swift */; };
+		45E0C9878E2083BC9BEDF832 /* ScenarioCompareHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B4AC9F1FB44E2FED3EF68E /* ScenarioCompareHomeView.swift */; };
 		5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */; };
 		5809467036E9C1D483F6EDF1 /* VetMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B48B43AC4603AD6BE6678259 /* VetMapViewModel.swift */; };
 		5D76E2067F9710ABED5E50F4 /* VetMapContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AAB46C63991E9ABB508494D /* VetMapContainerView.swift */; };
@@ -53,14 +55,21 @@
 		82E386E4958DE00A444D9CEE /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40938F3FFFB3538C4F3D6253 /* ViewModifiers.swift */; };
 		84306D6F5E9BD0F01109AC13 /* MapViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08DBA259051C33E01E78244 /* MapViewWrapper.swift */; };
 		9832EC2E43DAA4D24B69C514 /* ShopifyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84900EA374F123F44735A689 /* ShopifyService.swift */; };
+		C006685956930A2A941F7469 /* ScenarioDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B0A3C45C9AB61C60DD9430 /* ScenarioDetailView.swift */; };
+		C88014AB7980E56FB2B5238A /* ScenarioModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202BB0CCA17CFED11EEDD1E1 /* ScenarioModels.swift */; };
 		CC19638A2F386A8E00FA8CF3 /* Buy in Frameworks */ = {isa = PBXBuildFile; productRef = CC1963892F386A8E00FA8CF3 /* Buy */; };
 		CCABA6A92F3ED7AB00BF9151 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = CCABA6A82F3ED7AB00BF9151 /* GoogleMaps */; };
+		D0BE68656BA0ABD0ADEF7347 /* ScenarioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86363FF50F3F61B4EC53D780 /* ScenarioService.swift */; };
 		DF27EFB9398D02F4E15D9AEF /* VetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9333426B811F6EBE9D8C1337 /* VetService.swift */; };
+		E5D2FE03C07D04D5F6A09502 /* ScenarioCompareHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB68C28FC0FC4D462EC5DE3 /* ScenarioCompareHomeView.swift */; };
+		F14D12FE8F278C38B538C2D2 /* ScenarioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4686BF1736E825EEC323F0 /* ScenarioService.swift */; };
 		F1640ED1E7E136CAF64BAC4A /* RAGChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DBB5D947F0DD76560408AA /* RAGChatView.swift */; };
 		F17000012F20B102004900F1 /* ProviderSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17000022F20B102004900F1 /* ProviderSelectionView.swift */; };
+		F5B9DD00B956491A1214BD1F /* ScenarioModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5560E415CC208D98CD7FACEC /* ScenarioModels.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		179F5F3575FDE3DBE576028D /* ScenarioDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScenarioDetailView.swift; path = Views/Insurance/ScenarioDetailView.swift; sourceTree = "<group>"; };
 		200650152F20B102004900F1 /* BlogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogView.swift; sourceTree = "<group>"; };
 		200650172F20B102004900F1 /* insurance_list_test.sql */ = {isa = PBXFileReference; lastKnownFileType = text; path = insurance_list_test.sql; sourceTree = "<group>"; };
 		200650182F20B102004900F1 /* InsuranceCompareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceCompareView.swift; sourceTree = "<group>"; };
@@ -76,6 +85,7 @@
 		20175E9F2F40E32C000A3910 /* RAGService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAGService.swift; sourceTree = "<group>"; };
 		20175EA22F40F1A9000A3910 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		20175EA42F40F1B4000A3910 /* ClinicFilters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicFilters.swift; sourceTree = "<group>"; };
+		202BB0CCA17CFED11EEDD1E1 /* ScenarioModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScenarioModels.swift; path = Models/ScenarioModels.swift; sourceTree = "<group>"; };
 		2066063D2EFBB4B2004CAA54 /* PetWell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PetWell.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2066063F2EFBB4B2004CAA54 /* BlogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogService.swift; sourceTree = "<group>"; };
 		2066065D2EFBE648004CAA54 /* PetModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetModels.swift; sourceTree = "<group>"; };
@@ -107,6 +117,8 @@
 		62DBB5D947F0DD76560408AA /* RAGChatView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RAGChatView.swift; path = Views/Insurance/RAGChatView.swift; sourceTree = "<group>"; };
 		70BE189DFC88DA0CA634B870 /* VetClinic.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetClinic.swift; sourceTree = "<group>"; };
 		84900EA374F123F44735A689 /* ShopifyService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopifyService.swift; sourceTree = "<group>"; };
+		86363FF50F3F61B4EC53D780 /* ScenarioService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScenarioService.swift; path = Services/ScenarioService.swift; sourceTree = "<group>"; };
+		88B4AC9F1FB44E2FED3EF68E /* ScenarioCompareHomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScenarioCompareHomeView.swift; path = Views/Insurance/ScenarioCompareHomeView.swift; sourceTree = "<group>"; };
 		9333426B811F6EBE9D8C1337 /* VetService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetService.swift; sourceTree = "<group>"; };
 		B08DBA259051C33E01E78244 /* MapViewWrapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapViewWrapper.swift; sourceTree = "<group>"; };
 		B48B43AC4603AD6BE6678259 /* VetMapViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetMapViewModel.swift; sourceTree = "<group>"; };
@@ -143,6 +155,8 @@
 				200650182F20B102004900F1 /* InsuranceCompareView.swift */,
 				200650192F20B102004900F1 /* InsuranceLandingView.swift */,
 				F17000022F20B102004900F1 /* ProviderSelectionView.swift */,
+				BFB68C28FC0FC4D462EC5DE3 /* ScenarioCompareHomeView.swift */,
+				F5B0A3C45C9AB61C60DD9430 /* ScenarioDetailView.swift */,
 			);
 			path = Insurance;
 			sourceTree = "<group>";
@@ -193,6 +207,10 @@
 				62DBB5D947F0DD76560408AA /* RAGChatView.swift */,
 				98B299DA0A09820E808069C0 /* Frameworks */,
 				529E110BBB60A43DC29593E7 /* ViewModels */,
+				202BB0CCA17CFED11EEDD1E1 /* ScenarioModels.swift */,
+				86363FF50F3F61B4EC53D780 /* ScenarioService.swift */,
+				88B4AC9F1FB44E2FED3EF68E /* ScenarioCompareHomeView.swift */,
+				179F5F3575FDE3DBE576028D /* ScenarioDetailView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -216,6 +234,7 @@
 				F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */,
 				DBCDEA159103732D87EBD44C /* Vet.swift */,
 				70BE189DFC88DA0CA634B870 /* VetClinic.swift */,
+				5560E415CC208D98CD7FACEC /* ScenarioModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -267,6 +286,7 @@
 				5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */,
 				84900EA374F123F44735A689 /* ShopifyService.swift */,
 				9333426B811F6EBE9D8C1337 /* VetService.swift */,
+				2B4686BF1736E825EEC323F0 /* ScenarioService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -298,12 +318,28 @@
 			path = Social;
 			sourceTree = "<group>";
 		};
+		2B4686BF1736E825EEC323F0 /* ScenarioService.swift */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = ScenarioService.swift;
+			path = Services/ScenarioService.swift;
+			sourceTree = "<group>";
+		};
 		529E110BBB60A43DC29593E7 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
 				B48B43AC4603AD6BE6678259 /* VetMapViewModel.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		5560E415CC208D98CD7FACEC /* ScenarioModels.swift */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = ScenarioModels.swift;
+			path = Models/ScenarioModels.swift;
 			sourceTree = "<group>";
 		};
 		760CDEC3377ACF67218E22AB /* Map */ = {
@@ -328,6 +364,22 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BFB68C28FC0FC4D462EC5DE3 /* ScenarioCompareHomeView.swift */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = ScenarioCompareHomeView.swift;
+			path = Views/Insurance/ScenarioCompareHomeView.swift;
+			sourceTree = "<group>";
+		};
+		F5B0A3C45C9AB61C60DD9430 /* ScenarioDetailView.swift */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = ScenarioDetailView.swift;
+			path = Views/Insurance/ScenarioDetailView.swift;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -452,6 +504,14 @@
 				82E386E4958DE00A444D9CEE /* ViewModifiers.swift in Sources */,
 				6A0296CEE0996BC91EA15904 /* VetClinic.swift in Sources */,
 				DF27EFB9398D02F4E15D9AEF /* VetService.swift in Sources */,
+				F5B9DD00B956491A1214BD1F /* ScenarioModels.swift in Sources */,
+				F14D12FE8F278C38B538C2D2 /* ScenarioService.swift in Sources */,
+				E5D2FE03C07D04D5F6A09502 /* ScenarioCompareHomeView.swift in Sources */,
+				C006685956930A2A941F7469 /* ScenarioDetailView.swift in Sources */,
+				C88014AB7980E56FB2B5238A /* ScenarioModels.swift in Sources */,
+				D0BE68656BA0ABD0ADEF7347 /* ScenarioService.swift in Sources */,
+				45E0C9878E2083BC9BEDF832 /* ScenarioCompareHomeView.swift in Sources */,
+				3904708AABD9C0D051D8403E /* ScenarioDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

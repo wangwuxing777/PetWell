@@ -1,19 +1,24 @@
-# Task Plan: Apple HIG Redesign for Insurance Landing Page
+# Task Plan: Scenario Comparison Feature
 
 ## Focus
-Redesign `Views/Insurance/InsuranceLandingView.swift` from its current "Sketch" style to a professional, clean Apple HIG layout matching the rest of the application.
+Develop a new "By Scenario" comparison feature for pet insurance plans, featuring detailed real-world scenarios, cost breakdowns, and payout comparisons.
 
 ## Phases
+
 ### Phase 1: Planning (Status: `complete`)
-- [x] Read `InsuranceLandingView.swift`.
-- [x] Create `implementation_plan.md`.
+- [x] Read `InsuranceCompareView.swift`.
+- [x] Read `InsuranceModels.swift`.
+- [x] Read `InsuranceService.swift`.
+- [x] Create implementation plan.
+- [x] Get user approval for the plan.
 
 ### Phase 2: Execution (Status: `complete`)
-- [x] Remove all sketch modifiers, colors, and backgrounds.
-- [x] Apply `.white` backgrounds, `.cornerRadius(16)`, and gentle shadows.
-- [x] Standardize typography and iconography.
-- [x] Redesign sections (Hero, Key Terms, Not Covered, Compare).
+- [x] Create `ScenarioModels.swift` with `ScenarioResponse`, `Scenario`, `CostItem`, `Payout`.
+- [x] Create `ScenarioService.swift`.
+- [x] Update `InsuranceCompareView.swift` to introduce a toggle mechanism for Direct vs Scenario mode.
+- [x] Implement `ScenarioCompareHomeView.swift`.
+- [x] Implement `ScenarioDetailView.swift` with Charts and coverage visual cues.
 
 ### Phase 3: Verification (Status: `complete`)
-- [x] Code modifications compiled successfully.
-- [x] Notified user for visual QA using Xcode Preview.
+- [x] Ensure project compiles cleanly.
+- [x] Visually verify UI on Simulator/Previews.

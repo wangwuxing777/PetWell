@@ -67,7 +67,7 @@ struct ServiceSubcategory: Codable, Identifiable {
 final class InsuranceService: ObservableObject {
   static let shared = InsuranceService()
 
-  private let baseURL = "http://localhost:8000"
+  private let baseURL = "http://127.0.0.1:8000"
 
   // MARK: - Legacy Published Properties (for backward compatibility)
   @Published var providers: [InsuranceProvider] = []
