@@ -9,107 +9,188 @@ import SwiftUI
 
 struct ScenarioCompareHomeView: View {
   @StateObject private var scenarioService = ScenarioService.shared
+  @State private var expandedScenarioId: String? = nil
+  @State private var pendingExpandId: String? = nil
+  private let accordionAnimation = Animation.spring(
+    response: 0.62,
+    dampingFraction: 0.9,
+    blendDuration: 0.3
+  )
 
   var body: some View {
-    ZStack {
-      Color(hex: "F8F9FA").ignoresSafeArea()  // Light grey background
+    ScrollViewReader { proxy in
+      ZStack {
+        Color.white.ignoresSafeArea()
 
-      if scenarioService.isLoading {
-        ProgressView("Loading scenarios...")
-      } else if let error = scenarioService.errorMessage {
-        VStack {
-          Text("Error loading data")
-            .font(.headline)
-            .foregroundColor(.red)
-          Text(error)
-            .font(.caption)
-            .foregroundColor(.secondary)
-
-          Button("Retry") {
-            Task { await scenarioService.fetchScenarios() }
-          }
-          .padding(.top)
-        }
-      } else {
-        ScrollView {
-          VStack(alignment: .leading, spacing: 16) {
-
-            Text("Compare insurance payouts for real-world veterinary scenarios.")
-              .font(.subheadline)
+        if scenarioService.isLoading {
+          ProgressView("Loading scenarios...")
+        } else if let error = scenarioService.errorMessage {
+          VStack {
+            Text("Error loading data")
+              .font(.headline)
+              .foregroundColor(.red)
+            Text(error)
+              .font(.caption)
               .foregroundColor(.secondary)
-              .padding(.horizontal)
 
-            LazyVStack(spacing: 16) {
-              ForEach(scenarioService.scenarios) { scenario in
-                NavigationLink(destination: ScenarioDetailView(scenario: scenario)) {
-                  ScenarioCard(scenario: scenario)
-                }
-                .buttonStyle(PlainButtonStyle())
-              }
+            Button("Retry") {
+              Task { await scenarioService.fetchScenarios() }
             }
-            .padding(.horizontal)
-            .padding(.bottom, 24)
+            .padding(.top)
           }
-          .padding(.top, 16)
+        } else {
+          ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+
+              Text("Compare insurance payouts for real-world veterinary scenarios.")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
+
+              LazyVStack(spacing: 16) {
+                ForEach(scenarioService.scenarios) { scenario in
+                  ScenarioAccordionCard(
+                    scenario: scenario,
+                    isExpanded: expandedScenarioId == scenario.id,
+                    onToggle: {
+                      handleCardToggle(for: scenario.id, proxy: proxy)
+                    }
+                  )
+                  .id(scenario.id)
+                }
+              }
+              .padding(.horizontal)
+              .padding(.bottom, 24)
+            }
+            .padding(.top, 16)
+          }
         }
       }
     }
+  }
+
+  private func handleCardToggle(for scenarioId: String, proxy: ScrollViewProxy) {
+    if expandedScenarioId == scenarioId {
+      pendingExpandId = nil
+      withAnimation(accordionAnimation) {
+        expandedScenarioId = nil
+      }
+      return
+    }
+
+    pendingExpandId = scenarioId
+    withAnimation(.easeInOut(duration: 0.4)) {
+      proxy.scrollTo(scenarioId, anchor: .top)
+    }
+
+    Task { @MainActor in
+      try? await Task.sleep(nanoseconds: 240_000_000)
+      guard pendingExpandId == scenarioId else { return }
+      withAnimation(accordionAnimation) {
+        expandedScenarioId = scenarioId
+      }
+    }
+  }
+}
+
+struct ScenarioAccordionCard: View {
+  let scenario: Scenario
+  let isExpanded: Bool
+  let onToggle: () -> Void
+
+  var body: some View {
+    VStack(spacing: 0) {
+      Button(action: onToggle) {
+        ScenarioCard(scenario: scenario)
+      }
+      .buttonStyle(.plain)
+
+      if isExpanded {
+        ScenarioDetailView(scenario: scenario)
+          .transition(.move(edge: .bottom).combined(with: .opacity))
+      }
+    }
+    .background(
+      .ultraThinMaterial,
+      in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+    )
+    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+    .overlay(
+      RoundedRectangle(cornerRadius: 18, style: .continuous)
+        .stroke(Color.white.opacity(0.28), lineWidth: 0.9)
+    )
+    .overlay(
+      RoundedRectangle(cornerRadius: 18, style: .continuous)
+        .stroke(
+          LinearGradient(
+            colors: [Color.white.opacity(0.35), Color.clear, Color.white.opacity(0.12)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+          ),
+          lineWidth: 0.8
+        )
+    )
+    .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 5)
+    .animation(.spring(response: 0.62, dampingFraction: 0.9, blendDuration: 0.3), value: isExpanded)
   }
 }
 
 struct ScenarioCard: View {
   let scenario: Scenario
 
-  // Count how many providers were recommended
-  var recommendedCount: Int {
-    scenario.payouts.filter { $0.isRecommended }.count
-  }
-
   var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    // Use the midpoint between previous card #4 and #5 settings.
+    let imageBlurRadius: CGFloat = 1.65
+    let darkOverlayStart = 0.85
+    let darkOverlayEnd = 0.2
+    let whiteHighlight = 0.0
+    let materialOpacity = 0.1
 
-      Text(scenario.title)
-        .font(.headline)
-        .foregroundColor(.black)
-        .lineLimit(2)
+    ZStack(alignment: .bottomLeading) {
+      // 1. Background Image
+      Image(scenario.presentation.imageName)
+        .resizable()
+        .aspectRatio(contentMode: .fill)
+        .frame(height: 180)
+        .saturation(0.9)
+        .blur(radius: imageBlurRadius)
+        .clipped()
 
-      HStack {
-        // Cost Tag
-        HStack(spacing: 4) {
-          Image(systemName: "dollarsign.circle.fill")
-            .foregroundColor(.orange)
-          Text("Total Cost: HK$\(scenario.totalCostHkd)")
-            .font(.subheadline)
-            .fontWeight(.semibold)
-            .foregroundColor(.primary)
-        }
+      // 2. Glass + gradient overlay to keep text readable while retaining the photo
+      Rectangle()
+        .fill(.ultraThinMaterial)
+        .opacity(materialOpacity)
 
-        Spacer()
+      LinearGradient(
+        gradient: Gradient(
+          colors: [Color.black.opacity(darkOverlayStart), Color.black.opacity(darkOverlayEnd)]
+        ),
+        startPoint: .bottom,
+        endPoint: .top
+      )
 
-        // Recommended count tag
-        if recommendedCount > 0 {
-          HStack(spacing: 4) {
-            Image(systemName: "star.fill")
-              .foregroundColor(.yellow)
-            Text("\(recommendedCount) Recommended")
-              .font(.caption)
-              .fontWeight(.medium)
-              .foregroundColor(.primary)
-          }
-          .padding(.horizontal, 8)
-          .padding(.vertical, 4)
-          .background(Color.yellow.opacity(0.15))
-          .cornerRadius(8)
-        } else {
-          Text("View Breakdown")
-            .font(.caption)
-            .foregroundColor(.blue)
-        }
+      LinearGradient(
+        gradient: Gradient(colors: [Color.white.opacity(whiteHighlight), Color.clear]),
+        startPoint: .topLeading,
+        endPoint: .center
+      )
+
+      // 3. Text Overlay
+      VStack(alignment: .leading, spacing: 8) {
+        Text(scenario.presentation.title)
+          .font(.title3)
+          .fontWeight(.bold)
+          .foregroundColor(.white)
+          .lineLimit(2)
+
+        Text(scenario.presentation.description)
+          .font(.subheadline)
+          .foregroundColor(.white.opacity(0.9))
+          .lineLimit(2)
       }
+      .padding(16)
     }
-    .padding(16)
-    .background(Color.white)
-    .cornerRadius(16)
-    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+    .frame(height: 180)  // Fixed height to maintain image aspect ratio consistently in the list
+    .contentShape(Rectangle())
   }
 }

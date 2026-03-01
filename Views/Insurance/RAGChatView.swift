@@ -10,6 +10,7 @@ struct RAGChatView: View {
 
   // Context Management
   var contextString: String?
+  var initialModel: ChatModel = .insurance
   @Binding var isPresented: Bool
 
   var body: some View {
@@ -37,9 +38,17 @@ struct RAGChatView: View {
       }
     }
     .onAppear {
+      ragService.selectedModel = initialModel
+      if initialModel != .insurance {
+        ragService.selectedProvider = .all
+      }
+
       if ragService.messages.isEmpty {
-        let greeting = ChatMessage(
-          content: "Hello, I am your insurance assistant, how can I help you?", isUser: false)
+        let greetingText =
+          initialModel == .medical
+          ? "Hello, I am your medical assistant, how can I help you?"
+          : "Hello, I am your insurance assistant, how can I help you?"
+        let greeting = ChatMessage(content: greetingText, isUser: false)
         ragService.messages.append(greeting)
       }
       ragService.createSession()
@@ -147,7 +156,7 @@ struct RAGChatView: View {
       HStack(alignment: .bottom, spacing: 8) {
         if message.isUser {
           Spacer()
-          Text(message.content)
+          Text(LocalizedStringKey(message.content))
             .font(.body)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
@@ -167,7 +176,7 @@ struct RAGChatView: View {
             )
             .clipShape(Circle())
 
-          Text(message.content)
+          Text(LocalizedStringKey(message.content))
             .font(.body)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)

@@ -66,6 +66,9 @@
 		F1640ED1E7E136CAF64BAC4A /* RAGChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DBB5D947F0DD76560408AA /* RAGChatView.swift */; };
 		F17000012F20B102004900F1 /* ProviderSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17000022F20B102004900F1 /* ProviderSelectionView.swift */; };
 		F5B9DD00B956491A1214BD1F /* ScenarioModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5560E415CC208D98CD7FACEC /* ScenarioModels.swift */; };
+		F75332655DE91D68E539B658 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCAF2763C99096209B63097 /* LoginView.swift */; };
+		F1D39B6708A777E1D304E5B8 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */; };
+		FDD97A82D9D5A4388469E9A7 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8D216CCC7A9DF21E1D41A4 /* AuthViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -125,6 +128,9 @@
 		DBCDEA159103732D87EBD44C /* Vet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Vet.swift; sourceTree = "<group>"; };
 		F17000022F20B102004900F1 /* ProviderSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderSelectionView.swift; sourceTree = "<group>"; };
 		F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopModels.swift; sourceTree = "<group>"; };
+		6FCAF2763C99096209B63097 /* LoginView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LoginView.swift; path = Views/Auth/LoginView.swift; sourceTree = "<group>"; };
+		D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = Views/Onboarding/OnboardingView.swift; sourceTree = "<group>"; };
+		8E8D216CCC7A9DF21E1D41A4 /* AuthViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthViewModel.swift; path = ViewModels/AuthViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -296,6 +302,9 @@
 			children = (
 				206606632EFBEBB5004CAA54 /* Assets.xcassets */,
 				206606642EFBEBB5004CAA54 /* ContentView.swift */,
+				8E8D216CCC7A9DF21E1D41A4 /* AuthViewModel.swift */,
+				D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */,
+				6FCAF2763C99096209B63097 /* LoginView.swift */,
 				206606652EFBEBB5004CAA54 /* PetWellApp.swift */,
 			);
 			path = PetWell;
@@ -512,7 +521,10 @@
 				D0BE68656BA0ABD0ADEF7347 /* ScenarioService.swift in Sources */,
 				45E0C9878E2083BC9BEDF832 /* ScenarioCompareHomeView.swift in Sources */,
 				3904708AABD9C0D051D8403E /* ScenarioDetailView.swift in Sources */,
-			);
+							F75332655DE91D68E539B658 /* LoginView.swift in Sources */,
+				F1D39B6708A777E1D304E5B8 /* OnboardingView.swift in Sources */,
+				FDD97A82D9D5A4388469E9A7 /* AuthViewModel.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

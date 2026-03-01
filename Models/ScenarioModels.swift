@@ -60,3 +60,63 @@ struct Payout: Codable, Identifiable {
     case isRecommended = "is_recommended"
   }
 }
+
+struct ScenarioPresentation {
+  let title: String
+  let description: String
+  let imageName: String
+}
+
+extension Scenario {
+  var presentation: ScenarioPresentation {
+    switch totalCostHkd {
+    case ..<2000:
+      return ScenarioPresentation(
+        title: "Common Illness (e.g., Ear Infection)",
+        description: "A vet consultation, ear examination, and medication treatment.",
+        imageName: "EarInfection"
+      )
+    case 18000...22000:
+      return ScenarioPresentation(
+        title: "Hereditary Condition Surgery (e.g., Patellar Luxation)",
+        description: "Surgery for a common hereditary condition in pedigree pets.",
+        imageName: "PatellarLuxation"
+      )
+    case 28000...33000:
+      return ScenarioPresentation(
+        title: "Chronic Illness Treatment (e.g., Cancer Chemotherapy)",
+        description: "Ongoing chemotherapy treatment after a confirmed cancer diagnosis.",
+        imageName: "CancerChemotherapy"
+      )
+    case 43000...47000:
+      return ScenarioPresentation(
+        title: "Major Accident Surgery (e.g., Fracture / Ligament Tear)",
+        description: "X-ray, anesthesia, surgery, and multi-day hospitalization.",
+        imageName: "Fracture"
+      )
+    case 48000...:
+      return ScenarioPresentation(
+        title: "Third-Party Liability (e.g., Dog Bite Incident)",
+        description: "A third-party claim involving medical expenses and legal compensation.",
+        imageName: "DogBite"
+      )
+    default:
+      return ScenarioPresentation(
+        title: "Insurance Payout Scenario",
+        description: "A real-world veterinary case used for insurance payout comparison.",
+        imageName: "CancerChemotherapy"
+      )
+    }
+  }
+}
+
+extension Payout {
+  var englishSummary: String {
+    let percentage = Int(coveragePercentage.rounded())
+    let base = "Estimated payout: HK$\(estimatedPayoutHkd) (\(percentage)% coverage)."
+    if isRecommended {
+      return "\(base) Marked as a recommended option for this scenario."
+    }
+    return base
+  }
+}

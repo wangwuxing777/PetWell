@@ -102,7 +102,11 @@ struct ContentView: View {
       }
     }
     .sheet(isPresented: $isGuardianPresented) {
-      GuardianChatView()
+      RAGChatView(
+        contextString: languageManager.isChinese ? "寵物醫療諮詢" : "Pet medical consultation",
+        initialModel: .medical,
+        isPresented: $isGuardianPresented
+      )
     }
   }
 }

@@ -30,7 +30,12 @@ struct InsuranceLandingView: View {
     NavigationStack {
       ZStack(alignment: .top) {
         // Scrollable content
-        Color(UIColor.systemGroupedBackground).ignoresSafeArea()
+        LinearGradient(
+          colors: [Color.white, Color(hex: "F8F9FA")],
+          startPoint: .top,
+          endPoint: .bottom
+        )
+        .ignoresSafeArea()
 
         ScrollView(.vertical, showsIndicators: false) {
           VStack(spacing: 0) {
@@ -39,8 +44,11 @@ struct InsuranceLandingView: View {
 
             // Content
             VStack(spacing: 40) {
+              whyInsuranceIntroSection
+                .padding(.top, 24)
+
               headerSection
-                .padding(.top, 32)
+                .padding(.top, 4)
 
               coverageSection
 
@@ -64,9 +72,13 @@ struct InsuranceLandingView: View {
                       colors: [Color(hex: "0052FF"), Color.purple.opacity(0.8)],
                       startPoint: .leading,
                       endPoint: .trailing
-                    )
+                    ),
+                    in: RoundedRectangle(cornerRadius: 16, style: .continuous)
                   )
-                  .cornerRadius(16)
+                  .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                      .stroke(Color.white.opacity(0.45), lineWidth: 0.9)
+                  )
                   .shadow(color: Color.blue.opacity(0.2), radius: 8, x: 0, y: 4)
               }
               .padding(.horizontal, 20)
@@ -207,10 +219,67 @@ struct InsuranceLandingView: View {
       .padding(.vertical, 12)
     }
     .frame(maxWidth: .infinity)
-    .background(Color(UIColor.systemBackground))
+    .background(.ultraThinMaterial)
+    .overlay(alignment: .bottom) {
+      Divider().opacity(0.2)
+    }
   }
 
   // MARK: - Sections
+
+  private var whyInsuranceIntroSection: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text(languageManager.isChinese ? "為什麼要買寵物保險？" : "Why Pet Insurance Matters")
+        .font(.system(size: 24, weight: .bold))
+        .foregroundColor(.primary)
+        .frame(maxWidth: .infinity, alignment: .leading)
+
+      Text(
+        languageManager.isChinese
+          ? "突發手術或住院費用常常過萬，保險可降低一次性財務壓力，讓你在治療決策上更有彈性。"
+          : "Unexpected surgeries and hospital stays can cost a lot. Insurance reduces one-time financial stress and helps you make treatment decisions with confidence."
+      )
+      .font(.system(size: 14))
+      .foregroundColor(.secondary)
+      .fixedSize(horizontal: false, vertical: true)
+
+      VStack(alignment: .leading, spacing: 6) {
+        bulletRow(
+          languageManager.isChinese
+            ? "降低大型醫療支出風險（手術、住院、慢性病）"
+            : "Reduce risk from major medical bills (surgery, hospitalization, chronic care).")
+        bulletRow(
+          languageManager.isChinese
+            ? "有助規劃長期照護，而不只看短期成本"
+            : "Support long-term care planning, not just short-term affordability.")
+        bulletRow(
+          languageManager.isChinese
+            ? "發生緊急情況時，決策更快更安心"
+            : "Make faster, calmer decisions during emergencies.")
+      }
+    }
+    .padding(20)
+    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    .overlay(
+      RoundedRectangle(cornerRadius: 16, style: .continuous)
+        .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+    )
+    .padding(.horizontal, 20)
+  }
+
+  private func bulletRow(_ text: String) -> some View {
+    HStack(alignment: .top, spacing: 8) {
+      Circle()
+        .fill(Color.blue.opacity(0.8))
+        .frame(width: 6, height: 6)
+        .padding(.top, 6)
+      Text(text)
+        .font(.system(size: 13))
+        .foregroundColor(.secondary)
+        .fixedSize(horizontal: false, vertical: true)
+      Spacer(minLength: 0)
+    }
+  }
 
   private var headerSection: some View {
     VStack(spacing: 8) {
@@ -285,7 +354,7 @@ struct InsuranceLandingView: View {
   private func coverageItem(
     icon: String, title: String, desc: String, isAdvanced: Bool
   ) -> some View {
-    let bg = isAdvanced ? Color.purple.opacity(0.05) : Color.blue.opacity(0.05)
+    let bg = isAdvanced ? Color.purple.opacity(0.12) : Color.blue.opacity(0.12)
     let iconColor = isAdvanced ? Color.purple : Color.blue
 
     return VStack(alignment: .leading, spacing: 12) {
@@ -293,7 +362,7 @@ struct InsuranceLandingView: View {
         .font(.system(size: 20, weight: .semibold))
         .foregroundColor(iconColor)
         .frame(width: 44, height: 44)
-        .background(Color.white)
+        .background(.ultraThinMaterial)
         .clipShape(Circle())
         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
 
@@ -311,8 +380,15 @@ struct InsuranceLandingView: View {
     }
     .padding(16)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(bg)
-    .cornerRadius(16)
+    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    .overlay(
+      RoundedRectangle(cornerRadius: 16, style: .continuous)
+        .fill(bg)
+    )
+    .overlay(
+      RoundedRectangle(cornerRadius: 16, style: .continuous)
+        .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+    )
   }
 
   private var threeStepsSection: some View {
@@ -362,8 +438,11 @@ struct InsuranceLandingView: View {
     }
     .padding(16)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.white)
-    .cornerRadius(16)
+    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    .overlay(
+      RoundedRectangle(cornerRadius: 16, style: .continuous)
+        .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+    )
     .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
   }
 
@@ -437,8 +516,11 @@ struct InsuranceLandingView: View {
     }
     .padding(20)
     .frame(width: 260)
-    .background(Color.white)
-    .cornerRadius(16)
+    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    .overlay(
+      RoundedRectangle(cornerRadius: 16, style: .continuous)
+        .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+    )
     .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
   }
 
@@ -460,7 +542,7 @@ struct InsuranceLandingView: View {
         Spacer()
       }
       .padding(20)
-      .background(Color.white)
+      .background(.regularMaterial)
       .clipShape(
         RoundedRectangle(cornerRadius: 16)
           .path(in: CGRect(x: 0, y: 0, width: 1000, height: 1000))  // rough approximation for top corners
@@ -482,10 +564,14 @@ struct InsuranceLandingView: View {
             ? "配種相關費用、懷孕分娩，以及主人蓄意或嚴重疏忽的情況" : "Breeding, pregnancy, or intentional neglect.")
       }
       .padding(20)
-      .background(Color.red.opacity(0.03))
+      .background(.ultraThinMaterial)
     }
-    .background(Color.white)
+    .background(.thinMaterial)
     .cornerRadius(16)
+    .overlay(
+      RoundedRectangle(cornerRadius: 16, style: .continuous)
+        .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+    )
     .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
     .padding(.horizontal, 20)
   }
@@ -545,12 +631,15 @@ struct InsuranceLandingView: View {
               .foregroundColor(.red)
           }
           .padding(12)
-          .background(Color.red.opacity(0.05))
+          .background(.ultraThinMaterial)
           .cornerRadius(8)
         }
         .padding(20)
-        .background(Color.white)
-        .cornerRadius(16)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+          RoundedRectangle(cornerRadius: 16, style: .continuous)
+            .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+        )
         .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
 
         // Has Insurance Card
@@ -589,12 +678,15 @@ struct InsuranceLandingView: View {
             .foregroundColor(.blue)
           }
           .padding(16)
-          .background(Color.blue.opacity(0.05))
+          .background(.ultraThinMaterial)
           .cornerRadius(12)
         }
         .padding(20)
-        .background(Color.white)
-        .cornerRadius(16)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+          RoundedRectangle(cornerRadius: 16, style: .continuous)
+            .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+        )
         .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
       }
       .padding(.horizontal, 20)

@@ -51,6 +51,7 @@ class LanguageManager: ObservableObject {
 @main
 struct PetWellApp: App {
   @StateObject private var languageManager = LanguageManager()
+  @StateObject private var authViewModel = AuthViewModel()
 
   init() {
     GMSServices.provideAPIKey("AIzaSyCnsrWuXiYAtx70iTGxOfawqlP84o_i260")
@@ -58,9 +59,17 @@ struct PetWellApp: App {
 
   var body: some Scene {
     WindowGroup {
-      ContentView()
-        .environmentObject(languageManager)
-        .environment(\.locale, .init(identifier: languageManager.currentLanguage.rawValue))
+      Group {
+        if !authViewModel.isLoggedIn {
+          LoginView(viewModel: authViewModel)
+        } else if !authViewModel.hasCompletedOnboarding {
+          OnboardingView(authViewModel: authViewModel)
+        } else {
+          ContentView()
+            .environmentObject(languageManager)
+            .environment(\.locale, .init(identifier: languageManager.currentLanguage.rawValue))
+        }
+      }
     }
     .modelContainer(for: [
       PetModel.self,

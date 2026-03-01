@@ -12,31 +12,37 @@ struct ScenarioDetailView: View {
   let scenario: Scenario
 
   var body: some View {
-    ScrollView {
-      VStack(spacing: 24) {
-        // Intro Text
-        Text(scenario.description)
-          .font(.subheadline)
-          .foregroundColor(.secondary)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding(.horizontal)
-          .padding(.top, 8)
+    VStack(spacing: 24) {
+      // Intro Text
+      Text(scenario.presentation.description)
+        .font(.subheadline)
+        .foregroundColor(.secondary)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal)
+        .padding(.top, 8)
 
-        // Section 1: Cost Breakdown
-        costBreakdownSection
+      // Section 1: Cost Breakdown
+      costBreakdownSection
 
-        // Section 2: Payout Comparison Chart
-        chartSection
+      // Section 2: Payout Comparison Chart
+      chartSection
 
-        // Section 3: Payout Cards
-        payoutCardsSection
+      // Section 3: Payout Cards
+      payoutCardsSection
 
-        Spacer().frame(height: 40)
-      }
+      Spacer().frame(height: 16)
     }
-    .background(Color(hex: "F8F9FA").ignoresSafeArea())
-    .navigationTitle(scenario.title)
-    .navigationBarTitleDisplayMode(.inline)
+    .background(
+      .ultraThinMaterial,
+      in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+    )
+    .overlay(
+      RoundedRectangle(cornerRadius: 14, style: .continuous)
+        .stroke(Color.white.opacity(0.25), lineWidth: 0.8)
+    )
+    .padding(.horizontal, 10)
+    .padding(.top, 10)
+    .padding(.bottom, 16)
   }
 
   // MARK: - Section 1: Cost Breakdown
@@ -103,9 +109,13 @@ struct ScenarioDetailView: View {
       }
       .frame(height: max(200, CGFloat(scenario.payouts.count * 40)))
       .padding()
-      .background(Color.white)
+      .background(.ultraThinMaterial)
       .cornerRadius(16)
-      .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+      .overlay(
+        RoundedRectangle(cornerRadius: 16)
+          .stroke(Color.white.opacity(0.4), lineWidth: 1)
+      )
+      .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 3)
       .padding(.horizontal)
     }
   }
@@ -204,21 +214,19 @@ struct PayoutCard: View {
       .frame(height: 6)
 
       // Description/Analysis
-      if let analysis = payout.analysis, !analysis.isEmpty {
-        Text(analysis)
-          .font(.system(size: 13))
-          .foregroundColor(.gray)
-          .padding(.top, 4)
-          .fixedSize(horizontal: false, vertical: true)
-      }
+      Text(payout.englishSummary)
+        .font(.system(size: 13))
+        .foregroundColor(.gray)
+        .padding(.top, 4)
+        .fixedSize(horizontal: false, vertical: true)
     }
     .padding(16)
-    .background(Color.white)
-    .cornerRadius(16)
+    .background(.ultraThinMaterial)
+  .cornerRadius(16)
     .overlay(
       RoundedRectangle(cornerRadius: 16)
-        .stroke(payout.isRecommended ? Color.yellow.opacity(0.5) : Color.clear, lineWidth: 2)
+        .stroke(payout.isRecommended ? Color.yellow.opacity(0.7) : Color.white.opacity(0.32), lineWidth: 1.2)
     )
-    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+    .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 3)
   }
 }
