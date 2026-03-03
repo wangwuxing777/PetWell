@@ -1,5 +1,23 @@
 # PetWell - Pet Healthcare Management App
 
+## Local Config Standard (New)
+
+### Quick Setup
+```bash
+cp config/env.example config/local.env
+bash scripts/verify_env.sh
+```
+
+### Why this exists
+- Keep API configuration in one place (`config/`), instead of scattering values across files.
+- Ensure team members use the same key names during testing.
+- Keep real secrets out of git (`config/local.env` is ignored).
+
+### Related docs
+- `config/README.md`
+- `docs/LOCAL_SETUP.md`
+- `docs/DATA_POLICY.md`
+
 ## 📝 Update Log
 
 | Date | Location | Description |
