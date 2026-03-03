@@ -31,6 +31,11 @@ class AuthViewModel: ObservableObject {
     !identifier.trimmingCharacters(in: .whitespaces).isEmpty && password.count >= 6
   }
 
+  var isValidEmail: Bool {
+    let trimmed = identifier.trimmingCharacters(in: .whitespacesAndNewlines)
+    return trimmed.contains("@") && trimmed.contains(".")
+  }
+
   func signIn() async {
     guard isValidInput else { return }
 
@@ -88,6 +93,37 @@ class AuthViewModel: ObservableObject {
     isLoading = false
   }
 
+  func signInWithX() async {
+    isLoading = true
+    errorMessage = nil
+    try? await Task.sleep(nanoseconds: 800_000_000)
+    errorMessage = "X Sign-In not yet configured."
+    isLoading = false
+  }
+
+  func signInWithApple() async {
+    isLoading = true
+    errorMessage = nil
+    try? await Task.sleep(nanoseconds: 800_000_000)
+    errorMessage = "Apple Sign-In not yet configured."
+    isLoading = false
+  }
+
+  func requestEmailVerification() async {
+    guard isValidEmail else {
+      errorMessage = "Please enter a valid email."
+      return
+    }
+
+    isLoading = true
+    errorMessage = nil
+
+    // Placeholder for email magic-link / OTP API
+    try? await Task.sleep(nanoseconds: 800_000_000)
+    errorMessage = "Verification email sent. Please check your inbox."
+    isLoading = false
+  }
+
   func completeOnboarding() {
     hasCompletedOnboarding = true
     UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
@@ -102,6 +138,13 @@ class AuthViewModel: ObservableObject {
     UserDefaults.standard.set(false, forKey: "isLoggedIn")
     UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
     UserDefaults.standard.removeObject(forKey: "userName")
+  }
+
+  func continueAsGuest() {
+    isLoggedIn = true
+    userName = "Guest"
+    UserDefaults.standard.set(true, forKey: "isLoggedIn")
+    UserDefaults.standard.set(userName, forKey: "userName")
   }
 }
 

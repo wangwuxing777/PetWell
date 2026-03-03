@@ -25,6 +25,8 @@ class ShopifyService: ObservableObject {
   @Published var availableCategories: [String] = []
   @Published var availableBrands: [String] = []
   @Published var isLoading: Bool = false
+  @Published var cartItems: [CartItem] = []
+  @Published var checkoutErrorMessage: String?
 
   struct FilterCriteria {
     var category: String? = nil  // "All", "For my pet", or specific "Toy", etc.
@@ -36,6 +38,16 @@ class ShopifyService: ObservableObject {
 
   private init() {
     setupClient()
+  }
+
+  var cartItemCount: Int {
+    cartItems.reduce(0) { $0 + $1.quantity }
+  }
+
+  var cartSubtotal: Decimal {
+    cartItems.reduce(Decimal.zero) { partial, item in
+      partial + item.lineTotal
+    }
   }
 
   func setupClient() {
@@ -64,6 +76,7 @@ class ShopifyService: ObservableObject {
                     .id()
                     .title()
                     .description()
+                    .handle()
                     .productType()
                     .vendor()
                     .priceRange {
@@ -81,6 +94,16 @@ class ShopifyService: ObservableObject {
                             .node {
                               $0
                                 .url()
+                            }
+                        }
+                    }
+                    .variants(first: 1) {
+                      $0
+                        .edges {
+                          $0
+                            .node {
+                              $0
+                                .id()
                             }
                         }
                     }
@@ -121,7 +144,8 @@ class ShopifyService: ObservableObject {
           imageUrl: imageUrl,
           productType: node.productType,
           vendor: node.vendor,
-          handle: ""  // Handle not fetched for simple list
+          handle: node.handle,
+          variantId: node.variants.edges.first?.node.id.rawValue
         )
       }
 
@@ -187,7 +211,8 @@ class ShopifyService: ObservableObject {
         imageUrl: nil,
         productType: "Food",
         vendor: "Brand A",
-        handle: "premium-dog-food"
+        handle: "premium-dog-food",
+        variantId: "1"
       ),
       ShopProduct(
         id: "2",
@@ -198,11 +223,86 @@ class ShopifyService: ObservableObject {
         imageUrl: nil,
         productType: "Toy",
         vendor: "Brand B",
-        handle: "cat-scratch-post"
+        handle: "cat-scratch-post",
+        variantId: "2"
       ),
     ]
     self.products = mockProducts
     self.filteredProducts = mockProducts
     self.extractFilterOptions()
+  }
+
+  // MARK: - Cart
+
+  func addToCart(product: ShopProduct, quantity: Int = 1) {
+    guard quantity > 0 else { return }
+
+    if let index = cartItems.firstIndex(where: { $0.product.id == product.id }) {
+      cartItems[index].quantity += quantity
+    } else {
+      cartItems.append(CartItem(product: product, quantity: quantity))
+    }
+  }
+
+  func updateCartQuantity(productId: String, quantity: Int) {
+    guard let index = cartItems.firstIndex(where: { $0.product.id == productId }) else { return }
+
+    if quantity <= 0 {
+      cartItems.remove(at: index)
+    } else {
+      cartItems[index].quantity = quantity
+    }
+  }
+
+  func removeFromCart(productId: String) {
+    cartItems.removeAll { $0.product.id == productId }
+  }
+
+  // Use Shopify cart permalink so checkout is handled by Shopify-native flow.
+  func makeCheckoutURL() -> URL? {
+    checkoutErrorMessage = nil
+
+    guard !cartItems.isEmpty else {
+      checkoutErrorMessage = "Cart is empty."
+      return nil
+    }
+
+    let lineItems = cartItems.compactMap { item -> String? in
+      guard let variantId = item.product.checkoutVariantNumericId else { return nil }
+      return "\(variantId):\(item.quantity)"
+    }
+
+    guard lineItems.count == cartItems.count else {
+      checkoutErrorMessage = "Some products cannot be checked out yet (missing Shopify variant ID)."
+      return nil
+    }
+
+    return makeCheckoutURL(withLineItems: lineItems)
+  }
+
+  func makeCheckoutURL(for product: ShopProduct, quantity: Int = 1) -> URL? {
+    checkoutErrorMessage = nil
+
+    guard quantity > 0 else {
+      checkoutErrorMessage = "Invalid quantity."
+      return nil
+    }
+
+    guard let variantId = product.checkoutVariantNumericId else {
+      checkoutErrorMessage = "This product cannot be checked out yet (missing Shopify variant ID)."
+      return nil
+    }
+
+    return makeCheckoutURL(withLineItems: ["\(variantId):\(quantity)"])
+  }
+
+  private func makeCheckoutURL(withLineItems lineItems: [String]) -> URL? {
+    guard !lineItems.isEmpty else {
+      checkoutErrorMessage = "Cart is empty."
+      return nil
+    }
+
+    let permalink = "https://\(shopDomain)/cart/\(lineItems.joined(separator: ","))"
+    return URL(string: permalink)
   }
 }

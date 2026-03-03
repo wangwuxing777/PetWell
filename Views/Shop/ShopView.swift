@@ -5,11 +5,13 @@
 //  Created for Shopify Integration.
 //
 
+import SafariServices
 import SwiftUI
 
 struct ShopView: View {
   @StateObject private var shopifyService = ShopifyService.shared
   @EnvironmentObject var languageManager: LanguageManager
+  @EnvironmentObject var guideManager: GuideManager
   @State private var showFilter = false
 
   let columns = [
@@ -31,23 +33,47 @@ struct ShopView: View {
           HStack(spacing: 20) {
             Button(action: {
               showFilter = true
+              guideManager.mark(.shopOpenedFilter)
             }) {
               Image(systemName: "line.3.horizontal.decrease.circle")
                 .font(.title2)
                 .foregroundColor(.black)
             }
 
-            Button(action: {
-              // Cart action
-            }) {
-              Image(systemName: "cart")
-                .font(.title2)
-                .foregroundColor(.black)
+            NavigationLink(destination: CartView()) {
+              ZStack(alignment: .topTrailing) {
+                Image(systemName: "cart")
+                  .font(.title2)
+                  .foregroundColor(.black)
+
+                if shopifyService.cartItemCount > 0 {
+                  Text("\(min(shopifyService.cartItemCount, 99))")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(4)
+                    .background(Color.red)
+                    .clipShape(Circle())
+                    .offset(x: 8, y: -8)
+                }
+              }
             }
           }
         }
         .padding(.horizontal)
         .padding(.top, 10)  // Adjustment for status bar if needed, or rely on safe area
+
+        if guideManager.currentStep?.tab == .shop {
+          HStack(spacing: 8) {
+            Image(systemName: "sparkles")
+              .foregroundColor(.blue)
+            Text("Tip: Open Filter and select \"For my pet\" for personalized picks.")
+              .font(.caption)
+              .foregroundColor(.secondary)
+            Spacer()
+          }
+          .padding(.horizontal)
+          .padding(.bottom, 8)
+        }
 
         if shopifyService.isLoading {
           VStack {
@@ -99,7 +125,7 @@ struct ProductCard: View {
   let product: ShopProduct
 
   var body: some View {
-    VStack(alignment: .leading) {
+    VStack(alignment: .leading, spacing: 10) {
       // Product Image
       if let url = product.imageUrl {
         AsyncImage(url: url) { phase in
@@ -112,7 +138,7 @@ struct ProductCard: View {
           case .success(let image):
             image
               .resizable()
-              .aspectRatio(contentMode: .fit)
+              .aspectRatio(contentMode: .fill)
               .cornerRadius(12)
           case .failure:
             RoundedRectangle(cornerRadius: 12)
@@ -127,6 +153,8 @@ struct ProductCard: View {
             EmptyView()
           }
         }
+        .frame(height: 150)
+        .clipped()
       } else {
         RoundedRectangle(cornerRadius: 12)
           .fill(Color.gray.opacity(0.1))
@@ -138,23 +166,32 @@ struct ProductCard: View {
           )
       }
 
-      VStack(alignment: .leading, spacing: 4) {
+      VStack(alignment: .leading, spacing: 6) {
         Text(product.title)
-          .font(.subheadline)
+          .font(.system(size: 14, weight: .semibold))
           .fontWeight(.medium)
           .lineLimit(2)
 
+        Text(product.vendor)
+          .font(.caption2)
+          .foregroundColor(.secondary)
+          .lineLimit(1)
+
         Text(product.formattedPrice)
-          .font(.caption)
+          .font(.subheadline)
           .bold()
-          .foregroundColor(.blue)
+          .foregroundColor(Color(hex: "2563EB"))
       }
-      .padding(.horizontal, 4)
-      .padding(.bottom, 8)
+      .padding(.horizontal, 10)
+      .padding(.bottom, 10)
     }
-    .background(Color.white)
-    .cornerRadius(12)
-    .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+    .background(Color.white.opacity(0.95))
+    .overlay(
+      RoundedRectangle(cornerRadius: 14)
+        .stroke(Color(hex: "E2E8F0"), lineWidth: 1)
+    )
+    .cornerRadius(14)
+    .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
   }
 }
 
@@ -439,4 +476,288 @@ struct ShopFilterChipLayout: Layout {
 
     return LayoutResult(size: CGSize(width: maxWidth, height: y + maxHeightInRow), points: points)
   }
+}
+
+// MARK: - Cart View
+
+struct CartView: View {
+  @ObservedObject private var shopifyService = ShopifyService.shared
+  @EnvironmentObject var languageManager: LanguageManager
+
+  @State private var checkoutSession: CheckoutSession?
+  @State private var alertMessage: String?
+
+  var body: some View {
+    VStack(spacing: 0) {
+      if shopifyService.cartItems.isEmpty {
+        VStack(spacing: 16) {
+          Image(systemName: "cart.badge.questionmark")
+            .font(.system(size: 44, weight: .semibold))
+            .foregroundColor(Color(hex: "4F46E5"))
+
+          Text(languageManager.isChinese ? "你的購物車還是空的" : "Your cart is empty")
+            .font(.headline)
+
+          Text(
+            languageManager.isChinese
+              ? "回到商店挑選你想要的商品，隨時都可以再回來結帳。"
+              : "Browse products and add what you need, then come back to checkout."
+          )
+          .font(.subheadline)
+          .foregroundColor(.secondary)
+          .multilineTextAlignment(.center)
+        }
+        .padding(24)
+        .background(.ultraThinMaterial)
+        .cornerRadius(20)
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+      } else {
+        ScrollView {
+          VStack(spacing: 14) {
+            ForEach(shopifyService.cartItems) { item in
+              cartRow(item: item)
+            }
+          }
+          .padding()
+        }
+      }
+    }
+    .background(
+      LinearGradient(
+        colors: [Color(hex: "EEF2FF"), Color(hex: "F8FAFC"), Color.white],
+        startPoint: .top,
+        endPoint: .bottom
+      )
+      .ignoresSafeArea()
+    )
+    .navigationTitle(languageManager.isChinese ? "購物車" : "Cart")
+    .navigationBarTitleDisplayMode(.inline)
+    .safeAreaInset(edge: .bottom) {
+      if !shopifyService.cartItems.isEmpty {
+        checkoutBar
+      }
+    }
+    .alert(
+      languageManager.isChinese ? "結帳失敗" : "Checkout Failed",
+      isPresented: Binding(
+        get: { alertMessage != nil },
+        set: { if !$0 { alertMessage = nil } }
+      )
+    ) {
+      Button(languageManager.isChinese ? "知道了" : "OK", role: .cancel) {}
+    } message: {
+      Text(alertMessage ?? "")
+    }
+    .sheet(item: $checkoutSession) { session in
+      ShopCheckoutContainer(
+        url: session.url,
+        title: languageManager.isChinese ? "安全結帳" : "Secure Checkout"
+      )
+      .ignoresSafeArea()
+    }
+  }
+
+  private var checkoutBar: some View {
+    VStack(spacing: 10) {
+      HStack {
+        Text(languageManager.isChinese ? "商品 \(shopifyService.cartItemCount) 件" : "\(shopifyService.cartItemCount) items")
+          .font(.subheadline)
+          .foregroundColor(.secondary)
+        Spacer()
+        Text(languageManager.isChinese ? "小計" : "Subtotal")
+          .font(.subheadline)
+          .foregroundColor(.secondary)
+        Text(formatCurrency(shopifyService.cartSubtotal))
+          .font(.headline)
+      }
+
+      Button(action: startCheckout) {
+        HStack(spacing: 8) {
+          Image(systemName: "lock.shield.fill")
+          Text(languageManager.isChinese ? "在 App 內安全結帳" : "Checkout In App")
+        }
+          .font(.headline)
+          .foregroundColor(.white)
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 14)
+          .background(
+            LinearGradient(
+              colors: [Color(hex: "4F46E5"), Color(hex: "2563EB")],
+              startPoint: .leading,
+              endPoint: .trailing
+            )
+          )
+          .cornerRadius(12)
+      }
+    }
+    .padding()
+    .background(Color.white.shadow(color: .black.opacity(0.06), radius: 8, y: -2))
+  }
+
+  private func cartRow(item: CartItem) -> some View {
+    VStack(alignment: .leading, spacing: 12) {
+      HStack(alignment: .top, spacing: 12) {
+        if let url = item.product.imageUrl {
+          AsyncImage(url: url) { phase in
+            switch phase {
+            case .empty:
+              RoundedRectangle(cornerRadius: 10)
+                .fill(Color.gray.opacity(0.1))
+                .overlay(ProgressView())
+            case .success(let image):
+              image
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+            case .failure:
+              RoundedRectangle(cornerRadius: 10)
+                .fill(Color.gray.opacity(0.1))
+                .overlay(Image(systemName: "photo").foregroundColor(.gray))
+            @unknown default:
+              EmptyView()
+            }
+          }
+          .frame(width: 72, height: 72)
+          .clipped()
+          .cornerRadius(10)
+        } else {
+          RoundedRectangle(cornerRadius: 10)
+            .fill(Color.gray.opacity(0.1))
+            .frame(width: 72, height: 72)
+            .overlay(Image(systemName: "photo").foregroundColor(.gray))
+        }
+
+        VStack(alignment: .leading, spacing: 4) {
+          Text(item.product.title)
+            .font(.system(size: 15, weight: .semibold))
+            .fontWeight(.semibold)
+            .lineLimit(2)
+
+          Text(item.product.vendor)
+            .font(.caption)
+            .foregroundColor(.secondary)
+
+          Text(item.product.formattedPrice)
+            .font(.subheadline)
+            .foregroundColor(Color(hex: "2563EB"))
+        }
+
+        Spacer()
+
+        Button(action: { shopifyService.removeFromCart(productId: item.product.id) }) {
+          Image(systemName: "trash")
+            .foregroundColor(.red.opacity(0.85))
+        }
+      }
+
+      HStack {
+        quantityControl(item: item)
+
+        Spacer()
+
+        Text(formatCurrency(item.lineTotal))
+          .font(.system(size: 16, weight: .bold))
+          .fontWeight(.semibold)
+      }
+    }
+    .padding(14)
+    .background(
+      RoundedRectangle(cornerRadius: 16)
+        .fill(Color.white.opacity(0.95))
+    )
+    .overlay(
+      RoundedRectangle(cornerRadius: 16)
+        .stroke(Color(hex: "E2E8F0"), lineWidth: 1)
+    )
+    .shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: 3)
+  }
+
+  private func quantityControl(item: CartItem) -> some View {
+    HStack(spacing: 14) {
+      Button(action: {
+        shopifyService.updateCartQuantity(productId: item.product.id, quantity: item.quantity - 1)
+      }) {
+        Image(systemName: "minus")
+          .font(.system(size: 12, weight: .bold))
+          .frame(width: 24, height: 24)
+          .background(Color.white)
+          .clipShape(Circle())
+      }
+
+      Text("\(item.quantity)")
+        .font(.subheadline)
+        .fontWeight(.medium)
+        .frame(minWidth: 20)
+
+      Button(action: {
+        shopifyService.updateCartQuantity(productId: item.product.id, quantity: item.quantity + 1)
+      }) {
+        Image(systemName: "plus")
+          .font(.system(size: 12, weight: .bold))
+          .frame(width: 24, height: 24)
+          .background(Color.white)
+          .clipShape(Circle())
+      }
+    }
+    .padding(.horizontal, 10)
+    .padding(.vertical, 8)
+    .background(Color(hex: "E0E7FF"))
+    .foregroundColor(Color(hex: "1D4ED8"))
+    .cornerRadius(999)
+  }
+
+  private func startCheckout() {
+    if let checkoutURL = shopifyService.makeCheckoutURL() {
+      checkoutSession = CheckoutSession(url: checkoutURL)
+    } else {
+      let fallback = languageManager.isChinese ? "目前無法建立結帳連結。" : "Unable to create checkout link."
+      alertMessage = shopifyService.checkoutErrorMessage ?? fallback
+    }
+  }
+
+  private func formatCurrency(_ amount: Decimal) -> String {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .currency
+    formatter.currencyCode = shopifyService.cartItems.first?.product.currencyCode ?? "HKD"
+    return formatter.string(from: amount as NSNumber) ?? "\(amount)"
+  }
+}
+
+private struct CheckoutSession: Identifiable {
+  let id = UUID()
+  let url: URL
+}
+
+struct ShopCheckoutContainer: View {
+  @Environment(\.dismiss) private var dismiss
+  let url: URL
+  let title: String
+
+  var body: some View {
+    NavigationStack {
+      InAppSafariView(url: url)
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+          ToolbarItem(placement: .topBarTrailing) {
+            Button("Done") {
+              dismiss()
+            }
+          }
+        }
+    }
+  }
+}
+
+struct InAppSafariView: UIViewControllerRepresentable {
+  let url: URL
+
+  func makeUIViewController(context: Context) -> SFSafariViewController {
+    let vc = SFSafariViewController(url: url)
+    vc.dismissButtonStyle = .close
+    vc.preferredControlTintColor = UIColor(Color(hex: "2563EB"))
+    return vc
+  }
+
+  func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }

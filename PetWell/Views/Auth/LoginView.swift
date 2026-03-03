@@ -9,157 +9,261 @@ import SwiftUI
 
 struct LoginView: View {
   @ObservedObject var viewModel: AuthViewModel
+  @State private var showEmailLogin = false
 
   var body: some View {
-    ZStack {
-      Color(hex: "F8F9FA").ignoresSafeArea()
+    NavigationStack {
+      ZStack {
+        LinearGradient(
+          colors: [
+            Color(red: 0.04, green: 0.10, blue: 0.25),
+            Color(red: 0.11, green: 0.28, blue: 0.58),
+            Color(red: 0.23, green: 0.47, blue: 0.82)
+          ],
+          startPoint: .topLeading,
+          endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
 
-      ScrollView {
-        VStack(alignment: .leading, spacing: 28) {
+        Ellipse()
+          .fill(Color.white.opacity(0.24))
+          .frame(width: 360, height: 120)
+          .blur(radius: 30)
+          .rotationEffect(.degrees(-8))
+          .offset(x: -30, y: -190)
 
-          // Welcome Header
-          VStack(alignment: .leading, spacing: 8) {
-            Text("Welcome to PetWell")
-              .font(.largeTitle)
-              .fontWeight(.bold)
-              .foregroundColor(.primary)
+        Ellipse()
+          .fill(Color.white.opacity(0.12))
+          .frame(width: 320, height: 110)
+          .blur(radius: 38)
+          .rotationEffect(.degrees(15))
+          .offset(x: 90, y: -120)
 
-            Text("Sign in to manage your pet's insurance and health records.")
-              .font(.subheadline)
-              .foregroundColor(.secondary)
-          }
-          .padding(.top, 60)
-
-          // Input Fields
-          VStack(spacing: 20) {
-            // Identifier Field
-            VStack(alignment: .leading, spacing: 8) {
-              Text("Email or Phone Number")
-                .font(.footnote)
-                .fontWeight(.medium)
-                .foregroundColor(.secondary)
-
-              TextField("Enter email or phone", text: $viewModel.identifier)
-                .keyboardType(.emailAddress)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .padding()
-                .background(Color.white)
-                .cornerRadius(12)
-                .overlay(
-                  RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                )
-            }
-
-            // Password Field
-            VStack(alignment: .leading, spacing: 8) {
-              Text("Password")
-                .font(.footnote)
-                .fontWeight(.medium)
-                .foregroundColor(.secondary)
-
-              SecureField("Enter your password", text: $viewModel.password)
-                .padding()
-                .background(Color.white)
-                .cornerRadius(12)
-                .overlay(
-                  RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                )
-
-              HStack {
-                Spacer()
-                Button("Forgot Password?") {}
-                  .font(.caption)
-                  .fontWeight(.medium)
-                  .foregroundColor(.blue)
-                  .padding(.top, 4)
-              }
-            }
-          }
-
-          // Error Message
-          if let errorMessage = viewModel.errorMessage {
-            Text(errorMessage)
-              .font(.caption)
-              .foregroundColor(.red)
-              .frame(maxWidth: .infinity, alignment: .center)
-          }
-
-          // Main Sign In Button
-          Button(action: {
-            Task { await viewModel.signIn() }
-          }) {
-            HStack {
-              if viewModel.isLoading {
-                ProgressView()
-                  .tint(.white)
-              } else {
-                Text("Sign In")
-              }
-            }
-            .font(.headline)
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(viewModel.isValidInput ? Color.orange : Color.orange.opacity(0.5))
-            .cornerRadius(12)
-          }
-          .disabled(!viewModel.isValidInput || viewModel.isLoading)
-
-          // Divider
+        VStack(spacing: 0) {
           HStack {
-            Rectangle().fill(Color.gray.opacity(0.3)).frame(height: 1)
-            Text("OR")
-              .font(.caption)
-              .foregroundColor(.gray)
-              .padding(.horizontal, 8)
-            Rectangle().fill(Color.gray.opacity(0.3)).frame(height: 1)
-          }
-
-          // Google Sign In
-          Button(action: {
-            Task { await viewModel.signInWithGoogle() }
-          }) {
-            HStack(spacing: 12) {
-              Image(systemName: "g.circle.fill")
-                .resizable()
-                .frame(width: 24, height: 24)
-                .foregroundColor(.blue)
-
-              Text("Continue with Google")
-                .font(.headline)
-                .foregroundColor(.black.opacity(0.8))
+            Spacer()
+            Button("Skip") {
+              viewModel.continueAsGuest()
             }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.white)
-            .cornerRadius(12)
-            .overlay(
-              RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+            .font(.callout.weight(.semibold))
+            .foregroundColor(.white.opacity(0.92))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 9)
+            .background(Color.white.opacity(0.14), in: Capsule())
+            .overlay(Capsule().stroke(Color.white.opacity(0.35), lineWidth: 1))
           }
-          .disabled(viewModel.isLoading)
+          .padding(.horizontal, 24)
+          .padding(.top, 16)
 
           Spacer()
 
-          // Sign Up Link
-          HStack {
-            Text("Don't have an account?")
-              .foregroundColor(.secondary)
-            Button("Sign Up") {}
-              .fontWeight(.bold)
-              .foregroundColor(.orange)
+          VStack(spacing: 10) {
+            Text("PetWell")
+              .font(.system(size: 56, weight: .bold, design: .rounded))
+              .foregroundColor(.white)
+            Text("Protect every moment")
+              .font(.subheadline.weight(.medium))
+              .foregroundColor(.white.opacity(0.72))
           }
-          .font(.subheadline)
-          .frame(maxWidth: .infinity, alignment: .center)
-          .padding(.bottom, 20)
+
+          Spacer()
+
+          VStack(spacing: 12) {
+            Button {
+              Task { await viewModel.signInWithGoogle() }
+            } label: {
+              AuthWideButton(title: "Continue with Google", icon: "g.circle.fill")
+            }
+            .disabled(viewModel.isLoading)
+
+            Button {
+              Task { await viewModel.signInWithX() }
+            } label: {
+              AuthWideButton(title: "Continue with X", icon: "xmark")
+            }
+            .disabled(viewModel.isLoading)
+
+            HStack(spacing: 12) {
+              Button {
+                Task { await viewModel.signInWithApple() }
+              } label: {
+                AuthHalfButton(icon: "apple.logo", title: "Apple")
+              }
+              .disabled(viewModel.isLoading)
+
+              Button {
+                showEmailLogin = true
+              } label: {
+                AuthHalfButton(icon: "envelope.fill", title: "Email")
+              }
+              .disabled(viewModel.isLoading)
+            }
+          }
+          .padding(.horizontal, 24)
+          .padding(.bottom, 28)
+
+          Text("By continuing you agree to the Terms of Service and Privacy Policy")
+            .font(.caption2)
+            .foregroundColor(.white.opacity(0.55))
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 26)
+            .padding(.bottom, 10)
+
+          if let errorMessage = viewModel.errorMessage {
+            Text(errorMessage)
+              .font(.caption)
+              .foregroundColor(Color(red: 1, green: 0.84, blue: 0.84))
+              .padding(.bottom, 12)
+          }
         }
-        .padding(.horizontal, 24)
       }
+      .navigationBarHidden(true)
+      .navigationDestination(isPresented: $showEmailLogin) {
+        EmailLoginView(viewModel: viewModel)
+      }
+    }
+  }
+}
+
+private struct AuthWideButton: View {
+  let title: String
+  let icon: String
+
+  var body: some View {
+    HStack(spacing: 10) {
+      Image(systemName: icon)
+        .font(.system(size: 18, weight: .semibold))
+      Text(title)
+        .font(.headline.weight(.semibold))
+    }
+    .foregroundColor(.white.opacity(0.96))
+    .frame(maxWidth: .infinity)
+    .frame(height: 52)
+    .background(Color.white.opacity(0.12), in: Capsule())
+    .overlay(Capsule().stroke(Color.white.opacity(0.34), lineWidth: 1))
+  }
+}
+
+private struct AuthHalfButton: View {
+  let icon: String
+  let title: String
+
+  var body: some View {
+    HStack(spacing: 8) {
+      Image(systemName: icon)
+        .font(.system(size: 18, weight: .semibold))
+      Text(title)
+        .font(.headline.weight(.semibold))
+    }
+    .foregroundColor(.white.opacity(0.96))
+    .frame(maxWidth: .infinity)
+    .frame(height: 50)
+    .background(Color.white.opacity(0.10), in: Capsule())
+    .overlay(Capsule().stroke(Color.white.opacity(0.34), lineWidth: 1))
+  }
+}
+
+private struct EmailLoginView: View {
+  @ObservedObject var viewModel: AuthViewModel
+  @Environment(\.dismiss) private var dismiss
+
+  var body: some View {
+    ZStack {
+      LinearGradient(
+        colors: [
+          Color(red: 0.04, green: 0.10, blue: 0.25),
+          Color(red: 0.11, green: 0.28, blue: 0.58),
+          Color(red: 0.23, green: 0.47, blue: 0.82)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+      )
+      .ignoresSafeArea()
+
+      Ellipse()
+        .fill(Color.white.opacity(0.20))
+        .frame(width: 320, height: 100)
+        .blur(radius: 30)
+        .rotationEffect(.degrees(-8))
+        .offset(x: -40, y: -250)
+
+      VStack(alignment: .leading, spacing: 0) {
+        Button {
+          dismiss()
+        } label: {
+          Image(systemName: "chevron.left")
+            .font(.title3.weight(.semibold))
+            .foregroundColor(.white.opacity(0.95))
+            .frame(width: 28, height: 28)
+        }
+        .padding(.top, 12)
+
+        Text("Email Login")
+          .font(.title2.weight(.bold))
+          .foregroundColor(.white)
+          .padding(.top, 26)
+
+        Text("If this email exists in our system, we'll send a verification link.")
+          .font(.subheadline)
+          .foregroundColor(.white.opacity(0.72))
+          .padding(.top, 8)
+
+        HStack(spacing: 10) {
+          Image(systemName: "envelope")
+            .foregroundColor(.white.opacity(0.85))
+          TextField("Email address", text: $viewModel.identifier)
+            .keyboardType(.emailAddress)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+            .foregroundColor(.white)
+        }
+        .padding(.horizontal, 14)
+        .frame(height: 54)
+        .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+          RoundedRectangle(cornerRadius: 14, style: .continuous)
+            .stroke(Color.white.opacity(0.34), lineWidth: 1)
+        )
+        .padding(.top, 24)
+
+        Button {
+          Task { await viewModel.requestEmailVerification() }
+        } label: {
+          HStack {
+            if viewModel.isLoading {
+              ProgressView().tint(.white)
+            } else {
+              Text("Verify and Login")
+            }
+          }
+          .font(.headline.weight(.semibold))
+          .foregroundColor(.white)
+          .frame(maxWidth: .infinity)
+          .frame(height: 54)
+          .background(viewModel.isValidEmail ? Color.white.opacity(0.16) : Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+          .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+              .stroke(Color.white.opacity(0.34), lineWidth: 1)
+          )
+        }
+        .disabled(!viewModel.isValidEmail || viewModel.isLoading)
+        .padding(.top, 34)
+
+        if let errorMessage = viewModel.errorMessage {
+          Text(errorMessage)
+            .font(.caption)
+            .foregroundColor(errorMessage.contains("sent") ? Color.white.opacity(0.82) : Color(red: 1, green: 0.84, blue: 0.84))
+            .padding(.top, 12)
+        }
+
+        Spacer()
+      }
+      .padding(.horizontal, 28)
+      .padding(.bottom, 24)
+    }
+    .navigationBarBackButtonHidden(true)
+    .onAppear {
+      viewModel.errorMessage = nil
     }
   }
 }

@@ -16,6 +16,7 @@ private struct ScrollOffsetPreferenceKey: PreferenceKey {
 // MARK: - Main View
 struct InsuranceLandingView: View {
   @EnvironmentObject var languageManager: LanguageManager
+  @EnvironmentObject var guideManager: GuideManager
   @State private var scrollOffset: CGFloat = 0
   @State private var isShowingRecommendation = false
 
@@ -81,6 +82,9 @@ struct InsuranceLandingView: View {
                   )
                   .shadow(color: Color.blue.opacity(0.2), radius: 8, x: 0, y: 4)
               }
+              .simultaneousGesture(TapGesture().onEnded {
+                guideManager.mark(.insuranceCompareTapped)
+              })
               .padding(.horizontal, 20)
               .padding(.bottom, 60)
             }
@@ -98,6 +102,9 @@ struct InsuranceLandingView: View {
         .coordinateSpace(name: "scroll")
         .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
           scrollOffset = value
+          if scrollOffset > fullHeaderHeight / 2 {
+            guideManager.mark(.insuranceScrolled)
+          }
         }
         .ignoresSafeArea(edges: .top)
 
@@ -183,6 +190,9 @@ struct InsuranceLandingView: View {
               .background(Color.blue)
               .clipShape(Capsule())
           }
+          .simultaneousGesture(TapGesture().onEnded {
+            guideManager.mark(.insuranceCompareTapped)
+          })
           .fixedSize()
 
           // For You Button

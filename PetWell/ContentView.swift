@@ -6,6 +6,191 @@
 //
 
 import SwiftUI
+import Combine
+
+enum Tab: Hashable {
+  case shop, medical, insurance, profile, blog
+}
+
+enum GuideAction: String {
+  case blogPostTapped
+  case shopOpenedFilter
+  case insuranceScrolled
+  case insuranceCompareTapped
+  case insuranceComparedChanged
+  case medicalOpenedMap
+  case profileTappedAddPet
+}
+
+struct GuideStep: Identifiable {
+  let id = UUID()
+  let tab: Tab
+  let title: String
+  let message: String
+  let requiredAction: GuideAction?
+}
+
+final class GuideManager: ObservableObject {
+  @Published var isActive = false
+  @Published var currentIndex = 0
+
+  private let completedKey = "hasCompletedContextualGuideV1"
+
+  let steps: [GuideStep] = [
+    GuideStep(
+      tab: .blog,
+      title: "Blog",
+      message: "Tap the + button at the top-right to create your first post.",
+      requiredAction: .blogPostTapped
+    ),
+    GuideStep(
+      tab: .shop,
+      title: "Shop · For You",
+      message: "Open Filter to try the For my pet recommendation (future core feature).",
+      requiredAction: .shopOpenedFilter
+    ),
+    GuideStep(
+      tab: .insurance,
+      title: "Insurance",
+      message: "Scroll down to learn key insurance basics.",
+      requiredAction: .insuranceScrolled
+    ),
+    GuideStep(
+      tab: .insurance,
+      title: "Insurance Compare",
+      message: "Tap Compare to open side-by-side plan comparison.",
+      requiredAction: .insuranceCompareTapped
+    ),
+    GuideStep(
+      tab: .insurance,
+      title: "Use Compare",
+      message: "Try changing a product or switch to scenario mode to compare by case.",
+      requiredAction: .insuranceComparedChanged
+    ),
+    GuideStep(
+      tab: .medical,
+      title: "Medical",
+      message: "Use the map button to find nearby clinics quickly.",
+      requiredAction: .medicalOpenedMap
+    ),
+    GuideStep(
+      tab: .profile,
+      title: "Profile",
+      message: "Tap + to add your pet profile and complete records.",
+      requiredAction: .profileTappedAddPet
+    ),
+  ]
+
+  var currentStep: GuideStep? {
+    guard isActive, currentIndex < steps.count else { return nil }
+    return steps[currentIndex]
+  }
+
+  var progressText: String {
+    "\(min(currentIndex + 1, steps.count))/\(steps.count)"
+  }
+
+  func startIfNeeded() {
+    let hasCompleted = UserDefaults.standard.bool(forKey: completedKey)
+    if !hasCompleted {
+      isActive = true
+      currentIndex = 0
+    }
+  }
+
+  func skip() {
+    complete()
+  }
+
+  func next() {
+    guard isActive else { return }
+    if currentIndex >= steps.count - 1 {
+      complete()
+    } else {
+      currentIndex += 1
+    }
+  }
+
+  func mark(_ action: GuideAction) {
+    guard let step = currentStep else { return }
+    guard step.requiredAction == action else { return }
+    next()
+  }
+
+  func complete() {
+    isActive = false
+    UserDefaults.standard.set(true, forKey: completedKey)
+  }
+
+  func replay() {
+    UserDefaults.standard.set(false, forKey: completedKey)
+    isActive = true
+    currentIndex = 0
+  }
+}
+
+private struct GuideOverlayCard: View {
+  let step: GuideStep
+  let progressText: String
+  let onSkip: () -> Void
+  let onNext: () -> Void
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      HStack {
+        Text(step.title)
+          .font(.headline.weight(.bold))
+        Spacer()
+        Text(progressText)
+          .font(.caption)
+          .foregroundColor(.secondary)
+      }
+
+      Text(step.message)
+        .font(.subheadline)
+        .foregroundColor(.secondary)
+
+      HStack {
+        Button("Skip") { onSkip() }
+          .font(.subheadline.weight(.semibold))
+          .foregroundColor(.secondary)
+
+        Spacer()
+
+        Button("Next") {
+          onNext()
+        }
+        .font(.subheadline.weight(.bold))
+        .foregroundColor(.white)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 10)
+        .background(Color.blue, in: Capsule())
+      }
+    }
+    .padding(16)
+    .background(
+      LinearGradient(
+        colors: [Color.white.opacity(0.20), Color.white.opacity(0.08)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+      ),
+      in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+    )
+    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    .overlay(
+      RoundedRectangle(cornerRadius: 16, style: .continuous)
+        .stroke(
+          LinearGradient(
+            colors: [Color.white.opacity(0.70), Color.white.opacity(0.24)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+          ),
+          lineWidth: 1
+        )
+    )
+    .shadow(color: .black.opacity(0.20), radius: 18, x: 0, y: 10)
+  }
+}
 
 struct ContentView: View {
   @EnvironmentObject var languageManager: LanguageManager
@@ -14,6 +199,7 @@ struct ContentView: View {
   @State private var guardianButtonPosition: CGPoint = .zero
   @State private var guardianButtonDragOffset: CGSize = .zero
   @StateObject private var blogService = BlogService.shared
+  @StateObject private var guideManager = GuideManager()
 
   var body: some View {
     GeometryReader { geo in
@@ -21,6 +207,7 @@ struct ContentView: View {
         TabView(selection: $selectedTab) {
           BlogView()
             .environmentObject(blogService)  // Inject service
+            .environmentObject(guideManager)
             .tabItem {
               Label(
                 languageManager.isChinese ? "日誌" : "Blog",
@@ -29,22 +216,26 @@ struct ContentView: View {
             .tag(Tab.blog)
 
           ShopView()
+            .environmentObject(guideManager)
             .tabItem { Label(languageManager.isChinese ? "商店" : "Shop", systemImage: "bag") }
             .tag(Tab.shop)
 
           VaccineView()
+            .environmentObject(guideManager)
             .tabItem {
               Label(languageManager.isChinese ? "醫療" : "Medical", systemImage: "cross.case")
             }
             .tag(Tab.medical)
 
           InsuranceView()
+            .environmentObject(guideManager)
             .tabItem {
               Label(languageManager.isChinese ? "保險" : "Insurance", systemImage: "shield")
             }
             .tag(Tab.insurance)
 
           RecordsView()
+            .environmentObject(guideManager)
             .tabItem {
               Label(languageManager.isChinese ? "檔案" : "Profile", systemImage: "person.circle")
             }
@@ -99,6 +290,7 @@ struct ContentView: View {
             )
           }
         }
+
       }
     }
     .sheet(isPresented: $isGuardianPresented) {
@@ -109,10 +301,6 @@ struct ContentView: View {
       )
     }
   }
-}
-
-private enum Tab: Hashable {
-  case shop, medical, insurance, profile, blog
 }
 
 // MARK: - Placeholder screens (MVP stubs)
@@ -185,6 +373,7 @@ struct BlogPost: Identifiable {
 struct BlogView: View {
   @EnvironmentObject var languageManager: LanguageManager
   @EnvironmentObject var blogService: BlogService  // Injected service
+  @EnvironmentObject var guideManager: GuideManager
   @State private var showingPostSheet = false
 
   // User Switcher UI Helper
@@ -240,6 +429,7 @@ struct BlogView: View {
               Task { await blogService.registerUser(name: "Dev A") }  // Auto login if needed
             }
             showingPostSheet = true
+            guideManager.mark(.blogPostTapped)
           }) {
             Image(systemName: "plus.square")
               .font(.system(size: 22))

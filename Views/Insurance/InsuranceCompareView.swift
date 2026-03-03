@@ -26,6 +26,7 @@ struct RemarkSheetContext: Identifiable {
 struct InsuranceCompareView: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var languageManager: LanguageManager
+  @EnvironmentObject var guideManager: GuideManager
   @ObservedObject var insuranceService = InsuranceService.shared
 
   // Default selection keys (Product IDs)
@@ -51,10 +52,61 @@ struct InsuranceCompareView: View {
   // Scroll tracking
   @State private var scrollOffset: CGFloat = 0
   private let providerHeaderHeight: CGFloat = 280
+  private let addOnCoverageIds: Set<Int> = [7, 8, 11]
+
+  private var addOnBadgeText: String {
+    languageManager.isChinese ? "額外加購" : "Extra"
+  }
+
+  private var addOnGroupTitleText: String {
+    languageManager.isChinese ? "額外加購保障組" : "Paid Add-on Group"
+  }
+
+  private var addOnExplanationText: String {
+    languageManager.isChinese
+      ? "標記「額外加購」的保障項目需另付保費。"
+      : "Items marked \"Extra\" require additional premium."
+  }
 
   // Show mini header when provider cards are halfway scrolled off
   private var showMiniHeader: Bool {
     scrollOffset > providerHeaderHeight / 2
+  }
+
+  private var orderedCoverageItems: [CoverageItem] {
+    insuranceService.getOrderedCoverageItems()
+  }
+
+  private func isAddOnCoverage(_ coverageId: Int) -> Bool {
+    addOnCoverageIds.contains(coverageId)
+  }
+
+  private var groupedAddOnItems: [CoverageItem] {
+    orderedCoverageItems.filter { isAddOnCoverage($0.coverageId) }
+  }
+
+  private func hasDisplayableCoverage(_ item: CoverageItem) -> Bool {
+    let leftSubLimits =
+      leftProductId.map {
+        insuranceService.getSubCoverageLimits(productId: $0, parentCoverageId: item.coverageId)
+      } ?? []
+    let rightSubLimits =
+      rightProductId.map {
+        insuranceService.getSubCoverageLimits(productId: $0, parentCoverageId: item.coverageId)
+      } ?? []
+
+    let leftNames = Set(leftSubLimits.map { $0.subCoverageName ?? "" })
+    let rightNames = Set(rightSubLimits.map { $0.subCoverageName ?? "" })
+    let hasSubItems = !leftNames.union(rightNames).filter { !$0.isEmpty }.isEmpty
+
+    let hasLeftMain = leftProductId.flatMap {
+      insuranceService.getCoverageLimit(productId: $0, coverageId: item.coverageId)
+    } != nil
+    let hasRightMain = rightProductId.flatMap {
+      insuranceService.getCoverageLimit(productId: $0, coverageId: item.coverageId)
+    } != nil
+
+    return hasLeftMain || hasRightMain || hasSubItems
   }
 
   // Helpers to get current product and company
@@ -125,6 +177,11 @@ struct InsuranceCompareView: View {
       }
     }
     .animation(.easeInOut(duration: 0.25), value: showMiniHeader)
+    .onChange(of: compareMode) { mode in
+      if mode == .byScenario {
+        guideManager.mark(.insuranceComparedChanged)
+      }
+    }
     .navigationTitle("Coverage Breakdown")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar(.hidden, for: .tabBar)
@@ -245,6 +302,7 @@ struct InsuranceCompareView: View {
       Button(action: {
         isSelectingLeft = isLeft
         showSelectionSheet = true
+        guideManager.mark(.insuranceComparedChanged)
       }) {
         Text("Change")
           .font(.system(size: 12, weight: .medium))
@@ -388,8 +446,19 @@ struct InsuranceCompareView: View {
 
   private var coverageBreakdownSection: some View {
     VStack(spacing: 24) {  // Spacing between cards
-      ForEach(insuranceService.getOrderedCoverageItems()) { item in
-        coverageCard(item: item)
+      let visibleAddOnItems = groupedAddOnItems.filter { hasDisplayableCoverage($0) }
+      let firstVisibleAddOnIndex = orderedCoverageItems.firstIndex {
+        isAddOnCoverage($0.coverageId) && hasDisplayableCoverage($0)
+      }
+
+      ForEach(Array(orderedCoverageItems.enumerated()), id: \.element.id) { index, item in
+        if isAddOnCoverage(item.coverageId) {
+          if index == firstVisibleAddOnIndex, !visibleAddOnItems.isEmpty {
+            addOnCoverageGroup(items: visibleAddOnItems)
+          }
+        } else {
+          coverageCard(item: item)
+        }
       }
 
       // Footnote
@@ -402,7 +471,46 @@ struct InsuranceCompareView: View {
     }
   }
 
-  private func coverageCard(item: CoverageItem) -> some View {
+  private func addOnCoverageGroup(items: [CoverageItem]) -> some View {
+    VStack(alignment: .leading, spacing: 14) {
+      HStack(spacing: 8) {
+        Image(systemName: "plus.circle.fill")
+          .font(.system(size: 14, weight: .semibold))
+          .foregroundColor(Color(hex: "B45309"))
+
+        Text(addOnGroupTitleText)
+          .font(.system(size: 14, weight: .bold))
+          .foregroundColor(Color(hex: "92400E"))
+      }
+
+      Text(addOnExplanationText)
+        .font(.system(size: 12, weight: .medium))
+        .foregroundColor(Color(hex: "92400E"))
+
+      VStack(spacing: 16) {
+        ForEach(items) { item in
+          coverageCard(item: item, showAddOnDecorations: false, applyHorizontalPadding: false)
+        }
+      }
+    }
+    .padding(14)
+    .background(Color(hex: "FFFBF5"))
+    .overlay(
+      RoundedRectangle(cornerRadius: 16)
+        .stroke(Color(hex: "FDBA74").opacity(0.75), lineWidth: 1.2)
+    )
+    .cornerRadius(16)
+    .padding(.horizontal)
+  }
+
+  private func coverageCard(
+    item: CoverageItem,
+    showAddOnDecorations: Bool = true,
+    applyHorizontalPadding: Bool = true
+  ) -> some View {
+    let isAddOn = isAddOnCoverage(item.coverageId)
+    let shouldHighlightAddOn = isAddOn && showAddOnDecorations
+
     // 1. Calculate Sub-Limits for both products
     let leftSubLimits =
       leftProductId.map {
@@ -444,95 +552,128 @@ struct InsuranceCompareView: View {
       return AnyView(EmptyView())
     }
 
-    return AnyView(
-      VStack(alignment: .leading, spacing: 8) {
-        // 1. Title Outside the Box
-        Text(item.coverageType)
-          .font(.system(size: 16, weight: .bold))
-          .foregroundColor(.primary)
-          .padding(.horizontal)
+    let cardContainer = AnyView(
+      VStack(spacing: 0) {
 
-        // 2. White Box Container
-        VStack(spacing: 0) {
-
-          // Main Limits
-          // Only show main limits row if meaningful?
-          // Usually main limits are always shown if the section exists.
-          HStack(alignment: .center, spacing: 12) {
-            // Left Status
-            if let leftId = leftProductId {
-              coverageStatusCell(
-                productId: leftId, coverageId: item.coverageId, coverageType: item.coverageType,
-                isLeft: true)
-            }
-
-            // Right Status
-            if let rightId = rightProductId {
-              coverageStatusCell(
-                productId: rightId, coverageId: item.coverageId, coverageType: item.coverageType,
-                isLeft: false)
-            }
+        // Main Limits
+        // Only show main limits row if meaningful?
+        // Usually main limits are always shown if the section exists.
+        HStack(alignment: .center, spacing: 12) {
+          // Left Status
+          if let leftId = leftProductId {
+            coverageStatusCell(
+              productId: leftId, coverageId: item.coverageId, coverageType: item.coverageType,
+              isLeft: true)
           }
-          .padding(.top, hasSubItems ? 32 : 24)
-          .padding(.bottom, hasSubItems ? 16 : 24)
-          .padding(.horizontal, 16)
 
-          // Sub-coverages Display
-          if hasSubItems {
-            VStack(spacing: 0) {
-              ForEach(sortedNames, id: \.self) { subName in
-                // Dashed Divider
-                Line()
-                  .stroke(style: StrokeStyle(lineWidth: 1, dash: [4]))
-                  .frame(height: 1)
-                  .foregroundColor(Color.gray.opacity(0.3))
+          // Right Status
+          if let rightId = rightProductId {
+            coverageStatusCell(
+              productId: rightId, coverageId: item.coverageId, coverageType: item.coverageType,
+              isLeft: false)
+          }
+        }
+        .padding(.top, hasSubItems ? 32 : 24)
+        .padding(.bottom, hasSubItems ? 16 : 24)
+        .padding(.horizontal, 16)
+
+        // Sub-coverages Display
+        if hasSubItems {
+          VStack(spacing: 0) {
+            ForEach(sortedNames, id: \.self) { subName in
+              // Dashed Divider
+              Line()
+                .stroke(style: StrokeStyle(lineWidth: 1, dash: [4]))
+                .frame(height: 1)
+                .foregroundColor(Color.gray.opacity(0.3))
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 8)
+
+              VStack(spacing: 8) {
+                // Sub-coverage Name - CENTERED
+                Text(subName)
+                  .font(.system(size: 13, weight: .semibold))
+                  .foregroundColor(.primary.opacity(0.8))
+                  .multilineTextAlignment(.center)
+                  .frame(maxWidth: .infinity, alignment: .center)  // Force Center
                   .padding(.horizontal, 16)
-                  .padding(.top, 16)
-                  .padding(.bottom, 8)
+                  .padding(.bottom, 4)
 
-                VStack(spacing: 8) {
-                  // Sub-coverage Name - CENTERED
-                  Text(subName)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.primary.opacity(0.8))
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity, alignment: .center)  // Force Center
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 4)
-
-                  // Sub-coverage Values
-                  HStack(alignment: .center, spacing: 12) {
-                    // Left Value
-                    if let leftId = leftProductId {
-                      subCoverageStatusCell(
-                        productId: leftId,
-                        subName: subName,
-                        limits: leftSubLimits,
-                        isLeft: true
-                      )
-                    }
-
-                    // Right Value
-                    if let rightId = rightProductId {
-                      subCoverageStatusCell(
-                        productId: rightId,
-                        subName: subName,
-                        limits: rightSubLimits,
-                        isLeft: false
-                      )
-                    }
+                // Sub-coverage Values
+                HStack(alignment: .center, spacing: 12) {
+                  // Left Value
+                  if let leftId = leftProductId {
+                    subCoverageStatusCell(
+                      productId: leftId,
+                      subName: subName,
+                      limits: leftSubLimits,
+                      isLeft: true
+                    )
                   }
-                  .padding(.horizontal, 16)
-                  .padding(.bottom, 24)
+
+                  // Right Value
+                  if let rightId = rightProductId {
+                    subCoverageStatusCell(
+                      productId: rightId,
+                      subName: subName,
+                      limits: rightSubLimits,
+                      isLeft: false
+                    )
+                  }
                 }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 24)
               }
             }
           }
         }
-        .background(Color.white)
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+      }
+      .background(shouldHighlightAddOn ? Color(hex: "FFFBF5") : Color.white)
+      .overlay(
+        RoundedRectangle(cornerRadius: 16)
+          .stroke(
+            shouldHighlightAddOn ? Color(hex: "FDBA74").opacity(0.75) : Color.clear,
+            lineWidth: shouldHighlightAddOn ? 1.2 : 0
+          )
+      )
+      .cornerRadius(16)
+      .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+    )
+
+    return AnyView(
+      VStack(alignment: .leading, spacing: 8) {
+        // 1. Title Outside the Box
+        VStack(alignment: .leading, spacing: 8) {
+          HStack(alignment: .center, spacing: 10) {
+            Text(item.coverageType)
+              .font(.system(size: 16, weight: .bold))
+              .foregroundColor(.primary)
+
+            if shouldHighlightAddOn {
+              HStack(spacing: 4) {
+                Image(systemName: "plus.circle.fill")
+                  .font(.system(size: 11, weight: .bold))
+                Text(addOnBadgeText)
+                  .font(.system(size: 11, weight: .bold))
+              }
+              .foregroundColor(Color(hex: "92400E"))
+              .padding(.horizontal, 8)
+              .padding(.vertical, 4)
+              .background(Color(hex: "FFEDD5"))
+              .clipShape(Capsule())
+            }
+          }
+        }
         .padding(.horizontal)
+
+        // 2. White Box Container
+
+        if applyHorizontalPadding {
+          cardContainer.padding(.horizontal)
+        } else {
+          cardContainer
+        }
       }
     )
   }

@@ -34,6 +34,10 @@ struct RAGResponse: Decodable {
   let session_id: String?
 }
 
+private struct APIErrorResponse: Decodable {
+  let detail: String?
+}
+
 // MARK: - Chat Model (domain) enum
 
 enum ChatModel: String, CaseIterable, Identifiable {
@@ -234,6 +238,20 @@ class RAGService: ObservableObject {
         return
       }
 
+      if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+        let bodyText = String(data: data, encoding: .utf8) ?? ""
+        let apiErr = try? JSONDecoder().decode(APIErrorResponse.self, from: data)
+        let detail = apiErr?.detail?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let finalMsg = (detail?.isEmpty == false ? detail! : bodyText)
+        DispatchQueue.main.async {
+          self.errorMessage =
+            finalMsg.isEmpty
+            ? "RAG service error (HTTP \(http.statusCode))"
+            : "RAG service error: \(finalMsg)"
+        }
+        return
+      }
+
       do {
         let decodedResponse = try JSONDecoder().decode(RAGResponse.self, from: data)
         DispatchQueue.main.async {
@@ -258,8 +276,16 @@ class RAGService: ObservableObject {
           self.messages.append(aiMsg)
         }
       } catch {
+        let bodyText = String(data: data, encoding: .utf8) ?? ""
+        let apiErr = try? JSONDecoder().decode(APIErrorResponse.self, from: data)
+        let detail = apiErr?.detail?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let fallback = detail?.isEmpty == false ? detail! : bodyText
         DispatchQueue.main.async {
-          self.errorMessage = "Failed to parse response: \(error.localizedDescription)"
+          if fallback.isEmpty {
+            self.errorMessage = "Failed to parse response: \(error.localizedDescription)"
+          } else {
+            self.errorMessage = "RAG response format issue: \(fallback)"
+          }
         }
       }
     }.resume()

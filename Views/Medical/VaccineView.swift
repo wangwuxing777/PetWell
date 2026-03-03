@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct VaccineView: View {
+  @EnvironmentObject var guideManager: GuideManager
   @State private var searchText = ""
   @State private var vaccines: [Vaccine] = []
   @State private var isLoading = false
@@ -50,6 +51,9 @@ struct VaccineView: View {
                     .background(Color.blue.opacity(0.1))
                     .clipShape(Circle())
                 }
+                .simultaneousGesture(TapGesture().onEnded {
+                  guideManager.mark(.medicalOpenedMap)
+                })
               }
               .padding(.horizontal)
               .padding(.top, 20)

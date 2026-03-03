@@ -16,6 +16,7 @@ import UIKit
 struct RecordsView: View {
 
   @EnvironmentObject var languageManager: LanguageManager
+  @EnvironmentObject var guideManager: GuideManager
   @Environment(\.modelContext) private var modelContext
   @Query(sort: \PetModel.name) private var pets: [PetModel]
 
@@ -68,6 +69,7 @@ struct RecordsView: View {
 
             Button {
               showAddPet = true
+              guideManager.mark(.profileTappedAddPet)
             } label: {
               Image(systemName: "plus")
                 .font(.headline)
