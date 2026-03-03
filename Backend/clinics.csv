@@ -58,3 +58,4 @@ clinic_id,name,address,phone_regular,phone_emergency,whatsapp,opening_hours,emer
 57,SPCA (Mui Wo Clinic),"Shop 14, Mui Wo Clinic, 3 Ngan Wan Road, Mui Wo, Lantau Island, Hong Kong",852 2984 0060,,,Mon: 09:50-17:30 Wed-Sat: 09:50-17:30,FALSE,,,,,
 58,Tung Chung Animal Clinic,"Shop No. 7, G/F, Ma Wan Village, Tung Chung, Lantau Island, Hong Kong",852 2988 1534,,,Mon-Tue: 09:30-18:30 Thu-Sat: 09:30-18:30,FALSE,,,,,
 59,Creature Comforts Veterinary Housecall Practice,"Housecall, Hong Kong",852 9773 0372,,,Mon-Sat: 08:00-19:00,FALSE,,,,,
+60,testclinics,Petwell Test Clinic - Merchant Sync,+852 9000 0044,,,Mon-Sun: 09:00-18:00,FALSE,https://testclinics.petwell.local,https://maps.apple.com/?q=testclinics,22.3193,114.1694,5

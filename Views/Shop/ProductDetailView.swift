@@ -7,6 +7,7 @@ struct ProductDetailView: View {
     @State private var didAddToCart = false
     @State private var checkoutSession: DetailCheckoutSession?
     @State private var alertMessage: String?
+    @State private var showOwnerProfileEditor = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -126,6 +127,9 @@ struct ProductDetailView: View {
             )
             .ignoresSafeArea()
         }
+        .sheet(isPresented: $showOwnerProfileEditor) {
+            OwnerProfileEditorSheet(isMandatory: true) { _ in }
+        }
         .alert(
             languageManager.isChinese ? "結帳失敗" : "Checkout Failed",
             isPresented: Binding(
@@ -200,6 +204,10 @@ struct ProductDetailView: View {
     }
 
     private func buyNow() {
+        guard OwnerProfileStore.shared.hasRequiredContact() else {
+            showOwnerProfileEditor = true
+            return
+        }
         guard let checkoutURL = shopifyService.makeCheckoutURL(for: product, quantity: 1) else {
             let fallback = languageManager.isChinese ? "目前無法建立結帳連結。" : "Unable to create checkout link."
             alertMessage = shopifyService.checkoutErrorMessage ?? fallback

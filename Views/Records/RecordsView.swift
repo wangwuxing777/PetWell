@@ -7,6 +7,7 @@
 
 import CoreImage
 import CoreImage.CIFilterBuiltins
+import PhotosUI
 import SwiftData
 import SwiftUI
 import UIKit
@@ -24,6 +25,8 @@ struct RecordsView: View {
   @State private var showPetIDFor: PetModel? = nil
   @State private var petPendingDelete: PetModel? = nil
   @State private var showDeleteConfirm: Bool = false
+  @State private var showOwnerEditor = false
+  @State private var ownerProfile: OwnerProfile = OwnerProfileStore.shared.load()
 
   private let gridCols: [GridItem] = [
     GridItem(.flexible(), spacing: 12),
@@ -37,16 +40,26 @@ struct RecordsView: View {
 
           // MARK: Header
           HStack(alignment: .center, spacing: 12) {
-            Image(systemName: "person.crop.circle")
-              .font(.system(size: 44))
-              .foregroundStyle(.secondary)
+            Button {
+              showOwnerEditor = true
+            } label: {
+              if let data = ownerProfile.avatarImageData, let ui = UIImage(data: data) {
+                Image(uiImage: ui)
+                  .resizable()
+                  .scaledToFill()
+                  .frame(width: 52, height: 52)
+                  .clipShape(Circle())
+              } else {
+                Image(systemName: "person.crop.circle")
+                  .font(.system(size: 44))
+                  .foregroundStyle(.secondary)
+              }
+            }
 
             VStack(alignment: .leading, spacing: 2) {
               Text(languageManager.isChinese ? "個人檔案" : "Profile")
                 .font(.title2).bold()
-              Text(
-                languageManager.isChinese ? "管理您的寵物和健康記錄" : "Manage your pets and health records"
-              )
+              Text(ownerProfile.name.isEmpty ? (languageManager.isChinese ? "點擊頭像補齊主人資料" : "Tap avatar to complete owner profile") : ownerProfile.name)
               .font(.subheadline)
               .foregroundStyle(.secondary)
             }
@@ -157,6 +170,11 @@ struct RecordsView: View {
       .sheet(isPresented: $showAddPet) {
         AddPetView()
       }
+      .sheet(isPresented: $showOwnerEditor) {
+        OwnerProfileEditorSheet(isMandatory: false) { updated in
+          ownerProfile = updated
+        }
+      }
       .sheet(item: $showPetIDFor) { pet in
         PetIDSheet(pet: pet)
       }
@@ -178,6 +196,9 @@ struct RecordsView: View {
         if let pet = petPendingDelete {
           Text("This will permanently remove \(pet.name) and all related records.")
         }
+      }
+      .onAppear {
+        ownerProfile = OwnerProfileStore.shared.load()
       }
     }
   }
@@ -917,6 +938,90 @@ struct AddWeightEntryView: View {
         Text(saveErrorMessage)
       }
     }
+  }
+}
+
+struct OwnerProfileEditorSheet: View {
+  @Environment(\.dismiss) private var dismiss
+  let isMandatory: Bool
+  let onSaved: (OwnerProfile) -> Void
+
+  @State private var profile: OwnerProfile = OwnerProfileStore.shared.load()
+  @State private var pickerItem: PhotosPickerItem?
+  @State private var validationMessage: String?
+
+  var body: some View {
+    NavigationStack {
+      Form {
+        Section("Owner Profile") {
+          HStack(spacing: 12) {
+            if let data = profile.avatarImageData, let ui = UIImage(data: data) {
+              Image(uiImage: ui)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 56, height: 56)
+                .clipShape(Circle())
+            } else {
+              Image(systemName: "person.crop.circle.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.secondary)
+            }
+            PhotosPicker(selection: $pickerItem, matching: .images) {
+              Text("Change Avatar")
+            }
+          }
+
+          TextField("Owner Name", text: $profile.name)
+          TextField("Email", text: $profile.email)
+            .keyboardType(.emailAddress)
+            .textInputAutocapitalization(.never)
+          TextField("Phone", text: $profile.phone)
+            .keyboardType(.phonePad)
+        }
+
+        if let validationMessage {
+          Section {
+            Text(validationMessage)
+              .foregroundColor(.red)
+              .font(.footnote)
+          }
+        }
+      }
+      .navigationTitle("Profile")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          if !isMandatory {
+            Button("Cancel") { dismiss() }
+          }
+        }
+        ToolbarItem(placement: .confirmationAction) {
+          Button("Save") { save() }
+        }
+      }
+      .task(id: pickerItem) {
+        guard let pickerItem else { return }
+        if let data = try? await pickerItem.loadTransferable(type: Data.self) {
+          profile.avatarImageData = data
+        }
+      }
+    }
+  }
+
+  private func save() {
+    let name = profile.name.trimmingCharacters(in: .whitespacesAndNewlines)
+    let email = profile.email.trimmingCharacters(in: .whitespacesAndNewlines)
+    let phone = profile.phone.trimmingCharacters(in: .whitespacesAndNewlines)
+    if name.isEmpty || email.isEmpty || phone.isEmpty {
+      validationMessage = "Please complete name, email, and phone before continuing."
+      return
+    }
+    profile.name = name
+    profile.email = email
+    profile.phone = phone
+    OwnerProfileStore.shared.save(profile)
+    onSaved(profile)
+    dismiss()
   }
 }
 

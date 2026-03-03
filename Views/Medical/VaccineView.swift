@@ -43,8 +43,8 @@ struct VaccineView: View {
 
                 Spacer()
 
-                NavigationLink(destination: VetMapContainerView()) {
-                  Image(systemName: "map.fill")
+                NavigationLink(destination: TestClinicEntryView()) {
+                  Image(systemName: "cross.case.fill")
                     .font(.title2)
                     .foregroundColor(.blue)
                     .padding(8)
@@ -286,5 +286,144 @@ struct VaccineCard: View {
     .frame(width: 200, height: 220)  // Specify fixed width again to ensure container is rigid
     .cornerRadius(16)
     .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
+  }
+}
+
+private struct TestClinicService: Identifiable {
+  let id = UUID()
+  let name: String
+  let subtitle: String
+  let price: Int
+  let duration: String
+  let petType: String
+
+  var asVaccine: Vaccine {
+    Vaccine(
+      id: abs(name.hashValue % 100_000) + 10_000,
+      name: name,
+      petType: petType,
+      description: subtitle,
+      youngInfo: "Initial assessment and first treatment in one visit.",
+      adultInfo: "Revisit or follow-up can be booked based on vet advice.",
+      isCore: false,
+      isMandatory: false,
+      price: price
+    )
+  }
+}
+
+private struct TestClinicEntryView: View {
+  @State private var clinics: [Clinic] = []
+  @State private var isLoading = true
+  @State private var errorText: String?
+
+  private let services: [TestClinicService] = [
+    .init(name: "General Consultation", subtitle: "Physical exam + symptom review", price: 420, duration: "30 min", petType: "dog/cat"),
+    .init(name: "Vaccination Booster", subtitle: "Core booster shot and record update", price: 360, duration: "25 min", petType: "dog/cat"),
+    .init(name: "Skin & Allergy Check", subtitle: "Dermatitis and itch diagnostics", price: 480, duration: "35 min", petType: "dog/cat"),
+    .init(name: "Dental Checkup", subtitle: "Oral exam and preventive care plan", price: 520, duration: "40 min", petType: "dog/cat"),
+  ]
+
+  private var selectedClinic: Clinic {
+    clinics.first(where: { $0.name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == "testclinics" })
+      ?? Clinic(
+        id: "testclinics",
+        name: "testclinics",
+        address: "Petwell Test Clinic - Merchant Sync",
+        phoneRegular: "+852 9000 0044",
+        phoneEmergency: nil,
+        whatsapp: nil,
+        openingHours: "Mon-Sun: 09:00-18:00",
+        emergency24h: "FALSE",
+        websiteUrl: "https://testclinics.petwell.local",
+        applemapUrl: "https://maps.apple.com/?q=testclinics",
+        latitude: "22.3193",
+        longitude: "114.1694",
+        rating: "5",
+        photoUrl: nil,
+        googlePlaceId: nil
+      )
+  }
+
+  var body: some View {
+    ScrollView {
+      VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 6) {
+          Text("testclinics")
+            .font(.largeTitle.bold())
+          Text("Application ↔ Merchant integration test entry")
+            .foregroundColor(.secondary)
+        }
+
+        VStack(alignment: .leading, spacing: 10) {
+          Label(selectedClinic.address, systemImage: "mappin.and.ellipse")
+          Label(selectedClinic.openingHours, systemImage: "clock")
+          if let rating = selectedClinic.rating, !rating.isEmpty {
+            Label("Rating \(rating)", systemImage: "star.fill")
+          }
+        }
+        .font(.subheadline)
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(UIColor.secondarySystemBackground))
+        .cornerRadius(14)
+
+        Text("Bookable Services")
+          .font(.title2.bold())
+
+        ForEach(services) { item in
+          VStack(alignment: .leading, spacing: 10) {
+            Text(item.name)
+              .font(.headline)
+            Text(item.subtitle)
+              .font(.subheadline)
+              .foregroundColor(.secondary)
+
+            HStack {
+              Text("$\(item.price)")
+                .font(.headline)
+                .foregroundColor(.blue)
+              Spacer()
+              Text(item.duration)
+                .font(.caption)
+                .foregroundColor(.secondary)
+              NavigationLink(destination: VaccineBookingView(vaccine: item.asVaccine, clinic: selectedClinic)) {
+                Text("Book Now")
+                  .font(.caption.bold())
+                  .padding(.horizontal, 12)
+                  .padding(.vertical, 8)
+                  .background(Color.blue.opacity(0.12))
+                  .cornerRadius(12)
+              }
+            }
+          }
+          .padding()
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .background(Color.white)
+          .cornerRadius(14)
+          .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+        }
+
+        if let errorText {
+          Text("Clinics sync fallback: \(errorText)")
+            .font(.caption)
+            .foregroundColor(.orange)
+        } else if isLoading {
+          ProgressView("Syncing clinic data...")
+        }
+      }
+      .padding()
+    }
+    .navigationTitle("Test Clinic")
+    .navigationBarTitleDisplayMode(.inline)
+    .background(Color(UIColor.systemGroupedBackground))
+    .task {
+      do {
+        clinics = try await ClinicService.shared.fetchAllClinics()
+      } catch {
+        errorText = error.localizedDescription
+      }
+      isLoading = false
+    }
   }
 }
