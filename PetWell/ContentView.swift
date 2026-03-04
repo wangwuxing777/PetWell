@@ -7,6 +7,8 @@
 
 import SwiftUI
 import Combine
+import PhotosUI
+import UIKit
 
 enum Tab: Hashable {
   case shop, medical, insurance, profile, blog
@@ -716,7 +718,7 @@ struct PostBlogView: View {
 
           Button(action: {
             Task {
-              await blogService.createPost(title: title, content: content)
+              await blogService.createPost(title: title, content: content, images: selectedImages)
               dismiss()
             }
           }) {
