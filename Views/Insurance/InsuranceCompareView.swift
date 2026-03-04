@@ -177,7 +177,7 @@ struct InsuranceCompareView: View {
       }
     }
     .animation(.easeInOut(duration: 0.25), value: showMiniHeader)
-    .onChange(of: compareMode) { mode in
+    .onChange(of: compareMode) { _, mode in
       if mode == .byScenario {
         guideManager.mark(.insuranceComparedChanged)
       }
