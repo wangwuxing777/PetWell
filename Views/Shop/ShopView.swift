@@ -486,6 +486,7 @@ struct CartView: View {
 
   @State private var checkoutSession: CheckoutSession?
   @State private var alertMessage: String?
+  @State private var showOwnerProfileEditor = false
 
   var body: some View {
     VStack(spacing: 0) {
@@ -555,6 +556,9 @@ struct CartView: View {
         title: languageManager.isChinese ? "安全結帳" : "Secure Checkout"
       )
       .ignoresSafeArea()
+    }
+    .sheet(isPresented: $showOwnerProfileEditor) {
+      OwnerProfileEditorSheet(isMandatory: true) { _ in }
     }
   }
 
@@ -707,6 +711,10 @@ struct CartView: View {
   }
 
   private func startCheckout() {
+    guard OwnerProfileStore.shared.hasRequiredContact() else {
+      showOwnerProfileEditor = true
+      return
+    }
     if let checkoutURL = shopifyService.makeCheckoutURL() {
       checkoutSession = CheckoutSession(url: checkoutURL)
     } else {

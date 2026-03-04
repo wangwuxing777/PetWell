@@ -8,6 +8,45 @@
 import Foundation
 import SwiftData
 
+struct OwnerProfile: Codable {
+  var id: String
+  var name: String
+  var email: String
+  var phone: String
+  var avatarImageData: Data?
+
+  static let empty = OwnerProfile(id: UUID().uuidString, name: "", email: "", phone: "", avatarImageData: nil)
+}
+
+final class OwnerProfileStore {
+  static let shared = OwnerProfileStore()
+
+  private let key = "petwell_owner_profile_v1"
+  private let defaults = UserDefaults.standard
+
+  func load() -> OwnerProfile {
+    guard let data = defaults.data(forKey: key),
+      let profile = try? JSONDecoder().decode(OwnerProfile.self, from: data)
+    else {
+      return .empty
+    }
+    return profile
+  }
+
+  func save(_ profile: OwnerProfile) {
+    if let data = try? JSONEncoder().encode(profile) {
+      defaults.set(data, forKey: key)
+    }
+  }
+
+  func hasRequiredContact() -> Bool {
+    let profile = load()
+    return !profile.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+      && !profile.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+      && !profile.phone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+  }
+}
+
 @Model
 final class PetModel {
   // Basic

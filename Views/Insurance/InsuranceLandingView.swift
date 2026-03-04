@@ -124,7 +124,9 @@ struct InsuranceLandingView: View {
       .navigationBarHidden(true)
     }
     .fullScreenCover(isPresented: $isShowingRecommendation) {
-      InsuranceRecommendationView()
+      RAGChatView(
+        contextString: languageManager.isChinese ? "為我推薦寵物保險" : "Pet Insurance Recommendation",
+        isPresented: $isShowingRecommendation)
     }
   }
 
