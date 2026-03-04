@@ -139,7 +139,7 @@ struct RecordsView: View {
               }
 
               ModuleTile(title: "Travel Document", systemImage: "doc.text") {
-                PlaceholderView(title: "Travel Document")
+                TravelDocumentView()
               }
 
               ModuleTile(title: "Pet Care Tips", systemImage: "lightbulb") {
