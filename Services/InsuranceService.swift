@@ -358,4 +358,135 @@ final class InsuranceService: ObservableObject {
   private func fetchServiceSubcategories() async throws -> [ServiceSubcategory] {
     try await fetchJSON("/service-subcategories", as: [ServiceSubcategory].self)
   }
+
+  // MARK: - AI Insurance Recommendation
+
+  /**
+   Request AI-powered insurance recommendation
+
+   POST /api/insurance/recommend
+   Request: {
+       "pet_id": "uuid",
+       "pet_species": "dog | cat",
+       "pet_breed": "breed (optional)",
+       "pet_age": 3,
+       "budget_range": { "min": 500, "max": 2000, "currency": "HKD" },
+       "coverage_preferences": ["意外", "疾病", "手术"],
+       "additional_requirements": "string (optional)"
+   }
+   Response: {
+       "success": true,
+       "data": {
+           "recommendations": [...],
+           "analysis": "..."
+       }
+   }
+   */
+  func getRecommendation(
+    petId: String,
+    petSpecies: String,
+    petBreed: String? = nil,
+    petAge: Int,
+    budgetMin: Int? = nil,
+    budgetMax: Int? = nil,
+    coveragePreferences: [String] = [],
+    additionalRequirements: String? = nil
+  ) async throws -> InsuranceRecommendationResponse {
+    guard let url = URL(string: "\(baseURL)/insurance/recommend") else {
+        throw NetworkError.nonHTTPResponse
+    }
+
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+    var budgetRange: [String: Any]? = nil
+    if let min = budgetMin, let max = budgetMax {
+        budgetRange = ["min": min, "max": max, "currency": "HKD"]
+    }
+
+    var body: [String: Any] = [
+        "pet_id": petId,
+        "pet_species": petSpecies,
+        "pet_age": petAge
+    ]
+
+    if let breed = petBreed { body["pet_breed"] = breed }
+    if let budget = budgetRange { body["budget_range"] = budget }
+    if !coveragePreferences.isEmpty { body["coverage_preferences"] = coveragePreferences }
+    if let requirements = additionalRequirements { body["additional_requirements"] = requirements }
+
+    request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+    let (data, response) = try await URLSession.shared.data(for: request)
+
+    guard let httpResponse = response as? HTTPURLResponse else {
+        throw NetworkError.nonHTTPResponse
+    }
+
+    guard httpResponse.statusCode == 200 else {
+        let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
+        throw NetworkError.httpError(statusCode: httpResponse.statusCode, body: errorBody)
+    }
+
+    let decoder = JSONDecoder()
+    return try decoder.decode(InsuranceRecommendationResponse.self, from: data)
+  }
+
+  // Demo recommendation (for testing without backend)
+  func getDemoRecommendation() -> InsuranceRecommendationResponse {
+    InsuranceRecommendationResponse(
+        success: true,
+        data: InsuranceRecommendationData(
+            recommendations: [
+                InsuranceRecommendation(
+                    insuranceId: 1,
+                    insuranceName: "寵物全方位保障計劃",
+                    provider: "Blue Cross",
+                    matchScore: 95,
+                    coverageSummary: ["意外: HK$50,000", "疾病: HK$30,000", "手術: HK$80,000"],
+                    monthlyPremium: "1,280",
+                    currency: "HKD",
+                    reason: "根據您選擇的保障範圍和預算，這個計劃提供最全面的保障。"
+                ),
+                InsuranceRecommendation(
+                    insuranceId: 2,
+                    insuranceName: "基本寵物保險",
+                    provider: "One Degree",
+                    matchScore: 82,
+                    coverageSummary: ["意外: HK$30,000", "疾病: HK$20,000"],
+                    monthlyPremium: "680",
+                    currency: "HKD",
+                    reason: "經濟實惠的選擇，適合基本保障需求。"
+                )
+            ],
+            analysis: "根據您的寵物年齡（3歲）和選擇的保障偏好，我們建議優先考慮包含手術保障的計劃。您的預算範圍內有多個選擇，但全面保障計劃在理賠時更有優勢。"
+        )
+    )
+  }
+}
+
+// MARK: - AI Recommendation Models
+
+struct InsuranceRecommendationResponse: Decodable {
+    let success: Bool
+    let data: InsuranceRecommendationData
+}
+
+struct InsuranceRecommendationData: Decodable {
+    let recommendations: [InsuranceRecommendation]
+    let analysis: String
+}
+
+struct InsuranceRecommendation: Identifiable, Decodable {
+    let insuranceId: Int
+    let insuranceName: String
+    let provider: String
+    let matchScore: Int
+    let coverageSummary: [String]
+    let monthlyPremium: String
+    let currency: String
+    let reason: String
+
+    var id: Int { insuranceId }
 }
