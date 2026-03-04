@@ -143,7 +143,7 @@ struct RecordsView: View {
               }
 
               ModuleTile(title: "Pet Care Tips", systemImage: "lightbulb") {
-                PlaceholderView(title: "Pet Care Tips")
+                PetCareTipsView()
               }
             }
             .padding(.horizontal)

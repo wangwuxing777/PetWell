@@ -169,7 +169,8 @@ private struct SpeciesFilterButton: View {
                 Image(systemName: icon)
                     .font(.subheadline)
                 Text(title)
-                    .font(.subheadline.weight(.medium))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
@@ -260,7 +261,8 @@ private struct TipCard: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(tip.title)
-                            .font(.subheadline.weight(.semibold))
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
                             .foregroundColor(.primary)
                             .multilineTextAlignment(.leading)
 
