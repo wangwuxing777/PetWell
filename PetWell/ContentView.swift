@@ -554,9 +554,9 @@ struct PostBlogView: View {
   @State private var content = ""
 
   // Image Picker State
-  @State private var selectedImages: [SelectedImage] = []
+  @State private var photoItems: [PhotosPickerItem] = []
+  @State private var selectedImages: [UIImage] = []
   @State private var isShowingImagePicker = false
-  @State private var isUploading = false
 
   var body: some View {
     VStack(spacing: 0) {
@@ -580,7 +580,12 @@ struct PostBlogView: View {
           ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
               // Add Photo Button
-              Button(action: { isShowingImagePicker = true }) {
+              PhotosPicker(
+                isPresented: $isShowingImagePicker,
+                selection: $photoItems,
+                maxSelectionCount: 10,
+                matching: .images
+              ) {
                 VStack {
                   Image(systemName: "plus")
                     .font(.system(size: 30))
@@ -597,18 +602,19 @@ struct PostBlogView: View {
               // Selected Images Preview
               ForEach(selectedImages.indices, id: \.self) { index in
                 ZStack(alignment: .topTrailing) {
-                  if let uiImage = selectedImages[index].uiImage {
-                    Image(uiImage: uiImage)
-                      .resizable()
-                      .scaledToFill()
-                      .frame(width: 100, height: 100)
-                      .clipped()
-                      .cornerRadius(12)
-                  }
+                  Image(uiImage: selectedImages[index])
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 100, height: 100)
+                    .clipped()
+                    .cornerRadius(12)
 
                   // Delete Button
                   Button(action: {
                     selectedImages.remove(at: index)
+                    if index < photoItems.count {
+                      photoItems.remove(at: index)
+                    }
                   }) {
                     Image(systemName: "xmark.circle.fill")
                       .font(.system(size: 20))
@@ -620,6 +626,20 @@ struct PostBlogView: View {
               }
             }
             .padding(.horizontal)
+          }
+          .onChange(of: photoItems) { _, newItems in
+            // Load images from selected items
+            selectedImages.removeAll()
+            for item in newItems {
+              Task {
+                if let data = try? await item.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                  await MainActor.run {
+                    selectedImages.append(image)
+                  }
+                }
+              }
+            }
           }
 
           // Title Input
@@ -713,54 +733,7 @@ struct PostBlogView: View {
       }
       .background(Color.white)
     }
-    .photosPicker(
-      isPresented: $isShowingImagePicker,
-      selection: $selectedImages,
-      maxSelectionCount: 10,
-      matching: .images
-    )
   }
-}
-
-// MARK: - Selected Image Model
-struct SelectedImage: Identifiable {
-  let id = UUID()
-  let uiImage: UIImage?
-  let url: URL?
-
-  init(item: PhotosPickerItem) {
-    self.url = item.fullSizeImageURL
-    self.uiImage = nil
-
-    // Load UIImage asynchronously
-    Task {
-      if let data = try? await item.loadTransferable(type: Data.self),
-         let image = UIImage(data: data) {
-        await MainActor.run {
-          if let index = selectedImages.firstIndex(where: { $0.id == self.id }) {
-            selectedImages[index] = SelectedImage(uiImage: image, url: item.fullSizeImageURL)
-          }
-        }
-      }
-    }
-  }
-
-  init(uiImage: UIImage?, url: URL?) {
-    self.uiImage = uiImage
-    self.url = url
-  }
-}
-
-// Extension to make SelectedImage conform to Transferable
-extension SelectedImage: Transferable {
-  static var transferRepresentation: some TransferableRepresentation {
-    PhotosPickerItem.RepresentedRepresentation(SupportedContentTypes.images)
-  }
-}
-
-private var selectedImages: [SelectedImage] {
-  get { [] }
-  set { }
 }
 
 struct TagButton: View {

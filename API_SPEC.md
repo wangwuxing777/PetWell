@@ -436,6 +436,273 @@ Content-Type: application/json
 
 ---
 
+## P1 - 社交 API
+
+### 9. GET /api/users/search
+搜索用户
+
+#### 请求
+
+```http
+GET /api/users/search?q=关键词&limit=10
+Authorization: Bearer {token}
+```
+
+| 查询参数 | 类型 | 必填 | 说明 |
+|----------|------|------|------|
+| q | string | 是 | 搜索关键词 |
+| limit | int | 否 | 返回数量，默认 10 |
+
+#### 响应 (200)
+
+```json
+{
+  "success": true,
+  "data": {
+    "users": [
+      {
+        "id": "uuid",
+        "display_name": "用户名",
+        "avatar_url": "https://...",
+        "pets": [
+          {
+            "id": "uuid",
+            "name": "宠物名",
+            "species": "dog",
+            "breed": "品种"
+          }
+        ],
+        "friend_status": "none"
+      }
+    ]
+  }
+}
+```
+
+| friend_status 值 | 说明 |
+|------------------|------|
+| none | 无关系 |
+| pending_outgoing | 已发送请求 |
+| pending_incoming | 收到请求 |
+| friends | 已是好友 |
+
+---
+
+### 10. GET /api/friends
+获取好友列表
+
+#### 请求
+
+```http
+GET /api/friends
+Authorization: Bearer {token}
+```
+
+#### 响应 (200)
+
+```json
+{
+  "success": true,
+  "data": {
+    "friends": [
+      {
+        "id": "uuid",
+        "display_name": "好友名称",
+        "avatar_url": "https://...",
+        "friendship_date": "2024-01-01T00:00:00Z"
+      }
+    ],
+    "pending_requests": [
+      {
+        "id": "uuid",
+        "user_id": "uuid",
+        "display_name": "请求者名称",
+        "avatar_url": "https://...",
+        "requested_at": "2024-01-01T00:00:00Z"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 11. POST /api/friends/request
+发送好友请求
+
+#### 请求
+
+```http
+POST /api/friends/request
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+```json
+{
+  "user_id": "目标用户ID"
+}
+```
+
+#### 响应 (201)
+
+```json
+{
+  "success": true,
+  "data": {
+    "request_id": "uuid",
+    "status": "pending",
+    "message": "好友请求已发送"
+  }
+}
+```
+
+#### 错误码
+
+| 错误码 | 说明 |
+|--------|------|
+| NOT_FOUND | 用户不存在 |
+| 400 | 已经是好友或已发送请求 |
+
+---
+
+### 12. POST /api/friends/respond
+回应好友请求
+
+#### 请求
+
+```http
+POST /api/friends/respond
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+```json
+{
+  "request_id": "uuid",
+  "action": "accept"
+}
+```
+
+| action 值 | 说明 |
+|-----------|------|
+| accept | 接受 |
+| reject | 拒绝 |
+
+#### 响应 (200)
+
+```json
+{
+  "success": true,
+  "data": {
+    "request_id": "uuid",
+    "status": "accepted",
+    "message": "已接受好友请求"
+  }
+}
+```
+
+---
+
+## P1 - 实体搜索 API
+
+### 13. GET /api/entities/search
+搜索商店/诊所
+
+#### 请求
+
+```http
+GET /api/entities/search?q=关键词&type=shop&limit=10
+Authorization: Bearer {token}
+```
+
+| 查询参数 | 类型 | 必填 | 说明 |
+|----------|------|------|------|
+| q | string | 是 | 搜索关键词 |
+| type | string | 否 | 筛选类型: `shop` 或 `clinic` |
+| limit | int | 否 | 返回数量，默认 10 |
+
+#### 响应 (200)
+
+```json
+{
+  "success": true,
+  "data": {
+    "entities": [
+      {
+        "id": "uuid",
+        "name": "商店名称",
+        "type": "shop",
+        "address": "地址",
+        "distance": 0.5,
+        "rating": 4.5,
+        "phone": "12345678"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 14. GET /api/shops/{id}
+获取商店详情
+
+#### 请求
+
+```http
+GET /api/shops/{shop_id}
+Authorization: Bearer {token}
+```
+
+#### 响应 (200)
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "name": "商店名称",
+    "type": "shop",
+    "address": "地址",
+    "distance": 0.5,
+    "rating": 4.5,
+    "phone": "12345678"
+  }
+}
+```
+
+---
+
+### 15. GET /api/clinics/{id}
+获取诊所详情
+
+#### 请求
+
+```http
+GET /api/clinics/{clinic_id}
+Authorization: Bearer {token}
+```
+
+#### 响应 (200)
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "name": "诊所名称",
+    "type": "clinic",
+    "address": "地址",
+    "distance": 2.0,
+    "rating": 4.8,
+    "phone": "11112222"
+  }
+}
+```
+
+---
+
 ## 错误码汇总
 
 | 错误码 | HTTP 状态码 | 说明 |
