@@ -30,7 +30,7 @@ struct VaccineView: View {
     ),
     .init(
       title: "Post-vaccine care tips",
-      imageName: "Rabies"
+      imageName: "EarInfection"
     ),
     .init(
       title: "Dental checks matter",
@@ -334,30 +334,33 @@ private struct MedicalArticleCard: View {
   let article: MedicalArticle
 
   var body: some View {
-    ZStack(alignment: .bottomLeading) {
-      if let image = UIImage(named: article.imageName) {
-        Image(uiImage: image)
-          .resizable()
-          .scaledToFill()
-          .frame(maxWidth: .infinity, maxHeight: .infinity)
-          .clipped()
-      } else {
-        Rectangle()
-          .fill(
+    // 1. Define a strict layout boundary using an invisible color block
+    Color.clear
+      .overlay(
+        // 2. Place the image content inside the overlay
+        Group {
+          if let image = UIImage(named: article.imageName) {
+            Image(uiImage: image)
+              .resizable()
+              .scaledToFill()
+          } else {
             LinearGradient(
               colors: [Color.blue.opacity(0.35), Color.purple.opacity(0.35)],
               startPoint: .topLeading,
               endPoint: .bottomTrailing
-            ))
-      }
-    }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-    .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 6)
-    .overlay(
-      RoundedRectangle(cornerRadius: 24, style: .continuous)
-        .stroke(Color.black.opacity(0.05), lineWidth: 1)
-    )
+            )
+          }
+        }
+      )
+      // 3. Strictly clip to exact rectangular bounds, destroying any scaledToFill overflow
+      .clipped()
+      // 4. Round the perfectly-sized rectangle
+      .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+      // 5. Apply the thin border
+      .overlay(
+        RoundedRectangle(cornerRadius: 24, style: .continuous)
+          .stroke(Color(UIColor.systemGray4), lineWidth: 1)
+      )
   }
 }
 
