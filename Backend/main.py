@@ -1,6 +1,6 @@
 """
 PetWell Backend - FastAPI Application
-P0 Priority APIs: Authentication (OTP), Bookings, User Insurances
+P0 + P1 Priority APIs: Auth, Bookings, User Insurances, Social
 """
 
 import uuid
@@ -134,6 +134,79 @@ class InsuranceListResponse(BaseModel):
     insurances: List[UserInsurance]
 
 
+# Social Models
+class FriendStatus(str, Enum):
+    none = "none"
+    pending_outgoing = "pending_outgoing"
+    pending_incoming = "pending_incoming"
+    friends = "friends"
+
+
+class PetSummary(BaseModel):
+    id: str
+    name: str
+    species: str
+    breed: Optional[str] = None
+
+
+class SearchedUser(BaseModel):
+    id: str
+    display_name: str
+    avatar_url: Optional[str] = None
+    pets: List[PetSummary]
+    friend_status: FriendStatus
+
+
+class Friend(BaseModel):
+    id: str
+    display_name: str
+    avatar_url: Optional[str] = None
+    friendship_date: datetime
+
+
+class FriendRequest(BaseModel):
+    id: str
+    user_id: str
+    display_name: str
+    avatar_url: Optional[str] = None
+    requested_at: datetime
+
+
+class FriendsListResponse(BaseModel):
+    friends: List[Friend]
+    pending_requests: List[FriendRequest]
+
+
+class FriendRequestAction(str, Enum):
+    accept = "accept"
+    reject = "reject"
+
+
+class FriendRequestCreate(BaseModel):
+    user_id: str
+
+
+class FriendRequestRespond(BaseModel):
+    request_id: str
+    action: FriendRequestAction
+
+
+# Entity Models (for shop/clinic search)
+class EntityType(str, Enum):
+    shop = "shop"
+    clinic = "clinic"
+
+
+class SearchableEntity(BaseModel):
+    id: str
+    name: str
+    type: EntityType
+    address: str
+    distance: Optional[float] = None
+    rating: Optional[float] = None
+    phone: Optional[str] = None
+
+
 # ============== In-Memory Storage ==============
 
 # Simulated database
@@ -141,6 +214,28 @@ otp_store: dict = {}
 user_store: dict = {}
 booking_store: dict = {}
 insurance_store: dict = {}
+friend_store: dict = {}  # {user_id: {"friends": [], "pending": []}}
+friend_request_store: dict = {}  # {request_id: {...}}
+
+# Mock users for search
+mock_users = [
+    {"id": "user-001", "display_name": "宠物爱好者小明", "email": "xiaoming@pet.com", "avatar_url": None,
+     "pets": [{"id": "pet-001", "name": "豆豆", "species": "dog", "breed": "金毛"}]},
+    {"id": "user-002", "display_name": "爱猫人士小红", "email": "xiaohong@pet.com", "avatar_url": None,
+     "pets": [{"id": "pet-002", "name": "咪咪", "species": "cat", "breed": "英短"}]},
+    {"id": "user-003", "display_name": "养狗达人", "email": "doglover@pet.com", "avatar_url": None,
+     "pets": [{"id": "pet-003", "name": "旺财", "species": "dog", "breed": "哈士奇"}]},
+    {"id": "user-004", "display_name": "宠物医生李医生", "email": "drli@pet.com", "avatar_url": None,
+     "pets": [{"id": "pet-004", "name": "小虎", "species": "cat", "breed": "狸花猫"}]},
+]
+
+# Mock shops and clinics for search
+mock_entities = [
+    {"id": "shop-001", "name": "宠物用品店", "type": "shop", "address": "中环皇后大道中99号", "distance": 0.5, "rating": 4.5, "phone": "12345678"},
+    {"id": "shop-002", "name": "宠物食品超市", "type": "shop", "address": "铜锣湾时代广场", "distance": 1.2, "rating": 4.2, "phone": "87654321"},
+    {"id": "clinic-001", "name": "香港宠物医院", "type": "clinic", "address": "尖沙咀弥敦道100号", "distance": 2.0, "rating": 4.8, "phone": "11112222"},
+    {"id": "clinic-002", "name": "仁安宠物诊所", "type": "clinic", "address": "旺角朗豪坊", "distance": 1.5, "rating": 4.6, "phone": "33334444"},
+]
 
 # Current user (simulated)
 current_user_id = str(uuid.uuid4())
@@ -426,6 +521,280 @@ async def create_user_insurance(
             "message": "保险关联成功"
         }
     }
+
+
+# ============== P1 - Social APIs ==============
+
+@app.get("/api/users/search")
+async def search_users(
+    q: str = Query(..., min_length=1),
+    limit: int = Query(10, ge=1, le=50),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Search users by name or email
+    """
+    # Filter mock users by query
+    query = q.lower()
+    results = []
+    for user in mock_users:
+        if (query in user["display_name"].lower() or
+            query in user.get("email", "").lower()):
+            # Determine friend status
+            friend_status = FriendStatus.none
+
+            # Check friend store for current user
+            user_friends = friend_store.get(current_user.id, {})
+            friends_list = user_friends.get("friends", [])
+            pending_list = user_friends.get("pending", [])
+
+            if user["id"] in [f["user_id"] for f in friends_list]:
+                friend_status = FriendStatus.friends
+            elif user["id"] in [r["user_id"] for r in pending_list]:
+                friend_status = FriendStatus.pending_outgoing
+            elif user["id"] in friend_request_store.get(current_user.id, []):
+                friend_status = FriendStatus.pending_outgoing
+
+            results.append({
+                "id": user["id"],
+                "display_name": user["display_name"],
+                "avatar_url": user.get("avatar_url"),
+                "pets": user.get("pets", []),
+                "friend_status": friend_status.value
+            })
+
+            if len(results) >= limit:
+                break
+
+    return {"success": True, "data": {"users": results}}
+
+
+@app.get("/api/friends", response_model=FriendsListResponse)
+async def get_friends(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get user's friends list and pending requests
+    """
+    user_friends = friend_store.get(current_user.id, {})
+
+    friends_list = user_friends.get("friends", [])
+    pending_list = user_friends.get("pending", [])
+
+    # Convert to response format
+    friends = []
+    for f in friends_list:
+        # Find user info from mock data
+        user_info = next((u for u in mock_users if u["id"] == f["user_id"]), None)
+        if user_info:
+            friends.append(Friend(
+                id=f["id"],
+                display_name=user_info["display_name"],
+                avatar_url=user_info.get("avatar_url"),
+                friendship_date=f["created_at"]
+            ))
+
+    pending_requests = []
+    for r in pending_list:
+        user_info = next((u for u in mock_users if u["id"] == r["user_id"]), None)
+        if user_info:
+            pending_requests.append(FriendRequest(
+                id=r["id"],
+                user_id=r["user_id"],
+                display_name=user_info["display_name"],
+                avatar_url=user_info.get("avatar_url"),
+                requested_at=r["created_at"]
+            ))
+
+    return FriendsListResponse(friends=friends, pending_requests=pending_requests)
+
+
+@app.post("/api/friends/request")
+async def send_friend_request(
+    request: FriendRequestCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Send a friend request
+    """
+    # Check if already friends
+    user_friends = friend_store.get(current_user.id, {})
+    friends_list = user_friends.get("friends", [])
+    pending_list = user_friends.get("pending", [])
+
+    if any(f["user_id"] == request.user_id for f in friends_list):
+        raise HTTPException(status_code=400, detail="已经是好友")
+
+    if any(r["user_id"] == request.user_id for r in pending_list):
+        raise HTTPException(status_code=400, detail="已经发送过好友请求")
+
+    # Check if the target user exists
+    target_user = next((u for u in mock_users if u["id"] == request.user_id), None)
+    if not target_user:
+        raise HTTPException(status_code=404, detail="用户不存在")
+
+    # Create friend request
+    request_id = str(uuid.uuid4())
+    friend_request = {
+        "id": request_id,
+        "user_id": request.user_id,
+        "created_at": datetime.now()
+    }
+
+    # Store request
+    if current_user.id not in friend_store:
+        friend_store[current_user.id] = {"friends": [], "pending": []}
+    friend_store[current_user.id]["pending"].append(friend_request)
+
+    # Also add to request store (for incoming requests)
+    if request.user_id not in friend_request_store:
+        friend_request_store[request.user_id] = []
+    friend_request_store[request.user_id].append({
+        "from_user_id": current_user.id,
+        "request_id": request_id
+    })
+
+    return {
+        "success": True,
+        "data": {
+            "request_id": request_id,
+            "status": "pending",
+            "message": "好友请求已发送"
+        }
+    }
+
+
+@app.post("/api/friends/respond")
+async def respond_friend_request(
+    request: FriendRequestRespond,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Accept or reject a friend request
+    """
+    # Find the request
+    found_request = None
+    request_user_id = None
+
+    for user_id, requests in friend_request_store.items():
+        for r in requests:
+            if r["request_id"] == request.request_id:
+                found_request = r
+                request_user_id = user_id
+                break
+        if found_request:
+            break
+
+    if not found_request:
+        raise HTTPException(status_code=404, detail="好友请求不存在")
+
+    if request.action == FriendRequestAction.accept:
+        # Add to friends
+        if current_user.id not in friend_store:
+            friend_store[current_user.id] = {"friends": [], "pending": []}
+
+        friend_store[current_user.id]["friends"].append({
+            "id": str(uuid.uuid4()),
+            "user_id": request_user_id,
+            "created_at": datetime.now()
+        })
+
+        # Remove from pending
+        friend_store[current_user.id]["pending"] = [
+            r for r in friend_store[current_user.id]["pending"]
+            if r["user_id"] != request_user_id
+        ]
+
+        # Remove from request store
+        friend_request_store[current_user.id] = [
+            r for r in friend_request_store.get(current_user.id, [])
+            if r["request_id"] != request.request_id
+        ]
+
+        return {
+            "success": True,
+            "data": {
+                "request_id": request.request_id,
+                "status": "accepted",
+                "message": "已接受好友请求"
+            }
+        }
+    else:
+        # Reject - just remove from pending
+        friend_store[current_user.id]["pending"] = [
+            r for r in friend_store[current_user.id].get("pending", [])
+            if r["user_id"] != request_user_id
+        ]
+
+        friend_request_store[current_user.id] = [
+            r for r in friend_request_store.get(current_user.id, [])
+            if r["request_id"] != request.request_id
+        ]
+
+        return {
+            "success": True,
+            "data": {
+                "request_id": request.request_id,
+                "status": "rejected",
+                "message": "已拒绝好友请求"
+            }
+        }
+
+
+# ============== Entity Search APIs ==============
+
+@app.get("/api/entities/search")
+async def search_entities(
+    q: str = Query(..., min_length=1),
+    entity_type: Optional[EntityType] = None,
+    limit: int = Query(10, ge=1, le=50),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Search shops or clinics
+    """
+    query = q.lower()
+    results = []
+
+    for entity in mock_entities:
+        if entity_type and entity["type"] != entity_type:
+            continue
+        if query in entity["name"].lower() or query in entity["address"].lower():
+            results.append(entity)
+            if len(results) >= limit:
+                break
+
+    return {"success": True, "data": {"entities": results}}
+
+
+@app.get("/api/shops/{shop_id}")
+async def get_shop_details(
+    shop_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get shop details
+    """
+    shop = next((e for e in mock_entities if e["id"] == shop_id and e["type"] == "shop"), None)
+    if not shop:
+        raise HTTPException(status_code=404, detail="商店不存在")
+
+    return {"success": True, "data": shop}
+
+
+@app.get("/api/clinics/{clinic_id}")
+async def get_clinic_details(
+    clinic_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get clinic details
+    """
+    clinic = next((e for e in mock_entities if e["id"] == clinic_id and e["type"] == "clinic"), None)
+    if not clinic:
+        raise HTTPException(status_code=404, detail="诊所不存在")
+
+    return {"success": True, "data": clinic}
 
 
 # ============== Health Check ==============

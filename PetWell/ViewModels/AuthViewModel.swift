@@ -10,23 +10,66 @@ import Foundation
 
 // MARK: - API Configuration
 enum AuthAPI {
-    // TODO: Replace with actual backend URL when available
-    static let baseURL = "http://localhost:8000/api/auth"
+    // Base URL from api_doc.md
+    static let baseURL = "https://api.petwell.example.com/v1"
 
     enum Endpoints {
-        static let login = "\(baseURL)/login"
-        static let googleAuth = "\(baseURL)/google"
-        static let appleAuth = "\(baseURL)/apple"
-        static let sendOTP = "\(baseURL)/otp/send"
-        static let verifyOTP = "\(baseURL)/otp/verify"
-        static let refreshToken = "\(baseURL)/refresh"
+        static let googleAuth = "\(baseURL)/auth/google"
+        static let sendOTP = "\(baseURL)/auth/otp/send"
+        static let verifyOTP = "\(baseURL)/auth/otp/verify"
+        static let refreshToken = "\(baseURL)/auth/refresh"
+    }
+}
+
+// MARK: - Token Manager
+class TokenManager {
+    static let shared = TokenManager()
+
+    private let accessTokenKey = "accessToken"
+    private let refreshTokenKey = "refreshToken"
+    private let userDataKey = "userData"
+
+    var accessToken: String? {
+        get { UserDefaults.standard.string(forKey: accessTokenKey) }
+        set { UserDefaults.standard.set(newValue, forKey: accessTokenKey) }
+    }
+
+    var refreshToken: String? {
+        get { UserDefaults.standard.string(forKey: refreshTokenKey) }
+        set { UserDefaults.standard.set(newValue, forKey: refreshTokenKey) }
+    }
+
+    var isAuthenticated: Bool {
+        accessToken != nil
+    }
+
+    func saveTokens(accessToken: String, refreshToken: String?) {
+        self.accessToken = accessToken
+        self.refreshToken = refreshToken
+    }
+
+    func clearTokens() {
+        accessToken = nil
+        refreshToken = nil
+        UserDefaults.standard.removeObject(forKey: userDataKey)
+    }
+
+    func saveUser(_ user: APIUser) {
+        if let data = try? JSONEncoder().encode(user) {
+            UserDefaults.standard.set(data, forKey: userDataKey)
+        }
+    }
+
+    func getUser() -> APIUser? {
+        guard let data = UserDefaults.standard.data(forKey: userDataKey) else { return nil }
+        return try? JSONDecoder().decode(APIUser.self, from: data)
     }
 }
 
 @MainActor
 class AuthViewModel: ObservableObject {
     // MARK: - Published Properties
-    @Published var identifier: String = ""  // Email or Phone
+    @Published var identifier: String = ""  // Email
     @Published var password: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
@@ -37,22 +80,22 @@ class AuthViewModel: ObservableObject {
     // OTP Flow State
     @Published var verificationCode: String = ""
     @Published var otpSent: Bool = false
-    @Published var otpVerified: Bool = false
+    @Published var otpId: String = ""
     @Published var countdownSeconds: Int = 0
-
-    // Google Sign-In State
-    @Published var googleIdToken: String? = nil
-    @Published var googleAccessToken: String? = nil
+    @Published var currentUser: APIUser?
 
     private var countdownTimer: Timer?
-    private var cancellables = Set<AnyCancellable>()
+    private let tokenManager = TokenManager.shared
 
     // MARK: - Initialization
     init() {
         // Restore persisted state
-        self.isLoggedIn = UserDefaults.standard.bool(forKey: "isLoggedIn")
+        self.isLoggedIn = tokenManager.isAuthenticated
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
-        self.userName = UserDefaults.standard.string(forKey: "userName") ?? ""
+        if let user = tokenManager.getUser() {
+            self.userName = user.displayName
+            self.currentUser = user
+        }
     }
 
     // MARK: - Validation
@@ -69,75 +112,19 @@ class AuthViewModel: ObservableObject {
         verificationCode.count >= 6
     }
 
-    // MARK: - Password Login (Email + Password)
-    func signInWithPassword() async {
-        guard isValidInput else { return }
-
-        isLoading = true
-        errorMessage = nil
-
-        do {
-            // TODO: Connect to actual API when backend is ready
-            // POST /api/auth/login
-            // Request: { "email": "...", "password": "..." }
-            // Response: { "success": true, "token": "...", "user": {...} }
-
-            guard let url = URL(string: AuthAPI.Endpoints.login) else {
-                errorMessage = "Invalid server URL"
-                isLoading = false
-                return
-            }
-
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-            let body: [String: String] = [
-                "email": identifier.trimmingCharacters(in: .whitespaces),
-                "password": password,
-            ]
-            request.httpBody = try JSONEncoder().encode(body)
-
-            let (data, response) = try await URLSession.shared.data(for: request)
-
-            guard let httpResponse = response as? HTTPURLResponse else {
-                errorMessage = "Invalid response from server"
-                isLoading = false
-                return
-            }
-
-            let result = try JSONDecoder().decode(LoginAPIResponse.self, from: data)
-
-            if httpResponse.statusCode == 200 && result.success {
-                await handleSuccessfulLogin(user: result.user)
-            } else {
-                errorMessage = result.message ?? "Invalid credentials"
-            }
-        } catch {
-            // For demo purposes, allow mock login when API is unavailable
-            if identifier.lowercased() == "demo@petwell.com" && password == "demo123" {
-                await handleSuccessfulLogin(user: LoginAPIUser(id: 1, email: "demo@petwell.com", phone: "", name: "Demo User"))
-            } else {
-                errorMessage = "Network error: \(error.localizedDescription)"
-            }
-        }
-
-        isLoading = false
-    }
-
     // MARK: - Google Sign-In
     func signInWithGoogle() async {
         isLoading = true
         errorMessage = nil
 
         // TODO: Integrate GoogleSignIn SDK
-        // Step 1: Present Google Sign-In UI
-        // Step 2: Get ID Token from Google
-        // Step 3: Send ID Token to backend for verification
+        // Step 1: Present Google Sign-In UI using GoogleSignIn SDK
+        // Step 2: Get ID Token from Google result
+        // Step 3: Call sendGoogleAuthToBackend with the ID token
 
         // Example GoogleSignIn SDK integration:
         /*
-        guard let clientID = Bundle.main.object(forInfoDictionaryKey: "GOOGLE_CLIENT_ID") as? String else {
+        guard let clientID = Bundle.main.object(forInfoDictionaryKey: "GCLIENT_ID") as? String else {
             errorMessage = "Google Client ID not configured"
             isLoading = false
             return
@@ -147,76 +134,81 @@ class AuthViewModel: ObservableObject {
         GIDSignIn.sharedInstance.configuration = config
 
         do {
-            let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: presentingViewController)
-            let idToken = result.user.idToken?.tokenString
-            let accessToken = result.user.accessToken.tokenString
+            let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
+            guard let idToken = result.user.idToken?.tokenString else {
+                errorMessage = "Failed to get Google ID token"
+                isLoading = false
+                return
+            }
 
             // Send to backend
-            try await sendGoogleAuthToBackend(idToken: idToken, accessToken: accessToken)
+            try await sendGoogleAuthToBackend(idToken: idToken)
         } catch {
             errorMessage = "Google Sign-In failed: \(error.localizedDescription)"
         }
         */
 
-        // Placeholder: Mock Google Sign-In for demo
-        // TODO: Remove when GoogleSignIn SDK is integrated
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
-
-        // Demo: Accept any Google sign-in attempt
-        // In production, this would be handled by GoogleSignIn SDK
-        await handleSuccessfulLogin(user: LoginAPIUser(
-            id: Int.random(in: 1000...9999),
-            email: "google user",
-            phone: "",
-            name: "Google User"
-        ))
+        // Demo mode fallback - simulate successful Google sign-in
+        await simulateGoogleSignIn()
 
         isLoading = false
     }
 
-    // MARK: - Google Auth Backend Call (Placeholder)
+    // MARK: - Google Auth Backend Call
     /**
-     Send Google ID Token to backend for verification
-
      POST /api/auth/google
-     Request: {
-         "idToken": "eyJ...",
-         "accessToken": "ya29..."
+     Headers:
+         Authorization: Bearer {id_token}
+         Content-Type: application/json
+     Body: {
+         "id_token": "string",
+         "device_id": "string (optional)"
      }
      Response: {
          "success": true,
-         "token": "jwt_token",
-         "user": { "id": 1, "email": "...", "name": "..." }
+         "data": {
+             "user": { "id", "email", "display_name", "avatar_url", "created_at" },
+             "access_token": "jwt_token",
+             "refresh_token": "refresh_token",
+             "expires_in": 3600
+         }
      }
      */
-    private func sendGoogleAuthToBackend(idToken: String?, accessToken: String?) async throws {
+    private func sendGoogleAuthToBackend(idToken: String, deviceId: String? = nil) async throws {
         guard let url = URL(string: AuthAPI.Endpoints.googleAuth) else {
             throw AuthError.invalidURL
         }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
+        request.setValue("Bearer \(idToken)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        let body: [String: String] = [
-            "idToken": idToken ?? "",
-            "accessToken": accessToken ?? ""
-        ]
+        var body: [String: String] = ["id_token": idToken]
+        if let deviceId = deviceId {
+            body["device_id"] = deviceId
+        }
         request.httpBody = try JSONEncoder().encode(body)
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200 else {
+        guard let httpResponse = response as? HTTPURLResponse else {
             throw AuthError.serverError
         }
 
-        let result = try JSONDecoder().decode(LoginAPIResponse.self, from: data)
-
-        if result.success, let user = result.user {
-            await handleSuccessfulLogin(user: user)
+        if httpResponse.statusCode == 200 {
+            let result = try JSONDecoder().decode(GoogleAuthResponse.self, from: data)
+            if result.success, let data = result.data {
+                await handleSuccessfulAuth(
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken,
+                    user: data.user
+                )
+            } else {
+                throw AuthError.authenticationFailed
+            }
         } else {
-            throw AuthError.authenticationFailed
+            throw AuthError.serverError
         }
     }
 
@@ -227,18 +219,13 @@ class AuthViewModel: ObservableObject {
 
         // TODO: Integrate Apple Sign-In with AuthenticationServices framework
         /*
-        let authorization = try await ASAuthorizationController.performRequests([
-            ASAuthorizationAppleIDProvider().createRequest()
-        ])
+        let provider = ASAuthorizationAppleIDProvider()
+        let request = provider.createRequest()
+        request.requestedScopes = [.fullName, .email]
 
-        guard let credential = authorization.credentials.first as? ASAuthorizationAppleIDCredential else {
-            errorMessage = "Apple Sign-In failed"
-            isLoading = false
-            return
-        }
-
-        let idToken = String(data: credential.identityToken ?? Data(), encoding: .utf8)
-        try await sendAppleAuthToBackend(idToken: idToken)
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        controller.delegate = self
+        controller.performRequests()
         */
 
         // Placeholder
@@ -247,45 +234,12 @@ class AuthViewModel: ObservableObject {
         isLoading = false
     }
 
-    // MARK: - Apple Auth Backend Call (Placeholder)
-    /**
-     Send Apple ID Token to backend for verification
-
-     POST /api/auth/apple
-     Request: { "idToken": "..." }
-     Response: { "success": true, "token": "...", "user": {...} }
-     */
-    private func sendAppleAuthToBackend(idToken: String?) async throws {
-        guard let url = URL(string: AuthAPI.Endpoints.appleAuth) else {
-            throw AuthError.invalidURL
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let body: [String: String] = ["idToken": idToken ?? ""]
-        request.httpBody = try JSONEncoder().encode(body)
-
-        let (data, _) = try await URLSession.shared.data(for: request)
-        let result = try JSONDecoder().decode(LoginAPIResponse.self, from: data)
-
-        if result.success, let user = result.user {
-            await handleSuccessfulLogin(user: user)
-        }
-    }
-
     // MARK: - X (Twitter) Sign-In
     func signInWithX() async {
         isLoading = true
         errorMessage = nil
 
         // TODO: Implement X/Twitter OAuth
-        // X OAuth requires:
-        // 1. Create Twitter App at https://developer.twitter.com
-        // 2. Use TwitterKit or OAuth flow
-        // 3. Send token to backend for verification
-
         try? await Task.sleep(nanoseconds: 800_000_000)
         errorMessage = "X Sign-In not yet configured."
         isLoading = false
@@ -294,11 +248,16 @@ class AuthViewModel: ObservableObject {
     // MARK: - Email OTP Flow
 
     /**
-     Send OTP to user's email
-
      POST /api/auth/otp/send
-     Request: { "email": "user@example.com" }
-     Response: { "success": true, "message": "OTP sent", "expiresIn": 300 }
+     Body: { "email": "user@example.com", "purpose": "login | register" }
+     Response: {
+         "success": true,
+         "data": {
+             "otp_id": "uuid",
+             "expires_in": 300,
+             "message": "验证码已发送"
+         }
+     }
      */
     func sendOTP() async {
         guard isValidEmail else {
@@ -318,7 +277,10 @@ class AuthViewModel: ObservableObject {
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-            let body = ["email": identifier.trimmingCharacters(in: .whitespaces)]
+            let body: [String: String] = [
+                "email": identifier.trimmingCharacters(in: .whitespaces),
+                "purpose": "login"
+            ]
             request.httpBody = try JSONEncoder().encode(body)
 
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -328,40 +290,55 @@ class AuthViewModel: ObservableObject {
             }
 
             if httpResponse.statusCode == 200 {
-                let result = try JSONDecoder().decode(OTPResponse.self, from: data)
-                if result.success {
+                let result = try JSONDecoder().decode(OTPSendResponse.self, from: data)
+                if result.success, let data = result.data {
+                    otpId = data.otpId
                     otpSent = true
-                    startCountdown(seconds: result.expiresIn ?? 300)
-                    errorMessage = "OTP sent to your email."
+                    startCountdown(seconds: data.expiresIn)
+                    errorMessage = "Verification code sent to your email."
                 } else {
-                    errorMessage = result.message ?? "Failed to send OTP"
+                    errorMessage = result.data?.message ?? "Failed to send verification code"
                 }
             } else {
-                // Demo mode: allow OTP verification even without backend
+                // Demo mode fallback
                 otpSent = true
+                otpId = UUID().uuidString
                 startCountdown(seconds: 300)
-                errorMessage = "Demo: OTP would be sent (backend not connected)"
+                errorMessage = "Demo: Verification code would be sent"
             }
         } catch {
             // Demo mode fallback
             otpSent = true
+            otpId = UUID().uuidString
             startCountdown(seconds: 300)
-            errorMessage = "Demo mode: OTP sent (backend unavailable)"
+            errorMessage = "Demo mode: Verification code sent (API unavailable)"
         }
 
         isLoading = false
     }
 
     /**
-     Verify OTP and complete login
-
      POST /api/auth/otp/verify
-     Request: { "email": "user@example.com", "code": "123456" }
-     Response: { "success": true, "token": "jwt_token", "user": {...} }
+     Body: { "otp_id": "uuid", "code": "123456", "device_id": "string (optional)" }
+     Response: {
+         "success": true,
+         "data": {
+             "user": { "id", "email", "display_name", "avatar_url", "created_at" },
+             "access_token": "jwt_token",
+             "refresh_token": "refresh_token",
+             "expires_in": 3600,
+             "is_new_user": false
+         }
+     }
      */
     func verifyOTP() async {
         guard isValidOTP else {
             errorMessage = "Please enter the verification code."
+            return
+        }
+
+        guard !otpId.isEmpty else {
+            errorMessage = "Please request a verification code first."
             return
         }
 
@@ -378,7 +355,7 @@ class AuthViewModel: ObservableObject {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
             let body: [String: String] = [
-                "email": identifier.trimmingCharacters(in: .whitespaces),
+                "otp_id": otpId,
                 "code": verificationCode
             ]
             request.httpBody = try JSONEncoder().encode(body)
@@ -390,34 +367,48 @@ class AuthViewModel: ObservableObject {
             }
 
             if httpResponse.statusCode == 200 {
-                let result = try JSONDecoder().decode(LoginAPIResponse.self, from: data)
-                if result.success, let user = result.user {
-                    await handleSuccessfulLogin(user: user)
+                let result = try JSONDecoder().decode(OTPVerifyResponse.self, from: data)
+                if result.success, let data = result.data {
+                    await handleSuccessfulAuth(
+                        accessToken: data.accessToken,
+                        refreshToken: data.refreshToken,
+                        user: data.user
+                    )
                 } else {
-                    errorMessage = result.message ?? "Invalid verification code"
+                    errorMessage = "Invalid verification code"
                 }
             } else {
-                // Demo mode: accept any 6-digit code
+                // Demo mode fallback - accept any 6-digit code
                 if verificationCode.count >= 6 {
-                    otpVerified = true
-                    await handleSuccessfulLogin(user: LoginAPIUser(
-                        id: Int.random(in: 1000...9999),
+                    let demoUser = APIUser(
+                        id: UUID().uuidString,
                         email: identifier,
-                        phone: "",
-                        name: "Email User"
-                    ))
+                        displayName: "Email User",
+                        avatarUrl: nil,
+                        createdAt: Date()
+                    )
+                    await handleSuccessfulAuth(
+                        accessToken: "demo_access_token",
+                        refreshToken: "demo_refresh_token",
+                        user: demoUser
+                    )
                 }
             }
         } catch {
             // Demo mode fallback
             if verificationCode.count >= 6 {
-                otpVerified = true
-                await handleSuccessfulLogin(user: LoginAPIUser(
-                    id: Int.random(in: 1000...9999),
+                let demoUser = APIUser(
+                    id: UUID().uuidString,
                     email: identifier,
-                    phone: "",
-                    name: "Email User"
-                ))
+                    displayName: "Email User",
+                    avatarUrl: nil,
+                    createdAt: Date()
+                )
+                await handleSuccessfulAuth(
+                    accessToken: "demo_access_token",
+                    refreshToken: "demo_refresh_token",
+                    user: demoUser
+                )
             } else {
                 errorMessage = "Invalid verification code"
             }
@@ -451,22 +442,61 @@ class AuthViewModel: ObservableObject {
     }
 
     // MARK: - Login Success Handler
-    private func handleSuccessfulLogin(user: LoginAPIUser) async {
+    private func handleSuccessfulAuth(accessToken: String, refreshToken: String?, user: APIUser) async {
+        // Save tokens
+        tokenManager.saveTokens(accessToken: accessToken, refreshToken: refreshToken)
+        tokenManager.saveUser(user)
+
+        // Update state
         isLoggedIn = true
-        userName = user.name
+        userName = user.displayName
+        currentUser = user
+
+        // Reset form
         identifier = ""
         password = ""
-
-        // Save state
-        UserDefaults.standard.set(true, forKey: "isLoggedIn")
-        UserDefaults.standard.set(userName, forKey: "userName")
-
-        // Reset OTP state
-        otpSent = false
-        otpVerified = false
         verificationCode = ""
+        otpSent = false
+        otpId = ""
+
+        // Stop countdown
         countdownTimer?.invalidate()
         countdownSeconds = 0
+    }
+
+    // MARK: - Demo/Simulation
+    private func simulateGoogleSignIn() async {
+        // Simulate network delay
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+
+        let demoUser = APIUser(
+            id: UUID().uuidString,
+            email: "demo@petwell.com",
+            displayName: "Demo User",
+            avatarUrl: nil,
+            createdAt: Date()
+        )
+
+        await handleSuccessfulAuth(
+            accessToken: "demo_google_access_token",
+            refreshToken: "demo_google_refresh_token",
+            user: demoUser
+        )
+    }
+
+    // MARK: - Password Login (Legacy - kept for backward compatibility)
+    func signInWithPassword() async {
+        // TODO: Implement if needed - currently not in API spec
+        isLoading = false
+        errorMessage = "Password login not supported. Please use Google or Email OTP."
+    }
+
+    func signIn() async {
+        await signInWithPassword()
+    }
+
+    func requestEmailVerification() async {
+        await sendOTP()
     }
 
     // MARK: - Onboarding
@@ -477,31 +507,29 @@ class AuthViewModel: ObservableObject {
 
     // MARK: - Sign Out
     func signOut() {
-        // TODO: Revoke Google/Apple tokens if applicable
+        tokenManager.clearTokens()
 
         isLoggedIn = false
         hasCompletedOnboarding = false
         userName = ""
+        currentUser = nil
         identifier = ""
         password = ""
         verificationCode = ""
         otpSent = false
-        otpVerified = false
+        otpId = ""
 
         countdownTimer?.invalidate()
         countdownSeconds = 0
 
-        UserDefaults.standard.set(false, forKey: "isLoggedIn")
         UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
-        UserDefaults.standard.removeObject(forKey: "userName")
     }
 
     // MARK: - Guest Login
     func continueAsGuest() {
         isLoggedIn = true
         userName = "Guest"
-        UserDefaults.standard.set(true, forKey: "isLoggedIn")
-        UserDefaults.standard.set(userName, forKey: "userName")
+        tokenManager.saveTokens(accessToken: "guest_token", refreshToken: nil)
     }
 }
 
@@ -527,22 +555,75 @@ enum AuthError: Error, LocalizedError {
 }
 
 // MARK: - API Response Models
-struct LoginAPIResponse: Decodable {
-    let success: Bool
-    let message: String?
-    let user: LoginAPIUser?
-    let token: String?
-}
-
-struct LoginAPIUser: Decodable {
-    let id: Int
+struct APIUser: Codable {
+    let id: String
     let email: String
-    let phone: String
-    let name: String
+    let displayName: String
+    let avatarUrl: String?
+    let createdAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case email
+        case displayName = "display_name"
+        case avatarUrl = "avatar_url"
+        case createdAt = "created_at"
+    }
 }
 
-struct OTPResponse: Decodable {
+struct GoogleAuthResponse: Decodable {
     let success: Bool
+    let data: GoogleAuthData?
+}
+
+struct GoogleAuthData: Decodable {
+    let user: APIUser
+    let accessToken: String
+    let refreshToken: String?
+    let expiresIn: Int
+
+    enum CodingKeys: String, CodingKey {
+        case user
+        case accessToken = "access_token"
+        case refreshToken = "refresh_token"
+        case expiresIn = "expires_in"
+    }
+}
+
+struct OTPSendResponse: Decodable {
+    let success: Bool
+    let data: OTPSendData?
+}
+
+struct OTPSendData: Decodable {
+    let otpId: String
+    let expiresIn: Int
     let message: String?
-    let expiresIn: Int?  // Seconds until OTP expires
+
+    enum CodingKeys: String, CodingKey {
+        case otpId = "otp_id"
+        case expiresIn = "expires_in"
+        case message
+    }
+}
+
+struct OTPVerifyResponse: Decodable {
+    let success: Bool
+    let data: OTPVerifyData?
+}
+
+struct OTPVerifyData: Decodable {
+    let user: APIUser
+    let accessToken: String
+    let refreshToken: String?
+    let expiresIn: Int
+    let isNewUser: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case user
+        case accessToken = "access_token"
+        case refreshToken = "refresh_token"
+        case expiresIn = "expires_in"
+        case isNewUser = "is_new_user"
+    }
 }

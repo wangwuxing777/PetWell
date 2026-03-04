@@ -127,7 +127,7 @@ struct RecordsView: View {
               }
 
               ModuleTile(title: "Recent Purchase", systemImage: "cart") {
-                PlaceholderView(title: "Recent Purchase")
+                RecentPurchaseView()
               }
 
               ModuleTile(title: "Insurance", systemImage: "shield") {
