@@ -426,11 +426,6 @@ private struct RecommendationCard: View {
     }
 }
 
-private var isChinese: Bool {
-    // This would normally use @EnvironmentObject, but for simpler code:
-    false
-}
-
 #Preview {
     InsuranceRecommendationView()
         .environmentObject(LanguageManager())
