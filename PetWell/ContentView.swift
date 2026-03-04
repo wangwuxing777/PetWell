@@ -553,6 +553,11 @@ struct PostBlogView: View {
   @State private var title = ""
   @State private var content = ""
 
+  // Image Picker State
+  @State private var selectedImages: [SelectedImage] = []
+  @State private var isShowingImagePicker = false
+  @State private var isUploading = false
+
   var body: some View {
     VStack(spacing: 0) {
       // Custom Header
@@ -571,28 +576,48 @@ struct PostBlogView: View {
       ScrollView {
         VStack(alignment: .leading, spacing: 20) {
 
-          // Image Selection Area
+          // Image Selection Area with PhotosPicker
           ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-              // "Add" placeholder
-              RoundedRectangle(cornerRadius: 12)
-                .fill(Color.gray.opacity(0.1))
-                .frame(width: 100, height: 100)
-                .overlay(
+              // Add Photo Button
+              Button(action: { isShowingImagePicker = true }) {
+                VStack {
                   Image(systemName: "plus")
                     .font(.system(size: 30))
                     .foregroundColor(.gray)
-                )
-
-              // Mock selected image
-              RoundedRectangle(cornerRadius: 12)
-                .fill(Color.blue.opacity(0.2))
+                  Text(languageManager.isChinese ? "添加相片" : "Add Photo")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                }
                 .frame(width: 100, height: 100)
-                .overlay(
-                  Image(systemName: "photo")
-                    .font(.largeTitle)
-                    .foregroundColor(.blue)
-                )
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(12)
+              }
+
+              // Selected Images Preview
+              ForEach(selectedImages.indices, id: \.self) { index in
+                ZStack(alignment: .topTrailing) {
+                  if let uiImage = selectedImages[index].uiImage {
+                    Image(uiImage: uiImage)
+                      .resizable()
+                      .scaledToFill()
+                      .frame(width: 100, height: 100)
+                      .clipped()
+                      .cornerRadius(12)
+                  }
+
+                  // Delete Button
+                  Button(action: {
+                    selectedImages.remove(at: index)
+                  }) {
+                    Image(systemName: "xmark.circle.fill")
+                      .font(.system(size: 20))
+                      .foregroundColor(.white)
+                      .background(Circle().fill(Color.black.opacity(0.5)))
+                  }
+                  .offset(x: 8, y: -8)
+                }
+              }
             }
             .padding(.horizontal)
           }
@@ -688,7 +713,54 @@ struct PostBlogView: View {
       }
       .background(Color.white)
     }
+    .photosPicker(
+      isPresented: $isShowingImagePicker,
+      selection: $selectedImages,
+      maxSelectionCount: 10,
+      matching: .images
+    )
   }
+}
+
+// MARK: - Selected Image Model
+struct SelectedImage: Identifiable {
+  let id = UUID()
+  let uiImage: UIImage?
+  let url: URL?
+
+  init(item: PhotosPickerItem) {
+    self.url = item.fullSizeImageURL
+    self.uiImage = nil
+
+    // Load UIImage asynchronously
+    Task {
+      if let data = try? await item.loadTransferable(type: Data.self),
+         let image = UIImage(data: data) {
+        await MainActor.run {
+          if let index = selectedImages.firstIndex(where: { $0.id == self.id }) {
+            selectedImages[index] = SelectedImage(uiImage: image, url: item.fullSizeImageURL)
+          }
+        }
+      }
+    }
+  }
+
+  init(uiImage: UIImage?, url: URL?) {
+    self.uiImage = uiImage
+    self.url = url
+  }
+}
+
+// Extension to make SelectedImage conform to Transferable
+extension SelectedImage: Transferable {
+  static var transferRepresentation: some TransferableRepresentation {
+    PhotosPickerItem.RepresentedRepresentation(SupportedContentTypes.images)
+  }
+}
+
+private var selectedImages: [SelectedImage] {
+  get { [] }
+  set { }
 }
 
 struct TagButton: View {
