@@ -59,7 +59,7 @@ struct LoginView: View {
 
           VStack(spacing: 10) {
             Text("PetWell")
-              .font(.system(size: 56, weight: .bold, design: .rounded))
+              .font(.system(size: 56, weight: .bold))
               .foregroundColor(.white)
             Text("Protect every moment")
               .font(.subheadline.weight(.medium))
