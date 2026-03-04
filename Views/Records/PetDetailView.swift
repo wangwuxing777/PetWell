@@ -107,7 +107,7 @@ struct PetDetailView: View {
             AddPetView(petToEdit: pet)
         }
         .sheet(isPresented: $showShareSheet) {
-            SharePetProfileView(petName: pet.name)
+            SharePetProfileView(petId: pet.persistentModel.identifier.uuidString, petName: pet.name)
         }
     }
 
