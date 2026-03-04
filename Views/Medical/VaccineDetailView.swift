@@ -45,7 +45,7 @@ struct VaccineDetailView: View {
                         }
                         
                         Text(vaccine.name)
-                            .font(.system(size: 40, weight: .bold, design: .rounded))
+                            .font(.system(size: 40, weight: .bold))
                             .foregroundColor(.white)
                             .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 4)
                         
@@ -55,7 +55,7 @@ struct VaccineDetailView: View {
                                 .font(.title3)
                                 .foregroundColor(.white.opacity(0.8))
                             Text("$\(vaccine.price)")
-                                .font(.system(size: 32, weight: .heavy, design: .rounded))
+                                .font(.system(size: 32, weight: .heavy))
                                 .foregroundColor(.white)
                         }
                         .padding(.top, 4)

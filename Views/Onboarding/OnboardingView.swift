@@ -98,7 +98,7 @@ struct OnboardingView: View {
         Spacer().frame(height: 28)
 
         Text(slides[currentIndex].title)
-          .font(.system(size: 34, weight: .bold, design: .rounded))
+          .font(.system(size: 34, weight: .bold))
           .foregroundColor(.white)
 
         Text(slides[currentIndex].subtitle)
@@ -310,4 +310,3 @@ private struct GlassDemoCard<Content: View>: View {
     .shadow(color: .black.opacity(0.2), radius: 22, x: 0, y: 10)
   }
 }
-
