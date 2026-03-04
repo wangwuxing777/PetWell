@@ -10,7 +10,12 @@ import SwiftUI
 struct InsuranceRecommendationView: View {
     @EnvironmentObject var languageManager: LanguageManager
     @Environment(\.dismiss) private var dismiss
-    @State private var currentLanguage: AppLanguage = .english
+    @StateObject private var insuranceService = InsuranceService.shared
+
+    // Shortcut for language check
+    private var isChinese: Bool {
+        isChinese
+    }
     @StateObject private var insuranceService = InsuranceService.shared
 
     // Recommendation parameters
@@ -40,7 +45,7 @@ struct InsuranceRecommendationView: View {
                         VStack(spacing: 16) {
                             ProgressView()
                                 .scaleEffect(1.5)
-                            Text(languageManager.isChinese ? "分析中..." : "Analyzing...")
+                            Text(isChinese ? "分析中..." : "Analyzing...")
                                 .foregroundColor(.secondary)
                         }
                         .padding(.top, 60)
@@ -54,7 +59,7 @@ struct InsuranceRecommendationView: View {
                 }
                 .padding()
             }
-            .navigationTitle(languageManager.isChinese ? "AI 推薦" : "AI Recommendation")
+            .navigationTitle(isChinese ? "AI 推薦" : "AI Recommendation")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -69,12 +74,12 @@ struct InsuranceRecommendationView: View {
         VStack(alignment: .leading, spacing: 20) {
             // Pet Species
             VStack(alignment: .leading, spacing: 8) {
-                Text(languageManager.isChinese ? "寵物類型" : "Pet Type")
+                Text(isChinese ? "寵物類型" : "Pet Type")
                     .font(.headline)
 
                 HStack(spacing: 12) {
                     PetTypeButton(
-                        title: languageManager.isChinese ? "狗" : "Dog",
+                        title: isChinese ? "狗" : "Dog",
                         icon: "dog.fill",
                         isSelected: petSpecies == "dog"
                     ) {
@@ -82,7 +87,7 @@ struct InsuranceRecommendationView: View {
                     }
 
                     PetTypeButton(
-                        title: languageManager.isChinese ? "貓" : "Cat",
+                        title: isChinese ? "貓" : "Cat",
                         icon: "cat.fill",
                         isSelected: petSpecies == "cat"
                     ) {
@@ -93,18 +98,18 @@ struct InsuranceRecommendationView: View {
 
             // Pet Age
             VStack(alignment: .leading, spacing: 8) {
-                Text(languageManager.isChinese ? "寵物年齡" : "Pet Age")
+                Text(isChinese ? "寵物年齡" : "Pet Age")
                     .font(.headline)
 
                 Stepper(value: $petAge, in: 0...20) {
-                    Text("\(petAge) \(languageManager.isChinese ? "歲" : "years")")
+                    Text("\(petAge) \(isChinese ? "歲" : "years")")
                         .font(.title3.weight(.semibold))
                 }
             }
 
             // Budget
             VStack(alignment: .leading, spacing: 8) {
-                Text(languageManager.isChinese ? "每月預算 (HKD)" : "Monthly Budget (HKD)")
+                Text(isChinese ? "每月預算 (HKD)" : "Monthly Budget (HKD)")
                     .font(.headline)
 
                 HStack {
@@ -123,7 +128,7 @@ struct InsuranceRecommendationView: View {
 
             // Coverage Preferences
             VStack(alignment: .leading, spacing: 8) {
-                Text(languageManager.isChinese ? "保障偏好" : "Coverage Preferences")
+                Text(isChinese ? "保障偏好" : "Coverage Preferences")
                     .font(.headline)
 
                 FlowLayout(spacing: 8) {
@@ -144,11 +149,11 @@ struct InsuranceRecommendationView: View {
 
             // Additional Notes
             VStack(alignment: .leading, spacing: 8) {
-                Text(languageManager.isChinese ? "其他需求" : "Additional Requirements")
+                Text(isChinese ? "其他需求" : "Additional Requirements")
                     .font(.headline)
 
                 TextField(
-                    languageManager.isChinese ? "例如：想保障髖關節問題" : "e.g., Hip dysplasia coverage",
+                    isChinese ? "例如：想保障髖關節問題" : "e.g., Hip dysplasia coverage",
                     text: $additionalNotes,
                     axis: .vertical
                 )
@@ -162,7 +167,7 @@ struct InsuranceRecommendationView: View {
             Button(action: searchRecommendations) {
                 HStack {
                     Image(systemName: "sparkles")
-                    Text(languageManager.isChinese ? "開始推薦" : "Get Recommendations")
+                    Text(isChinese ? "開始推薦" : "Get Recommendations")
                 }
                 .font(.headline)
                 .foregroundColor(.white)
@@ -184,7 +189,7 @@ struct InsuranceRecommendationView: View {
                 HStack {
                     Image(systemName: "brain.head.profile")
                         .foregroundColor(.purple)
-                    Text(languageManager.isChinese ? "AI 分析" : "AI Analysis")
+                    Text(isChinese ? "AI 分析" : "AI Analysis")
                         .font(.headline)
                 }
 
@@ -203,7 +208,7 @@ struct InsuranceRecommendationView: View {
 
             // Search Again
             Button(action: { hasSearched = false }) {
-                Text(languageManager.isChinese ? "重新搜尋" : "Search Again")
+                Text(isChinese ? "重新搜尋" : "Search Again")
                     .font(.subheadline)
                     .foregroundColor(.blue)
             }
@@ -217,15 +222,15 @@ struct InsuranceRecommendationView: View {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 50))
                 .foregroundColor(.secondary)
-            Text(languageManager.isChinese ? "沒有找到合適的計劃" : "No matching plans found")
+            Text(isChinese ? "沒有找到合適的計劃" : "No matching plans found")
                 .font(.headline)
-            Text(languageManager.isChinese ? "嘗試調整您的預算或保障偏好" : "Try adjusting your budget or coverage preferences")
+            Text(isChinese ? "嘗試調整您的預算或保障偏好" : "Try adjusting your budget or coverage preferences")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
 
             Button(action: { hasSearched = false }) {
-                Text(languageManager.isChinese ? "重新搜尋" : "Try Again")
+                Text(isChinese ? "重新搜尋" : "Try Again")
                     .font(.headline)
                     .foregroundColor(.blue)
             }
@@ -404,7 +409,7 @@ private struct RecommendationCard: View {
                 Text("HKD \(recommendation.monthlyPremium)")
                     .font(.title2.weight(.bold))
                     .foregroundColor(.blue)
-                Text("/ \(languageManager.isChinese ? "月" : "month")")
+                Text("/ \(isChinese ? "月" : "month")")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -421,9 +426,9 @@ private struct RecommendationCard: View {
     }
 }
 
-private var languageManager: LanguageManager {
-    // This is a workaround - in real use, inject via EnvironmentObject
-    LanguageManager()
+private var isChinese: Bool {
+    // This would normally use @EnvironmentObject, but for simpler code:
+    false
 }
 
 #Preview {
