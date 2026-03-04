@@ -135,7 +135,7 @@ struct RecordsView: View {
               }
 
               ModuleTile(title: "Activity Tracking", systemImage: "figure.walk") {
-                PlaceholderView(title: "Activity Tracking")
+                ActivityTrackingView()
               }
 
               ModuleTile(title: "Travel Document", systemImage: "doc.text") {
