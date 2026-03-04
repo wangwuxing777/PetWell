@@ -560,6 +560,11 @@ struct PostBlogView: View {
   @State private var selectedImages: [UIImage] = []
   @State private var isShowingImagePicker = false
 
+  // Tags State
+  @State private var showTagsSheet = false
+  @State private var selectedTopics: [BlogTopic] = []
+  @State private var selectedUsers: [BlogUser] = []
+
   var body: some View {
     VStack(spacing: 0) {
       // Custom Header
@@ -667,11 +672,28 @@ struct PostBlogView: View {
 
           // Tags Row
           HStack(spacing: 12) {
-            TagButton(icon: "number", text: languageManager.isChinese ? "話題" : "Topic")
-            TagButton(icon: "at", text: languageManager.isChinese ? "用戶" : "User")
-            TagButton(icon: "chart.bar", text: languageManager.isChinese ? "投票" : "Poll")
+            Button {
+              showTagsSheet = true
+            } label: {
+              TagButton(icon: "number", text: languageManager.isChinese ? "話題" : "Topic")
+            }
+
+            Button {
+              showTagsSheet = true
+            } label: {
+              TagButton(icon: "at", text: languageManager.isChinese ? "用戶" : "User")
+            }
+
+            Button {
+              showTagsSheet = true
+            } label: {
+              TagButton(icon: "chart.bar", text: languageManager.isChinese ? "投票" : "Poll")
+            }
           }
           .padding(.horizontal)
+          .sheet(isPresented: $showTagsSheet) {
+            BlogTagsView(isPresented: $showTagsSheet)
+          }
 
           Divider()
 
