@@ -107,7 +107,7 @@ struct PetDetailView: View {
             AddPetView(petToEdit: pet)
         }
         .sheet(isPresented: $showShareSheet) {
-            SharePetProfileView(petName: pet.name)
+            SharePetProfileView(petId: pet.persistentModelID.chatSessionKey, petName: pet.name)
         }
     }
 

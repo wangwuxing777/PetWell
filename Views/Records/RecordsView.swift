@@ -136,27 +136,27 @@ struct RecordsView: View {
 
             LazyVGrid(columns: gridCols, spacing: 12) {
               ModuleTile(title: "Booking Record", systemImage: "calendar.badge.clock") {
-                PlaceholderView(title: "Booking Record")
+                BookingRecordView()
               }
 
               ModuleTile(title: "Recent Purchase", systemImage: "cart") {
-                PlaceholderView(title: "Recent Purchase")
+                RecentPurchaseView()
               }
 
               ModuleTile(title: "Insurance", systemImage: "shield") {
-                PlaceholderView(title: "Insurance")
+                InsuranceLandingView()
               }
 
               ModuleTile(title: "Activity Tracking", systemImage: "figure.walk") {
-                PlaceholderView(title: "Activity Tracking")
+                ActivityTrackingView()
               }
 
               ModuleTile(title: "Travel Document", systemImage: "doc.text") {
-                PlaceholderView(title: "Travel Document")
+                TravelDocumentView()
               }
 
               ModuleTile(title: "Pet Care Tips", systemImage: "lightbulb") {
-                PlaceholderView(title: "Pet Care Tips")
+                PetCareTipsView()
               }
             }
             .padding(.horizontal)

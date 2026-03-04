@@ -7,6 +7,8 @@
 
 import SwiftUI
 import Combine
+import PhotosUI
+import UIKit
 
 enum Tab: Hashable {
   case shop, medical, insurance, profile, blog
@@ -553,6 +555,16 @@ struct PostBlogView: View {
   @State private var title = ""
   @State private var content = ""
 
+  // Image Picker State
+  @State private var photoItems: [PhotosPickerItem] = []
+  @State private var selectedImages: [UIImage] = []
+  @State private var isShowingImagePicker = false
+
+  // Tags State
+  @State private var showTagsSheet = false
+  @State private var selectedTopics: [BlogTopic] = []
+  @State private var selectedUsers: [BlogUser] = []
+
   var body: some View {
     VStack(spacing: 0) {
       // Custom Header
@@ -571,30 +583,69 @@ struct PostBlogView: View {
       ScrollView {
         VStack(alignment: .leading, spacing: 20) {
 
-          // Image Selection Area
+          // Image Selection Area with PhotosPicker
           ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-              // "Add" placeholder
-              RoundedRectangle(cornerRadius: 12)
-                .fill(Color.gray.opacity(0.1))
-                .frame(width: 100, height: 100)
-                .overlay(
+              // Add Photo Button
+              PhotosPicker(
+                selection: $photoItems,
+                maxSelectionCount: 10,
+                matching: .images
+              ) {
+                VStack {
                   Image(systemName: "plus")
                     .font(.system(size: 30))
                     .foregroundColor(.gray)
-                )
-
-              // Mock selected image
-              RoundedRectangle(cornerRadius: 12)
-                .fill(Color.blue.opacity(0.2))
+                  Text(languageManager.isChinese ? "添加相片" : "Add Photo")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                }
                 .frame(width: 100, height: 100)
-                .overlay(
-                  Image(systemName: "photo")
-                    .font(.largeTitle)
-                    .foregroundColor(.blue)
-                )
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(12)
+              }
+
+              // Selected Images Preview
+              ForEach(selectedImages.indices, id: \.self) { index in
+                ZStack(alignment: .topTrailing) {
+                  Image(uiImage: selectedImages[index])
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 100, height: 100)
+                    .clipped()
+                    .cornerRadius(12)
+
+                  // Delete Button
+                  Button(action: {
+                    selectedImages.remove(at: index)
+                    if index < photoItems.count {
+                      photoItems.remove(at: index)
+                    }
+                  }) {
+                    Image(systemName: "xmark.circle.fill")
+                      .font(.system(size: 20))
+                      .foregroundColor(.white)
+                      .background(Circle().fill(Color.black.opacity(0.5)))
+                  }
+                  .offset(x: 8, y: -8)
+                }
+              }
             }
             .padding(.horizontal)
+          }
+          .onChange(of: photoItems) { _, newItems in
+            // Load images from selected items
+            selectedImages.removeAll()
+            for item in newItems {
+              Task {
+                if let data = try? await item.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                  await MainActor.run {
+                    selectedImages.append(image)
+                  }
+                }
+              }
+            }
           }
 
           // Title Input
@@ -620,11 +671,28 @@ struct PostBlogView: View {
 
           // Tags Row
           HStack(spacing: 12) {
-            TagButton(icon: "number", text: languageManager.isChinese ? "話題" : "Topic")
-            TagButton(icon: "at", text: languageManager.isChinese ? "用戶" : "User")
-            TagButton(icon: "chart.bar", text: languageManager.isChinese ? "投票" : "Poll")
+            Button {
+              showTagsSheet = true
+            } label: {
+              TagButton(icon: "number", text: languageManager.isChinese ? "話題" : "Topic")
+            }
+
+            Button {
+              showTagsSheet = true
+            } label: {
+              TagButton(icon: "at", text: languageManager.isChinese ? "用戶" : "User")
+            }
+
+            Button {
+              showTagsSheet = true
+            } label: {
+              TagButton(icon: "chart.bar", text: languageManager.isChinese ? "投票" : "Poll")
+            }
           }
           .padding(.horizontal)
+          .sheet(isPresented: $showTagsSheet) {
+            BlogTagsView(isPresented: $showTagsSheet)
+          }
 
           Divider()
 
@@ -671,7 +739,7 @@ struct PostBlogView: View {
 
           Button(action: {
             Task {
-              await blogService.createPost(title: title, content: content)
+              await blogService.createPost(title: title, content: content, images: selectedImages)
               dismiss()
             }
           }) {
