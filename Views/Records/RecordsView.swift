@@ -123,7 +123,7 @@ struct RecordsView: View {
 
             LazyVGrid(columns: gridCols, spacing: 12) {
               ModuleTile(title: "Booking Record", systemImage: "calendar.badge.clock") {
-                PlaceholderView(title: "Booking Record")
+                BookingRecordView()
               }
 
               ModuleTile(title: "Recent Purchase", systemImage: "cart") {
@@ -131,7 +131,7 @@ struct RecordsView: View {
               }
 
               ModuleTile(title: "Insurance", systemImage: "shield") {
-                PlaceholderView(title: "Insurance")
+                InsuranceLandingView()
               }
 
               ModuleTile(title: "Activity Tracking", systemImage: "figure.walk") {

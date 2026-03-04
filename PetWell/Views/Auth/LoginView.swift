@@ -166,6 +166,8 @@ private struct AuthHalfButton: View {
 private struct EmailLoginView: View {
   @ObservedObject var viewModel: AuthViewModel
   @Environment(\.dismiss) private var dismiss
+  @State private var showPasswordLogin = false
+  @State private var showPassword = false
 
   var body: some View {
     ZStack {
@@ -187,56 +189,78 @@ private struct EmailLoginView: View {
         .rotationEffect(.degrees(-8))
         .offset(x: -40, y: -250)
 
-      VStack(alignment: .leading, spacing: 0) {
-        Button {
-          dismiss()
-        } label: {
-          Image(systemName: "chevron.left")
-            .font(.title3.weight(.semibold))
-            .foregroundColor(.white.opacity(0.95))
-            .frame(width: 28, height: 28)
-        }
-        .padding(.top, 12)
-
-        Text("Email Login")
-          .font(.title2.weight(.bold))
-          .foregroundColor(.white)
-          .padding(.top, 26)
-
-        Text("If this email exists in our system, we'll send a verification link.")
-          .font(.subheadline)
-          .foregroundColor(.white.opacity(0.72))
-          .padding(.top, 8)
-
-        HStack(spacing: 10) {
-          Image(systemName: "envelope")
-            .foregroundColor(.white.opacity(0.85))
-          TextField("Email address", text: $viewModel.identifier)
-            .keyboardType(.emailAddress)
-            .textInputAutocapitalization(.never)
-            .autocorrectionDisabled()
-            .foregroundColor(.white)
-        }
-        .padding(.horizontal, 14)
-        .frame(height: 54)
-        .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-          RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .stroke(Color.white.opacity(0.34), lineWidth: 1)
-        )
-        .padding(.top, 24)
-
-        Button {
-          Task { await viewModel.requestEmailVerification() }
-        } label: {
-          HStack {
-            if viewModel.isLoading {
-              ProgressView().tint(.white)
-            } else {
-              Text("Verify and Login")
-            }
+      ScrollView {
+        VStack(alignment: .leading, spacing: 0) {
+          Button {
+            dismiss()
+          } label: {
+            Image(systemName: "chevron.left")
+              .font(.title3.weight(.semibold))
+              .foregroundColor(.white.opacity(0.95))
+              .frame(width: 28, height: 28)
           }
-          .font(.headline.weight(.semibold))
+          .padding(.top, 12)
+
+          if showPasswordLogin {
+            // Password Login Form
+            passwordLoginForm
+          } else {
+            // Email Verification Form
+            emailVerificationForm
+          }
+        }
+        .padding(.horizontal, 28)
+        .padding(.bottom, 24)
+      }
+    }
+    .navigationBarBackButtonHidden(true)
+    .onAppear {
+      viewModel.errorMessage = nil
+    }
+  }
+
+  // MARK: - Email Verification Form
+  private var emailVerificationForm: some View {
+    VStack(alignment: .leading, spacing: 0) {
+      Text("Email Login")
+        .font(.title2.weight(.bold))
+        .foregroundColor(.white)
+        .padding(.top, 26)
+
+      Text("If this email exists in our system, we'll send a verification link.")
+        .font(.subheadline)
+        .foregroundColor(.white.opacity(0.72))
+        .padding(.top, 8)
+
+      HStack(spacing: 10) {
+        Image(systemName: "envelope")
+          .foregroundColor(.white.opacity(0.85))
+        TextField("Email address", text: $viewModel.identifier)
+          .keyboardType(.emailAddress)
+          .textInputAutocapitalization(.never)
+          .autocorrectionDisabled()
+          .foregroundColor(.white)
+      }
+      .padding(.horizontal, 14)
+      .frame(height: 54)
+      .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+      .overlay(
+        RoundedRectangle(cornerRadius: 14, style: .continuous)
+          .stroke(Color.white.opacity(0.34), lineWidth: 1)
+      )
+      .padding(.top, 24)
+
+      Button {
+        Task { await viewModel.requestEmailVerification() }
+      } label: {
+        HStack {
+          if viewModel.isLoading {
+            ProgressView().tint(.white)
+          } else {
+            Text("Verify and Login")
+          }
+        }
+        .font(.headline.weight(.semibold))
           .foregroundColor(.white)
           .frame(maxWidth: .infinity)
           .frame(height: 54)
@@ -256,14 +280,138 @@ private struct EmailLoginView: View {
             .padding(.top, 12)
         }
 
+        // Switch to password login link
+        HStack {
+          Spacer()
+          Button("Use password instead") {
+            withAnimation {
+              showPasswordLogin = true
+            }
+          }
+          .font(.caption)
+          .foregroundColor(.white.opacity(0.7))
+        }
+        .padding(.top, 16)
+
         Spacer()
       }
-      .padding(.horizontal, 28)
-      .padding(.bottom, 24)
     }
-    .navigationBarBackButtonHidden(true)
-    .onAppear {
-      viewModel.errorMessage = nil
+  }
+
+  // MARK: - Password Login Form
+  private var passwordLoginForm: some View {
+    VStack(alignment: .leading, spacing: 0) {
+      Text("Password Login")
+        .font(.title2.weight(.bold))
+        .foregroundColor(.white)
+        .padding(.top, 26)
+
+      Text("Enter your email and password to sign in.")
+        .font(.subheadline)
+        .foregroundColor(.white.opacity(0.72))
+        .padding(.top, 8)
+
+      // Email Field
+      HStack(spacing: 10) {
+        Image(systemName: "envelope")
+          .foregroundColor(.white.opacity(0.85))
+        TextField("Email address", text: $viewModel.identifier)
+          .keyboardType(.emailAddress)
+          .textInputAutocapitalization(.never)
+          .autocorrectionDisabled()
+          .foregroundColor(.white)
+      }
+      .padding(.horizontal, 14)
+      .frame(height: 54)
+      .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+      .overlay(
+        RoundedRectangle(cornerRadius: 14, style: .continuous)
+          .stroke(Color.white.opacity(0.34), lineWidth: 1)
+      )
+      .padding(.top, 24)
+
+      // Password Field
+      HStack(spacing: 10) {
+        Image(systemName: "lock")
+          .foregroundColor(.white.opacity(0.85))
+        if showPassword {
+          TextField("Password", text: $viewModel.password)
+            .foregroundColor(.white)
+        } else {
+          SecureField("Password", text: $viewModel.password)
+            .foregroundColor(.white)
+        }
+        Button {
+          showPassword.toggle()
+        } label: {
+          Image(systemName: showPassword ? "eye.slash" : "eye")
+            .foregroundColor(.white.opacity(0.6))
+        }
+      }
+      .padding(.horizontal, 14)
+      .frame(height: 54)
+      .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+      .overlay(
+        RoundedRectangle(cornerRadius: 14, style: .continuous)
+          .stroke(Color.white.opacity(0.34), lineWidth: 1)
+      )
+      .padding(.top, 16)
+
+      // Login Button
+      Button {
+        Task { await viewModel.signInWithPassword() }
+      } label: {
+        HStack {
+          if viewModel.isLoading {
+            ProgressView().tint(.white)
+          } else {
+            Text("Sign In")
+          }
+        }
+        .font(.headline.weight(.semibold))
+        .foregroundColor(.white)
+        .frame(maxWidth: .infinity)
+        .frame(height: 54)
+        .background(viewModel.isValidInput ? Color.white.opacity(0.16) : Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+          RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .stroke(Color.white.opacity(0.34), lineWidth: 1)
+        )
+      }
+      .disabled(!viewModel.isValidInput || viewModel.isLoading)
+      .padding(.top, 24)
+
+      // Demo hint
+      HStack {
+        Image(systemName: "info.circle")
+          .font(.caption2)
+        Text("Demo: demo@petwell.com / demo123")
+          .font(.caption2)
+      }
+      .foregroundColor(.white.opacity(0.5))
+      .padding(.top, 8)
+
+      if let errorMessage = viewModel.errorMessage {
+        Text(errorMessage)
+          .font(.caption)
+          .foregroundColor(Color(red: 1, green: 0.84, blue: 0.84))
+          .padding(.top, 12)
+      }
+
+      // Switch to email verification link
+      HStack {
+        Spacer()
+        Button("Use verification link instead") {
+          withAnimation {
+            showPasswordLogin = false
+          }
+        }
+        .font(.caption)
+        .foregroundColor(.white.opacity(0.7))
+      }
+      .padding(.top, 16)
+
+      Spacer()
     }
   }
 }

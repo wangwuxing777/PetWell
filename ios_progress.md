@@ -27,14 +27,17 @@
   - `ios_findings.md` (updated)
 
 ### Phase 3: 技術架構設計
-- **Status:** pending
-- Actions planned:
-  - 設計共享組件和服務層
-  - 規劃數據模型
-  - 定義 API 接口需求
+- **Status:** in_progress
+- **Started:** 2026-03-04
+- Actions taken:
+  - 創建團隊 (team-lead, frontend-engineer, backend-engineer)
+  - 後端工程師完成 API 文檔 (api_doc.md)
+- Files created/modified:
+  - `api_doc.md` (created) - 完整 API 規格文檔 (22 個端點)
+  - `ios_progress.md` (updated)
 
 ### Phase 4: 優先級排序與實施規劃
-- **Status:** pending
+- **Status:** in_progress
 - Actions planned:
   - 確定開發順序
   - 估算工作量
@@ -113,8 +116,23 @@
 ## 5-Question Reboot Check
 | 問題 | 回答 |
 |------|------|
-| 我在哪裡？ | Phase 2（制定開發計劃） |
-| 我要去哪裡？ | 完成所有頁面的開發計劃 |
-| 目標是什麼？ | 為 PetWell iOS 未完善頁面制定詳細開發計劃 |
-| 我學到了什麼？ | 見 ios_findings.md |
-| 我做了什麼？ | 完成了 15 個功能點的識別和優先級排序 |
+| 我在哪裡？ | Phase 3（技術架構設計） |
+| 我要去哪裡？ | 完成 API 需求文檔，协调前后端开发 |
+| 目標是什麼？ | 推進 PetWell iOS 開發，確保 API 完整 |
+| 我學到了什麼？ | 現有 InsuranceService 已實現，後端運行在 localhost:8000 |
+| 我做了什麼？ | 創建 api-requirements.md，識別 15+ API 端點需求 |
+
+---
+
+## 團隊協作記錄
+
+### 2026-03-04 協調會議
+- **Team Lead**: 協調團隊工作
+- **Frontend Engineer**: 待實現登錄功能
+- **Backend Engineer**: 完成 API 文檔 (api_doc.md)
+
+### 2026-03-04 團隊啟動
+- **團隊創建**: petwell-dev 團隊
+- **API 文檔**: api_doc.md (22 個端點，P0-P2)
+- **後端優先級**: 認證 API (Google/OTP), 預約 API
+- **前端優先級**: 登錄功能 (AuthViewModel)
