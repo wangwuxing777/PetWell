@@ -40,7 +40,7 @@ struct RecentPurchaseView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(OrderFilter.allCases, id: \.self) { filter in
-                        FilterChip(
+                        RecentPurchaseFilterChip(
                             title: filterTitle(filter),
                             isSelected: selectedFilter == filter,
                             onTap: { selectedFilter = filter }
@@ -125,7 +125,7 @@ struct RecentPurchaseView: View {
 }
 
 // MARK: - Filter Chip
-private struct FilterChip: View {
+private struct RecentPurchaseFilterChip: View {
     let title: String
     let isSelected: Bool
     let onTap: () -> Void
@@ -161,7 +161,7 @@ private struct OrderCard: View {
 
                 Spacer()
 
-                StatusBadge(status: order.fulfillmentStatus)
+                RecentPurchaseStatusBadge(status: order.fulfillmentStatus)
             }
 
             Divider()
@@ -223,7 +223,7 @@ private struct OrderCard: View {
 }
 
 // MARK: - Status Badge
-private struct StatusBadge: View {
+private struct RecentPurchaseStatusBadge: View {
     let status: FulfillmentStatus
 
     var body: some View {

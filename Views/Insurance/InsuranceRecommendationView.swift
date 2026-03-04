@@ -14,9 +14,8 @@ struct InsuranceRecommendationView: View {
 
     // Shortcut for language check
     private var isChinese: Bool {
-        isChinese
+        languageManager.isChinese
     }
-    @StateObject private var insuranceService = InsuranceService.shared
 
     // Recommendation parameters
     @State private var petSpecies: String = "dog"
@@ -131,7 +130,7 @@ struct InsuranceRecommendationView: View {
                 Text(isChinese ? "保障偏好" : "Coverage Preferences")
                     .font(.headline)
 
-                FlowLayout(spacing: 8) {
+                InsuranceFlowLayout(spacing: 8) {
                     ForEach(coverageOptions, id: \.self) { option in
                         CoverageChip(
                             title: option,
@@ -313,7 +312,7 @@ private struct CoverageChip: View {
 }
 
 // MARK: - Flow Layout
-struct FlowLayout: Layout {
+private struct InsuranceFlowLayout: Layout {
     var spacing: CGFloat = 8
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
@@ -360,6 +359,7 @@ struct FlowLayout: Layout {
 // MARK: - Recommendation Card
 private struct RecommendationCard: View {
     let recommendation: InsuranceRecommendation
+    @EnvironmentObject var languageManager: LanguageManager
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -409,7 +409,7 @@ private struct RecommendationCard: View {
                 Text("HKD \(recommendation.monthlyPremium)")
                     .font(.title2.weight(.bold))
                     .foregroundColor(.blue)
-                Text("/ \(isChinese ? "月" : "month")")
+                Text("/ \(languageManager.isChinese ? "月" : "month")")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }

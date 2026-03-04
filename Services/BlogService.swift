@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import UIKit
 
 struct User: Codable, Identifiable {
   let id: String

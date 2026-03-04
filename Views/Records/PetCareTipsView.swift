@@ -57,7 +57,9 @@ struct PetCareTipsView: View {
 
                             // Tips List
                             if let category = selectedCategory {
-                                tipsForCategory(category)
+                                ForEach(tipsForCategory(category)) { tip in
+                                    TipCard(tip: tip, isChinese: languageManager.isChinese)
+                                }
                             } else {
                                 ForEach(TipCategory.allCases) { category in
                                     Section {

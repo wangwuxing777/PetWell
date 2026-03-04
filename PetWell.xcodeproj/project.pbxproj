@@ -39,11 +39,19 @@
 		207519282F2524A800B1FD1A /* VaccineBookingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519272F2524A800B1FD1A /* VaccineBookingView.swift */; };
 		2075192A2F25289700B1FD1A /* ClinicSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519292F25289700B1FD1A /* ClinicSelectionView.swift */; };
 		20833D5A2F20B39A00D59583 /* VaccineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20833D592F20B39A00D59583 /* VaccineDetailView.swift */; };
+		20B365DC2F5868C9000F2B3A /* ScenarioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B365DB2F5868C9000F2B3A /* ScenarioService.swift */; };
 		20CCB5FF2F0418F300CE57E7 /* AddPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */; };
 		20CCB6012F04190E00CE57E7 /* PetDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CCB6002F04190A00CE57E7 /* PetDetailView.swift */; };
 		20INSMOD012F51A000004CAA54 /* InsuranceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20INSMOD022F51A000004CAA54 /* InsuranceModels.swift */; };
 		20SOCIAL012F42B000004CAA54 /* SharePetProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */; };
 		20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */; };
+		21B7A1012F60000100AABBCC /* BlogTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7A1002F60000100AABBCC /* BlogTagsView.swift */; };
+		21B7A1032F60000100AABBCC /* InsuranceRecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7A1022F60000100AABBCC /* InsuranceRecommendationView.swift */; };
+		21B7A1202F60000100AABBCC /* BookingRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7A1102F60000100AABBCC /* BookingRecordView.swift */; };
+		21B7A1212F60000100AABBCC /* RecentPurchaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7A1112F60000100AABBCC /* RecentPurchaseView.swift */; };
+		21B7A1222F60000100AABBCC /* ActivityTrackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7A1122F60000100AABBCC /* ActivityTrackingView.swift */; };
+		21B7A1232F60000100AABBCC /* TravelDocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7A1132F60000100AABBCC /* TravelDocumentView.swift */; };
+		21B7A1242F60000100AABBCC /* PetCareTipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7A1142F60000100AABBCC /* PetCareTipsView.swift */; };
 		333BACED5C6923948F4FAF30 /* Vet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCDEA159103732D87EBD44C /* Vet.swift */; };
 		3595376D11423AB92286AB6C /* ShopModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */; };
 		3904708AABD9C0D051D8403E /* ScenarioDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179F5F3575FDE3DBE576028D /* ScenarioDetailView.swift */; };
@@ -65,9 +73,9 @@
 		F14D12FE8F278C38B538C2D2 /* ScenarioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4686BF1736E825EEC323F0 /* ScenarioService.swift */; };
 		F1640ED1E7E136CAF64BAC4A /* RAGChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DBB5D947F0DD76560408AA /* RAGChatView.swift */; };
 		F17000012F20B102004900F1 /* ProviderSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17000022F20B102004900F1 /* ProviderSelectionView.swift */; };
+		F1D39B6708A777E1D304E5B8 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */; };
 		F5B9DD00B956491A1214BD1F /* ScenarioModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5560E415CC208D98CD7FACEC /* ScenarioModels.swift */; };
 		F75332655DE91D68E539B658 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCAF2763C99096209B63097 /* LoginView.swift */; };
-		F1D39B6708A777E1D304E5B8 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */; };
 		FDD97A82D9D5A4388469E9A7 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8D216CCC7A9DF21E1D41A4 /* AuthViewModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -109,28 +117,36 @@
 		207519272F2524A800B1FD1A /* VaccineBookingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineBookingView.swift; sourceTree = "<group>"; };
 		207519292F25289700B1FD1A /* ClinicSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicSelectionView.swift; sourceTree = "<group>"; };
 		20833D592F20B39A00D59583 /* VaccineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineDetailView.swift; sourceTree = "<group>"; };
+		20B365DB2F5868C9000F2B3A /* ScenarioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioService.swift; sourceTree = "<group>"; };
 		20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPetView.swift; sourceTree = "<group>"; };
 		20CCB6002F04190A00CE57E7 /* PetDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDetailView.swift; sourceTree = "<group>"; };
 		20INSMOD022F51A000004CAA54 /* InsuranceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceModels.swift; sourceTree = "<group>"; };
 		20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePetProfileView.swift; sourceTree = "<group>"; };
 		20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialSearchView.swift; sourceTree = "<group>"; };
+		21B7A1002F60000100AABBCC /* BlogTagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogTagsView.swift; sourceTree = "<group>"; };
+		21B7A1022F60000100AABBCC /* InsuranceRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceRecommendationView.swift; sourceTree = "<group>"; };
+		21B7A1102F60000100AABBCC /* BookingRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookingRecordView.swift; sourceTree = "<group>"; };
+		21B7A1112F60000100AABBCC /* RecentPurchaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPurchaseView.swift; sourceTree = "<group>"; };
+		21B7A1122F60000100AABBCC /* ActivityTrackingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingView.swift; sourceTree = "<group>"; };
+		21B7A1132F60000100AABBCC /* TravelDocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelDocumentView.swift; sourceTree = "<group>"; };
+		21B7A1142F60000100AABBCC /* PetCareTipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetCareTipsView.swift; sourceTree = "<group>"; };
 		40938F3FFFB3538C4F3D6253 /* ViewModifiers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
 		4AAB46C63991E9ABB508494D /* VetMapContainerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetMapContainerView.swift; sourceTree = "<group>"; };
 		5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceService.swift; sourceTree = "<group>"; };
 		62DBB5D947F0DD76560408AA /* RAGChatView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RAGChatView.swift; path = Views/Insurance/RAGChatView.swift; sourceTree = "<group>"; };
+		6FCAF2763C99096209B63097 /* LoginView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LoginView.swift; path = Views/Auth/LoginView.swift; sourceTree = "<group>"; };
 		70BE189DFC88DA0CA634B870 /* VetClinic.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetClinic.swift; sourceTree = "<group>"; };
 		84900EA374F123F44735A689 /* ShopifyService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopifyService.swift; sourceTree = "<group>"; };
 		86363FF50F3F61B4EC53D780 /* ScenarioService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScenarioService.swift; path = Services/ScenarioService.swift; sourceTree = "<group>"; };
 		88B4AC9F1FB44E2FED3EF68E /* ScenarioCompareHomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScenarioCompareHomeView.swift; path = Views/Insurance/ScenarioCompareHomeView.swift; sourceTree = "<group>"; };
+		8E8D216CCC7A9DF21E1D41A4 /* AuthViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthViewModel.swift; path = ViewModels/AuthViewModel.swift; sourceTree = "<group>"; };
 		9333426B811F6EBE9D8C1337 /* VetService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetService.swift; sourceTree = "<group>"; };
 		B08DBA259051C33E01E78244 /* MapViewWrapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapViewWrapper.swift; sourceTree = "<group>"; };
 		B48B43AC4603AD6BE6678259 /* VetMapViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetMapViewModel.swift; sourceTree = "<group>"; };
+		D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = Views/Onboarding/OnboardingView.swift; sourceTree = "<group>"; };
 		DBCDEA159103732D87EBD44C /* Vet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Vet.swift; sourceTree = "<group>"; };
 		F17000022F20B102004900F1 /* ProviderSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderSelectionView.swift; sourceTree = "<group>"; };
 		F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopModels.swift; sourceTree = "<group>"; };
-		6FCAF2763C99096209B63097 /* LoginView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LoginView.swift; path = Views/Auth/LoginView.swift; sourceTree = "<group>"; };
-		D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = Views/Onboarding/OnboardingView.swift; sourceTree = "<group>"; };
-		8E8D216CCC7A9DF21E1D41A4 /* AuthViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthViewModel.swift; path = ViewModels/AuthViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +176,7 @@
 				200650172F20B102004900F1 /* insurance_list_test.sql */,
 				200650182F20B102004900F1 /* InsuranceCompareView.swift */,
 				200650192F20B102004900F1 /* InsuranceLandingView.swift */,
+				21B7A1022F60000100AABBCC /* InsuranceRecommendationView.swift */,
 				F17000022F20B102004900F1 /* ProviderSelectionView.swift */,
 				BFB68C28FC0FC4D462EC5DE3 /* ScenarioCompareHomeView.swift */,
 				F5B0A3C45C9AB61C60DD9430 /* ScenarioDetailView.swift */,
@@ -267,6 +284,11 @@
 				20CCB6002F04190A00CE57E7 /* PetDetailView.swift */,
 				20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */,
 				2066065E2EFBE668004CAA54 /* RecordsView.swift */,
+				21B7A1102F60000100AABBCC /* BookingRecordView.swift */,
+				21B7A1112F60000100AABBCC /* RecentPurchaseView.swift */,
+				21B7A1122F60000100AABBCC /* ActivityTrackingView.swift */,
+				21B7A1132F60000100AABBCC /* TravelDocumentView.swift */,
+				21B7A1142F60000100AABBCC /* PetCareTipsView.swift */,
 			);
 			path = Records;
 			sourceTree = "<group>";
@@ -282,6 +304,7 @@
 		2066065C2EFBE621004CAA54 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				20B365DB2F5868C9000F2B3A /* ScenarioService.swift */,
 				20175EA22F40F1A9000A3910 /* LocationManager.swift */,
 				20175E9E2F40E32C000A3910 /* CachedImageLoader.swift */,
 				20175E9F2F40E32C000A3910 /* RAGService.swift */,
@@ -302,6 +325,7 @@
 			children = (
 				206606632EFBEBB5004CAA54 /* Assets.xcassets */,
 				206606642EFBEBB5004CAA54 /* ContentView.swift */,
+				21B7A1002F60000100AABBCC /* BlogTagsView.swift */,
 				8E8D216CCC7A9DF21E1D41A4 /* AuthViewModel.swift */,
 				D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */,
 				6FCAF2763C99096209B63097 /* LoginView.swift */,
@@ -476,6 +500,7 @@
 				20175EA02F40E32C000A3910 /* RAGService.swift in Sources */,
 				20175EA12F40E32C000A3910 /* CachedImageLoader.swift in Sources */,
 				2006501F2F20B102004900F1 /* InsuranceCompareView.swift in Sources */,
+				21B7A1032F60000100AABBCC /* InsuranceRecommendationView.swift in Sources */,
 				2075192A2F25289700B1FD1A /* ClinicSelectionView.swift in Sources */,
 				200650202F20B102004900F1 /* BlogView.swift in Sources */,
 				206606402EFBB4B2004CAA54 /* BlogService.swift in Sources */,
@@ -487,8 +512,14 @@
 				20175E9C2F40D38E000A3910 /* ProductDetailView.swift in Sources */,
 				20175E9D2F40D38E000A3910 /* ShopView.swift in Sources */,
 				206606672EFBEBB5004CAA54 /* ContentView.swift in Sources */,
+				21B7A1012F60000100AABBCC /* BlogTagsView.swift in Sources */,
 				207519202F251CEA00B1FD1A /* ClinicService.swift in Sources */,
 				2066066B2EFBEF92004CAA54 /* RecordsView.swift in Sources */,
+				21B7A1202F60000100AABBCC /* BookingRecordView.swift in Sources */,
+				21B7A1212F60000100AABBCC /* RecentPurchaseView.swift in Sources */,
+				21B7A1222F60000100AABBCC /* ActivityTrackingView.swift in Sources */,
+				21B7A1232F60000100AABBCC /* TravelDocumentView.swift in Sources */,
+				21B7A1242F60000100AABBCC /* PetCareTipsView.swift in Sources */,
 				5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */,
 				207519222F251CFD00B1FD1A /* EmergencyClinicsView.swift in Sources */,
 				2075191E2F251CD000B1FD1A /* Clinic.swift in Sources */,
@@ -516,15 +547,16 @@
 				F5B9DD00B956491A1214BD1F /* ScenarioModels.swift in Sources */,
 				F14D12FE8F278C38B538C2D2 /* ScenarioService.swift in Sources */,
 				E5D2FE03C07D04D5F6A09502 /* ScenarioCompareHomeView.swift in Sources */,
+				20B365DC2F5868C9000F2B3A /* ScenarioService.swift in Sources */,
 				C006685956930A2A941F7469 /* ScenarioDetailView.swift in Sources */,
 				C88014AB7980E56FB2B5238A /* ScenarioModels.swift in Sources */,
 				D0BE68656BA0ABD0ADEF7347 /* ScenarioService.swift in Sources */,
 				45E0C9878E2083BC9BEDF832 /* ScenarioCompareHomeView.swift in Sources */,
 				3904708AABD9C0D051D8403E /* ScenarioDetailView.swift in Sources */,
-							F75332655DE91D68E539B658 /* LoginView.swift in Sources */,
+				F75332655DE91D68E539B658 /* LoginView.swift in Sources */,
 				F1D39B6708A777E1D304E5B8 /* OnboardingView.swift in Sources */,
 				FDD97A82D9D5A4388469E9A7 /* AuthViewModel.swift in Sources */,
-);
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

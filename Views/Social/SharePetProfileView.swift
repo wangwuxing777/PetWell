@@ -39,10 +39,10 @@ struct SharePetProfileView: View {
         case `private` = "private"
         case `public` = "public"
 
-        var displayName: String {
+        func displayName(isChinese: Bool) -> String {
             switch self {
-            case .private: return languageManager.isChinese ? "私人" : "Private"
-            case .public: return languageManager.isChinese ? "公開" : "Public"
+            case .private: return isChinese ? "私人" : "Private"
+            case .public: return isChinese ? "公開" : "Public"
             }
         }
     }
@@ -123,7 +123,7 @@ struct SharePetProfileView: View {
             Section(languageManager.isChinese ? "權限" : "Permission") {
                 Picker(languageManager.isChinese ? "訪問權限" : "Access Permission", selection: $permission) {
                     ForEach(SharePermission.allCases, id: \.self) { perm in
-                        Text(perm.displayName).tag(perm)
+                        Text(perm.displayName(isChinese: languageManager.isChinese)).tag(perm)
                     }
                 }
 
@@ -131,9 +131,11 @@ struct SharePetProfileView: View {
             }
 
             // MARK: - Access Time Range
-            Section(languageManager.isChinese ? "訪問時間" : "Access Time Range") {
+            Section {
                 DatePicker(languageManager.isChinese ? "開始日期" : "Start Date", selection: $accessStartDate, displayedComponents: [.date, .hourAndMinute])
                 DatePicker(languageManager.isChinese ? "結束日期" : "End Date", selection: $accessEndDate, in: accessStartDate..., displayedComponents: [.date, .hourAndMinute])
+            } header: {
+                Text(languageManager.isChinese ? "訪問時間" : "Access Time Range")
             } footer: {
                 Text(languageManager.isChinese ? "好友只能在設定的時間範圍內查看檔案" : "Friends can only view the profile during this time period")
             }

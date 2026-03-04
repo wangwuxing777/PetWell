@@ -588,7 +588,6 @@ struct PostBlogView: View {
             HStack(spacing: 12) {
               // Add Photo Button
               PhotosPicker(
-                isPresented: $isShowingImagePicker,
                 selection: $photoItems,
                 maxSelectionCount: 10,
                 matching: .images

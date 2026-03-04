@@ -39,7 +39,7 @@ struct BookingRecordView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(BookingFilter.allCases, id: \.self) { filter in
-                        FilterChip(
+                        BookingFilterChip(
                             title: filterTitle(filter),
                             isSelected: selectedFilter == filter,
                             onTap: { selectedFilter = filter }
@@ -118,7 +118,7 @@ struct BookingRecordView: View {
 }
 
 // MARK: - Filter Chip
-private struct FilterChip: View {
+private struct BookingFilterChip: View {
     let title: String
     let isSelected: Bool
     let onTap: () -> Void

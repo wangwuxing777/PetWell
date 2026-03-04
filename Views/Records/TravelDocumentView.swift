@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import PhotosPicker
+import PhotosUI
 
 struct TravelDocumentView: View {
     @EnvironmentObject var languageManager: LanguageManager
@@ -258,6 +258,7 @@ private struct AddDocumentView: View {
     @State private var issueDate: Date = Date()
     @State private var expiryDate: Date = Date().addingTimeInterval(365 * 24 * 60 * 60)
     @State private var selectedPet: String = "Max"
+    @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var selectedImage: UIImage?
     @State private var isUploading = false
 
@@ -329,11 +330,22 @@ private struct AddDocumentView: View {
                             .cornerRadius(8)
                     }
 
-                    PhotosPicker(selection: $selectedImage, matching: .images) {
+                    PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
                         Label(
                             languageManager.isChinese ? "選擇圖片" : "Select Image",
                             systemImage: "photo"
                         )
+                    }
+                    .onChange(of: selectedPhotoItem) { _, item in
+                        guard let item else { return }
+                        Task {
+                            if let data = try? await item.loadTransferable(type: Data.self),
+                               let image = UIImage(data: data) {
+                                await MainActor.run {
+                                    selectedImage = image
+                                }
+                            }
+                        }
                     }
                 }
             }
