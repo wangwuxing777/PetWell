@@ -5,8 +5,6 @@
 //  Created for Shopify Integration.
 //
 
-// UNCOMMENT these lines after adding the 'Mobile Buy SDK' via Swift Package Manager
-import Buy
 import Combine
 import Foundation
 
@@ -14,11 +12,11 @@ class ShopifyService: ObservableObject {
   static let shared = ShopifyService()
 
   // MARK: - Configuration
-  // Replace these with your actual keys from Shopify Admin
-  private let shopDomain = "petwell-8.myshopify.com"
-  private let storefrontAccessToken = "6697b5a808943c68b44b058817d16326"
+  // Backend API base URL - all Shopify requests go through our Go backend
+  private let apiBaseURL = "http://localhost:8080"
 
-  private var client: Graph.Client?  // Uncomment after SDK install
+  // Shopify domain for checkout permalinks (safe to keep - public info)
+  private let shopDomain = "petwell-8.myshopify.com"
 
   @Published var products: [ShopProduct] = []
   @Published var filteredProducts: [ShopProduct] = []
@@ -37,7 +35,7 @@ class ShopifyService: ObservableObject {
   }
 
   private init() {
-    setupClient()
+    // No SDK client setup needed - using backend API
   }
 
   var cartItemCount: Int {
@@ -50,114 +48,90 @@ class ShopifyService: ObservableObject {
     }
   }
 
-  func setupClient() {
-    // UNCOMMENT after SDK install
-    client = Graph.Client(
-      shopDomain: shopDomain,
-      apiKey: storefrontAccessToken
-    )
+  // MARK: - Backend API Methods
 
-    // Mock data removed in favor of real API loading state
-    // loadMockData()
-  }
-
+  /// Fetches products from the Go backend proxy instead of directly calling Shopify
   func fetchProducts() {
     isLoading = true
 
-    // defined query: request first 30 products, sorted by newest
-    let query = Storefront.buildQuery {
-      $0
-        .products(first: 30, reverse: true, sortKey: .createdAt) {
-          $0
-            .edges {
-              $0
-                .node {
-                  $0
-                    .id()
-                    .title()
-                    .description()
-                    .handle()
-                    .productType()
-                    .vendor()
-                    .priceRange {
-                      $0
-                        .minVariantPrice {
-                          $0
-                            .amount()
-                            .currencyCode()
-                        }
-                    }
-                    .images(first: 1) {
-                      $0
-                        .edges {
-                          $0
-                            .node {
-                              $0
-                                .url()
-                            }
-                        }
-                    }
-                    .variants(first: 1) {
-                      $0
-                        .edges {
-                          $0
-                            .node {
-                              $0
-                                .id()
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    guard let url = URL(string: "\(apiBaseURL)/api/shop/products") else {
+      DispatchQueue.main.async {
+        self.isLoading = false
+        self.checkoutErrorMessage = "Invalid API URL"
+      }
+      return
     }
 
-    let task = client?.queryGraphWith(query, cachePolicy: .networkOnly) { response, error in
-      if let error = error {
-        print("Shopify Fetch Error: \(error)")
-        DispatchQueue.main.async {
-          self.isLoading = false
-        }
-        return
-      }
+    var request = URLRequest(url: url)
+    request.httpMethod = "GET"
+    request.setValue("application/json", forHTTPHeaderField: "Accept")
 
-      guard let data = response else {
-        DispatchQueue.main.async {
-          self.isLoading = false
-        }
-        return
-      }
-
-      // Map Shopify models to our simplified ShopModels
-      let shopProducts = data.products.edges.map { edge -> ShopProduct in
-        let node = edge.node
-        let price = node.priceRange.minVariantPrice.amount
-        let currency = node.priceRange.minVariantPrice.currencyCode.rawValue
-        let imageUrl = node.images.edges.first?.node.url
-
-        return ShopProduct(
-          id: node.id.rawValue,
-          title: node.title,
-          description: node.description,
-          price: price,
-          currencyCode: currency,
-          imageUrl: imageUrl,
-          productType: node.productType,
-          vendor: node.vendor,
-          handle: node.handle,
-          variantId: node.variants.edges.first?.node.id.rawValue
-        )
-      }
+    let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+      guard let self = self else { return }
 
       DispatchQueue.main.async {
-        self.products = shopProducts
-        self.filteredProducts = shopProducts
-        self.extractFilterOptions()
         self.isLoading = false
+
+        if let error = error {
+          print("Backend API Error: \(error)")
+          self.checkoutErrorMessage = "Failed to load products"
+          return
+        }
+
+        guard let data = data else {
+          self.checkoutErrorMessage = "No data received"
+          return
+        }
+
+        do {
+          let backendProducts = try JSONDecoder().decode([BackendProduct].self, from: data)
+          let shopProducts = backendProducts.map { $0.toShopProduct() }
+          self.products = shopProducts
+          self.filteredProducts = shopProducts
+          self.extractFilterOptions()
+        } catch {
+          print("JSON Decoding Error: \(error)")
+          self.checkoutErrorMessage = "Failed to parse products"
+        }
       }
     }
-    task?.resume()
+    task.resume()
   }
+
+  // MARK: - Backend Response Models
+
+  /// Model matching the Go backend JSON response
+  struct BackendProduct: Codable {
+    let id: String
+    let title: String
+    let description: String
+    let price: String
+    let currencyCode: String
+    let imageUrl: String?
+    let productType: String
+    let vendor: String
+    let handle: String
+    let variantId: String?
+
+    func toShopProduct() -> ShopProduct {
+      let decimalPrice = Decimal(string: price) ?? Decimal(0)
+      let url = imageUrl.flatMap { URL(string: $0) }
+
+      return ShopProduct(
+        id: id,
+        title: title,
+        description: description,
+        price: decimalPrice,
+        currencyCode: currencyCode,
+        imageUrl: url,
+        productType: productType,
+        vendor: vendor,
+        handle: handle,
+        variantId: variantId
+      )
+    }
+  }
+
 
   private func extractFilterOptions() {
     let categories = Set(products.map { $0.productType }).filter { !$0.isEmpty }
