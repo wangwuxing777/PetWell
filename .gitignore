@@ -3,10 +3,23 @@
 # Xcode user data
 *.xcuserstate
 xcschememanagement.plist
+*.xcuserdatad/
+DerivedData/
 
 # Build logs
 build.log
 build_error.log
+
+# Local config / secrets
+config/local.env
+.env
+.env.*
+
+# Runtime DB and local artifacts
+*.db
+!pet_insurance.db
+*.log
+tmp/
 
 
 # implementation plan 

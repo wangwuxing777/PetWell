@@ -7,6 +7,7 @@
 
 import CoreImage
 import CoreImage.CIFilterBuiltins
+import PhotosUI
 import SwiftData
 import SwiftUI
 import UIKit
@@ -24,6 +25,8 @@ struct RecordsView: View {
   @State private var showPetIDFor: PetModel? = nil
   @State private var petPendingDelete: PetModel? = nil
   @State private var showDeleteConfirm: Bool = false
+  @State private var showOwnerEditor = false
+  @State private var ownerProfile: OwnerProfile = OwnerProfileStore.shared.load()
 
   private let gridCols: [GridItem] = [
     GridItem(.flexible(), spacing: 12),
@@ -37,16 +40,26 @@ struct RecordsView: View {
 
           // MARK: Header
           HStack(alignment: .center, spacing: 12) {
-            Image(systemName: "person.crop.circle")
-              .font(.system(size: 44))
-              .foregroundStyle(.secondary)
+            Button {
+              showOwnerEditor = true
+            } label: {
+              if let data = ownerProfile.avatarImageData, let ui = UIImage(data: data) {
+                Image(uiImage: ui)
+                  .resizable()
+                  .scaledToFill()
+                  .frame(width: 52, height: 52)
+                  .clipShape(Circle())
+              } else {
+                Image(systemName: "person.crop.circle")
+                  .font(.system(size: 44))
+                  .foregroundStyle(.secondary)
+              }
+            }
 
             VStack(alignment: .leading, spacing: 2) {
               Text(languageManager.isChinese ? "個人檔案" : "Profile")
                 .font(.title2).bold()
-              Text(
-                languageManager.isChinese ? "管理您的寵物和健康記錄" : "Manage your pets and health records"
-              )
+              Text(ownerProfile.name.isEmpty ? (languageManager.isChinese ? "點擊頭像補齊主人資料" : "Tap avatar to complete owner profile") : ownerProfile.name)
               .font(.subheadline)
               .foregroundStyle(.secondary)
             }
@@ -157,6 +170,11 @@ struct RecordsView: View {
       .sheet(isPresented: $showAddPet) {
         AddPetView()
       }
+      .sheet(isPresented: $showOwnerEditor) {
+        OwnerProfileEditorSheet(isMandatory: false) { updated in
+          ownerProfile = updated
+        }
+      }
       .sheet(item: $showPetIDFor) { pet in
         PetIDSheet(pet: pet)
       }
@@ -178,6 +196,9 @@ struct RecordsView: View {
         if let pet = petPendingDelete {
           Text("This will permanently remove \(pet.name) and all related records.")
         }
+      }
+      .onAppear {
+        ownerProfile = OwnerProfileStore.shared.load()
       }
     }
   }
@@ -919,6 +940,8 @@ struct AddWeightEntryView: View {
     }
   }
 }
+
+// NOTE: OwnerProfileEditorSheet is defined in ViewModifiers.swift
 
 // MARK: - PetModel Guardian Context Extension
 

@@ -72,7 +72,7 @@ final class GuideManager: ObservableObject {
     GuideStep(
       tab: .medical,
       title: "Medical",
-      message: "Use the map button to find nearby clinics quickly.",
+      message: "Use the clinic button at top-right to open testclinics and book a test medical service.",
       requiredAction: .medicalOpenedMap
     ),
     GuideStep(
