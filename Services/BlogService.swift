@@ -31,7 +31,7 @@ class BlogService: ObservableObject {
   @Published var currentUser: User?
   @Published var posts: [BlogPostModel] = []
 
-  private let baseURL = "https://api.petwell.example.com/v1"
+  private let baseURL = "http://localhost:8000"
 
   func registerUser(name: String, role: String = "developer") async {
     let id = UUID().uuidString
