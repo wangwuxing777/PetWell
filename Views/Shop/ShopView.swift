@@ -124,9 +124,15 @@ struct ShopView: View {
 struct ProductCard: View {
   let product: ShopProduct
 
+  // Fixed card dimensions for uniform grid
+  private let cardWidth: CGFloat = 170
+  private let cardHeight: CGFloat = 260
+  private let imageHeight: CGFloat = 170
+  private let textAreaHeight: CGFloat = 90
+
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
-      // Product Image - Fixed 1:1 aspect ratio container
+      // Product Image - Fixed size container
       ZStack {
         RoundedRectangle(cornerRadius: 12)
           .fill(Color.gray.opacity(0.1))
@@ -140,8 +146,6 @@ struct ProductCard: View {
               image
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipped()
             case .failure:
               Image(systemName: "photo")
                 .font(.system(size: 40))
@@ -156,31 +160,34 @@ struct ProductCard: View {
             .foregroundColor(.gray)
         }
       }
-      .aspectRatio(1, contentMode: .fit)
+      .frame(width: cardWidth, height: imageHeight)
+      .clipped()
       .cornerRadius(12)
 
-      // Text Content - Fixed height area
+      // Text Content - Fixed size area
       VStack(alignment: .leading, spacing: 4) {
         Text(product.title)
-          .font(.system(size: 14, weight: .semibold))
+          .font(.system(size: 13, weight: .semibold))
           .lineLimit(2)
-          .frame(height: 36, alignment: .top)
+          .frame(height: 34, alignment: .topLeading)
 
         Text(product.vendor)
           .font(.caption2)
           .foregroundColor(.secondary)
           .lineLimit(1)
-          .frame(height: 14, alignment: .top)
+          .frame(height: 14, alignment: .topLeading)
 
         Text(product.formattedPrice)
           .font(.subheadline)
           .bold()
           .foregroundColor(Color(hex: "2563EB"))
-          .frame(height: 20, alignment: .top)
+          .frame(height: 20, alignment: .topLeading)
       }
-      .padding(.horizontal, 10)
-      .padding(.vertical, 10)
+      .frame(width: cardWidth - 16, height: textAreaHeight - 12)
+      .padding(.horizontal, 8)
+      .padding(.vertical, 6)
     }
+    .frame(width: cardWidth, height: cardHeight)
     .background(Color.white.opacity(0.95))
     .overlay(
       RoundedRectangle(cornerRadius: 14)
