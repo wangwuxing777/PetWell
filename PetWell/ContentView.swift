@@ -447,20 +447,21 @@ struct BlogView: View {
           HStack(alignment: .top, spacing: 10) {
             // Left Column
             LazyVStack(spacing: 10) {
-              ForEach(leftColumn) { post in
-                BlogCard(post: post)
+              ForEach(Array(leftColumn.enumerated()), id: \.element.id) { index, post in
+                BlogCard(post: post, index: index * 2)
               }
             }
 
             // Right Column
             LazyVStack(spacing: 10) {
-              ForEach(rightColumn) { post in
-                BlogCard(post: post)
+              ForEach(Array(rightColumn.enumerated()), id: \.element.id) { index, post in
+                BlogCard(post: post, index: index * 2 + 1)
               }
             }
           }
           .padding(10)
         }
+        .accessibilityIdentifier("BlogFeedView")
         .refreshable {
           await blogService.fetchPosts()
         }
@@ -480,6 +481,7 @@ struct BlogView: View {
 
 struct BlogCard: View {
   let post: BlogPostModel
+  let index: Int
 
   // Helper to produce color from string
   var imageColor: Color {
@@ -510,6 +512,7 @@ struct BlogCard: View {
           .font(.system(size: 14, weight: .medium))
           .lineLimit(2)
           .foregroundColor(.black)
+          .accessibilityIdentifier("BlogPostTitle_\(index)")
 
         HStack {
           HStack(spacing: 4) {
@@ -544,6 +547,7 @@ struct BlogCard: View {
     }
     .cornerRadius(8)
     .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+    .accessibilityIdentifier("BlogPostCell_\(index)")
   }
 }
 
