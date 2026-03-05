@@ -67,6 +67,7 @@ struct PetWellApp: App {
         } else {
           ContentView()
             .environmentObject(languageManager)
+            .environmentObject(authViewModel)
             .environment(\.locale, .init(identifier: languageManager.currentLanguage.rawValue))
         }
       }

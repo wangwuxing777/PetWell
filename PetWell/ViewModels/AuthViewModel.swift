@@ -10,14 +10,14 @@ import Foundation
 
 // MARK: - API Configuration
 enum AuthAPI {
-    // Base URL from api_doc.md
-    static let baseURL = "https://api.petwell.example.com/v1"
+    static let baseURL = "http://localhost:8000"
 
     enum Endpoints {
+        static let login    = "\(baseURL)/api/auth/login"
+        static let register = "\(baseURL)/api/auth/register"
         static let googleAuth = "\(baseURL)/auth/google"
-        static let sendOTP = "\(baseURL)/auth/otp/send"
-        static let verifyOTP = "\(baseURL)/auth/otp/verify"
-        static let refreshToken = "\(baseURL)/auth/refresh"
+        static let sendOTP    = "\(baseURL)/auth/otp/send"
+        static let verifyOTP  = "\(baseURL)/auth/otp/verify"
     }
 }
 
@@ -95,6 +95,8 @@ class AuthViewModel: ObservableObject {
         if let user = tokenManager.getUser() {
             self.userName = user.displayName
             self.currentUser = user
+            // Re-propagate identity so BlogService knows who is logged in after app restart
+            syncIdentityToServices(user: user)
         }
     }
 
@@ -385,7 +387,7 @@ class AuthViewModel: ObservableObject {
                         email: identifier,
                         displayName: "Email User",
                         avatarUrl: nil,
-                        createdAt: Date()
+                        createdAt: ""
                     )
                     await handleSuccessfulAuth(
                         accessToken: "demo_access_token",
@@ -402,7 +404,7 @@ class AuthViewModel: ObservableObject {
                     email: identifier,
                     displayName: "Email User",
                     avatarUrl: nil,
-                    createdAt: Date()
+                    createdAt: ""
                 )
                 await handleSuccessfulAuth(
                     accessToken: "demo_access_token",
@@ -443,14 +445,15 @@ class AuthViewModel: ObservableObject {
 
     // MARK: - Login Success Handler
     private func handleSuccessfulAuth(accessToken: String, refreshToken: String?, user: APIUser) async {
-        // Save tokens
         tokenManager.saveTokens(accessToken: accessToken, refreshToken: refreshToken)
         tokenManager.saveUser(user)
 
-        // Update state
         isLoggedIn = true
         userName = user.displayName
         currentUser = user
+
+        // Propagate identity to BlogService and OwnerProfile
+        syncIdentityToServices(user: user)
 
         // Reset form
         identifier = ""
@@ -459,9 +462,28 @@ class AuthViewModel: ObservableObject {
         otpSent = false
         otpId = ""
 
-        // Stop countdown
         countdownTimer?.invalidate()
         countdownSeconds = 0
+    }
+
+    // MARK: - Identity Sync
+    // After every successful login/register, push the real user info into
+    // BlogService (so posts show the correct author) and pre-fill OwnerProfile.
+    private func syncIdentityToServices(user: APIUser) {
+        // Update BlogService author identity
+        BlogService.shared.setCurrentUser(
+            id: user.id,
+            name: user.displayName,
+            avatarUrl: user.avatarUrl ?? ""
+        )
+
+        // Pre-fill OwnerProfile only if it hasn't been set by the user yet
+        var profile = OwnerProfileStore.shared.load()
+        if profile.name.isEmpty {
+            profile.name = user.displayName
+            profile.email = user.email
+            OwnerProfileStore.shared.save(profile)
+        }
     }
 
     // MARK: - Demo/Simulation
@@ -474,7 +496,7 @@ class AuthViewModel: ObservableObject {
             email: "demo@petwell.com",
             displayName: "Demo User",
             avatarUrl: nil,
-            createdAt: Date()
+            createdAt: ""
         )
 
         await handleSuccessfulAuth(
@@ -484,11 +506,62 @@ class AuthViewModel: ObservableObject {
         )
     }
 
-    // MARK: - Password Login (Legacy - kept for backward compatibility)
+    // MARK: - Email + Password Login (calls real backend)
     func signInWithPassword() async {
-        // TODO: Implement if needed - currently not in API spec
+        isLoading = true
+        errorMessage = nil
+
+        guard let url = URL(string: AuthAPI.Endpoints.login) else { isLoading = false; return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try? JSONEncoder().encode(["identifier": identifier, "password": password])
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse else { throw AuthError.serverError }
+
+            if http.statusCode == 200 {
+                let result = try JSONDecoder().decode(AuthTokenResponse.self, from: data)
+                await handleSuccessfulAuth(accessToken: result.token, refreshToken: nil, user: result.user.toAPIUser())
+            } else {
+                let err = try? JSONDecoder().decode([String: String].self, from: data)
+                errorMessage = err?["error"] ?? "Invalid email or password"
+            }
+        } catch {
+            errorMessage = "Could not connect to server. Check that the backend is running."
+        }
         isLoading = false
-        errorMessage = "Password login not supported. Please use Google or Email OTP."
+    }
+
+    // MARK: - Email + Password Registration (calls real backend)
+    func registerWithPassword(name: String) async {
+        isLoading = true
+        errorMessage = nil
+
+        guard let url = URL(string: AuthAPI.Endpoints.register) else { isLoading = false; return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try? JSONEncoder().encode(["name": name, "email": identifier, "password": password])
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse else { throw AuthError.serverError }
+
+            if http.statusCode == 201 {
+                let result = try JSONDecoder().decode(AuthTokenResponse.self, from: data)
+                await handleSuccessfulAuth(accessToken: result.token, refreshToken: nil, user: result.user.toAPIUser())
+            } else {
+                let err = try? JSONDecoder().decode([String: String].self, from: data)
+                errorMessage = err?["error"] ?? "Registration failed"
+            }
+        } catch {
+            errorMessage = "Could not connect to server. Check that the backend is running."
+        }
+        isLoading = false
     }
 
     func signIn() async {
@@ -555,19 +628,46 @@ enum AuthError: Error, LocalizedError {
 }
 
 // MARK: - API Response Models
+
+// APIUser matches the backend AuthUserResponse JSON shape:
+// { "id", "email", "name", "avatar_url", "created_at" }
 struct APIUser: Codable {
     let id: String
     let email: String
-    let displayName: String
+    let displayName: String   // mapped from "name"
     let avatarUrl: String?
-    let createdAt: Date
+    let createdAt: String     // keep as String to avoid date-format issues
 
     enum CodingKeys: String, CodingKey {
-        case id
-        case email
-        case displayName = "display_name"
+        case id, email
+        case displayName = "name"
+        case avatarUrl   = "avatar_url"
+        case createdAt   = "created_at"
+    }
+}
+
+// AuthTokenResponse matches { "token": "...", "user": { ... } }
+struct AuthTokenResponse: Decodable {
+    let token: String
+    let user: BackendUser
+}
+
+// BackendUser is the raw shape from Go (id as string, name not display_name)
+struct BackendUser: Decodable {
+    let id: String
+    let email: String
+    let name: String
+    let avatarUrl: String?
+    let createdAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case id, email, name
         case avatarUrl = "avatar_url"
         case createdAt = "created_at"
+    }
+
+    func toAPIUser() -> APIUser {
+        APIUser(id: id, email: email, displayName: name, avatarUrl: avatarUrl, createdAt: createdAt)
     }
 }
 
