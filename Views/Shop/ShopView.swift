@@ -125,65 +125,61 @@ struct ProductCard: View {
   let product: ShopProduct
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
-      // Product Image
-      if let url = product.imageUrl {
-        AsyncImage(url: url) { phase in
-          switch phase {
-          case .empty:
-            RoundedRectangle(cornerRadius: 12)
-              .fill(Color.gray.opacity(0.1))
-              .aspectRatio(1, contentMode: .fit)
-              .overlay(ProgressView())
-          case .success(let image):
-            image
-              .resizable()
-              .aspectRatio(contentMode: .fill)
-              .cornerRadius(12)
-          case .failure:
-            RoundedRectangle(cornerRadius: 12)
-              .fill(Color.gray.opacity(0.1))
-              .aspectRatio(1, contentMode: .fit)
-              .overlay(
-                 Image(systemName: "photo")
-                   .font(.largeTitle)
-                   .foregroundColor(.gray)
-              )
-          @unknown default:
-            EmptyView()
-          }
-        }
-        .frame(height: 150)
-        .clipped()
-      } else {
+    VStack(alignment: .leading, spacing: 0) {
+      // Product Image - Fixed 1:1 aspect ratio container
+      ZStack {
         RoundedRectangle(cornerRadius: 12)
           .fill(Color.gray.opacity(0.1))
-          .aspectRatio(1, contentMode: .fit)
-          .overlay(
-            Image(systemName: "photo")
-              .font(.largeTitle)
-              .foregroundColor(.gray)
-          )
-      }
 
-      VStack(alignment: .leading, spacing: 6) {
+        if let url = product.imageUrl {
+          AsyncImage(url: url) { phase in
+            switch phase {
+            case .empty:
+              ProgressView()
+            case .success(let image):
+              image
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
+            case .failure:
+              Image(systemName: "photo")
+                .font(.system(size: 40))
+                .foregroundColor(.gray)
+            @unknown default:
+              EmptyView()
+            }
+          }
+        } else {
+          Image(systemName: "photo")
+            .font(.system(size: 40))
+            .foregroundColor(.gray)
+        }
+      }
+      .aspectRatio(1, contentMode: .fit)
+      .cornerRadius(12)
+
+      // Text Content - Fixed height area
+      VStack(alignment: .leading, spacing: 4) {
         Text(product.title)
           .font(.system(size: 14, weight: .semibold))
-          .fontWeight(.medium)
           .lineLimit(2)
+          .frame(height: 36, alignment: .top)
 
         Text(product.vendor)
           .font(.caption2)
           .foregroundColor(.secondary)
           .lineLimit(1)
+          .frame(height: 14, alignment: .top)
 
         Text(product.formattedPrice)
           .font(.subheadline)
           .bold()
           .foregroundColor(Color(hex: "2563EB"))
+          .frame(height: 20, alignment: .top)
       }
       .padding(.horizontal, 10)
-      .padding(.bottom, 10)
+      .padding(.vertical, 10)
     }
     .background(Color.white.opacity(0.95))
     .overlay(
