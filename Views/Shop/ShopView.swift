@@ -13,6 +13,7 @@ struct ShopView: View {
   @EnvironmentObject var languageManager: LanguageManager
   @EnvironmentObject var guideManager: GuideManager
   @State private var showFilter = false
+  @State private var searchText = ""
 
   let columns = [
     GridItem(.flexible(), spacing: 16),
@@ -61,6 +62,27 @@ struct ShopView: View {
         }
         .padding(.horizontal)
         .padding(.top, 10)  // Adjustment for status bar if needed, or rely on safe area
+
+        // Search Bar
+        HStack {
+          Image(systemName: "magnifyingglass")
+            .foregroundColor(.gray)
+          TextField(languageManager.isChinese ? "搜尋商品..." : "Search products...", text: $searchText)
+            .autocorrectionDisabled()
+            .onChange(of: searchText) { _, newValue in
+              shopifyService.search(query: newValue)
+            }
+          if !searchText.isEmpty {
+            Button { searchText = "" } label: {
+              Image(systemName: "xmark.circle.fill").foregroundColor(.gray)
+            }
+          }
+        }
+        .padding(10)
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+        .padding(.horizontal)
+        .padding(.bottom, 8)
 
         if guideManager.currentStep?.tab == .shop {
           HStack(spacing: 8) {

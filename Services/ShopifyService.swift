@@ -141,6 +141,32 @@ class ShopifyService: ObservableObject {
     self.availableBrands = Array(brands).sorted()
   }
 
+  // MARK: - Search
+
+  /// Searches products via the Go backend's /api/shop/search?q=... endpoint.
+  /// Updates filteredProducts with results. Pass empty string to reset.
+  func search(query: String) {
+    let trimmed = query.trimmingCharacters(in: .whitespaces)
+    if trimmed.isEmpty {
+      filteredProducts = products
+      return
+    }
+
+    guard let encoded = trimmed.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+          let url = URL(string: "\(apiBaseURL)/api/shop/search?q=\(encoded)") else { return }
+
+    isLoading = true
+    URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+      DispatchQueue.main.async {
+        guard let self = self else { return }
+        self.isLoading = false
+        guard let data = data, error == nil,
+              let backendProducts = try? JSONDecoder().decode([BackendProduct].self, from: data) else { return }
+        self.filteredProducts = backendProducts.map { $0.toShopProduct() }
+      }
+    }.resume()
+  }
+
   func applyFilter(_ criteria: FilterCriteria) {
     var result = products
 
