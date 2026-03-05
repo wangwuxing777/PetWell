@@ -13,7 +13,7 @@ class ShopifyService: ObservableObject {
 
   // MARK: - Configuration
   // Backend API base URL - all Shopify requests go through our Go backend
-  private let apiBaseURL = "http://localhost:8080"
+  private let apiBaseURL = "http://localhost:8000"
 
   // Shopify domain for checkout permalinks (safe to keep - public info)
   private let shopDomain = "petwell-8.myshopify.com"
