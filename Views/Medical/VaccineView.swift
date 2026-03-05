@@ -249,29 +249,17 @@ struct VaccineView: View {
     case .healthCheck:
       HealthCheckView()
     case .deworming:
-      ServicePlaceholderView(
-        title: "Deworming",
-        description: "Deworming package list will be added in next update.")
+      MedicalServiceDetailView(category: "deworming", fallbackTitle: "Deworming")
     case .dentalCare:
-      ServicePlaceholderView(
-        title: "Dental Care",
-        description: "Oral exam, scaling, and treatment booking is coming soon.")
+      MedicalServiceDetailView(category: "dental", fallbackTitle: "Dental Care")
     case .labTests:
-      ServicePlaceholderView(
-        title: "Lab Tests",
-        description: "Blood test and diagnostic package booking is coming soon.")
+      MedicalServiceDetailView(category: "lab_tests", fallbackTitle: "Lab Tests")
     case .microchip:
-      ServicePlaceholderView(
-        title: "Microchip",
-        description: "Microchip registration and appointment booking is coming soon.")
+      MedicalServiceDetailView(category: "microchip", fallbackTitle: "Microchip")
     case .nutrition:
-      ServicePlaceholderView(
-        title: "Nutrition",
-        description: "Nutrition consultation services will be available soon.")
+      MedicalServiceDetailView(category: "nutrition", fallbackTitle: "Nutrition")
     case .surgeryCare:
-      ServicePlaceholderView(
-        title: "Surgery Care",
-        description: "Pre-op and post-op care workflow will be available soon.")
+      MedicalServiceDetailView(category: "surgery_care", fallbackTitle: "Surgery Care")
     }
   }
 
