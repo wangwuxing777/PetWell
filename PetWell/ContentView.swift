@@ -210,6 +210,11 @@ struct ContentView: View {
           BlogView()
             .environmentObject(blogService)  // Inject service
             .environmentObject(guideManager)
+            .onChange(of: selectedTab) { _, tab in
+              if tab == .blog {
+                Task { await blogService.fetchPosts() }
+              }
+            }
             .tabItem {
               Label(
                 languageManager.isChinese ? "日誌" : "Blog",
@@ -427,11 +432,13 @@ struct BlogView: View {
           Spacer()
 
           Button(action: {
-            if blogService.currentUser == nil {
-              Task { await blogService.registerUser(name: "Dev A") }  // Auto login if needed
+            Task {
+              if blogService.currentUser == nil {
+                await blogService.registerUser(name: "Dev A")
+              }
+              showingPostSheet = true
+              guideManager.mark(.blogPostTapped)
             }
-            showingPostSheet = true
-            guideManager.mark(.blogPostTapped)
           }) {
             Image(systemName: "plus.square")
               .font(.system(size: 22))
@@ -447,20 +454,27 @@ struct BlogView: View {
           HStack(alignment: .top, spacing: 10) {
             // Left Column
             LazyVStack(spacing: 10) {
-              ForEach(leftColumn) { post in
-                BlogCard(post: post)
+              ForEach(Array(leftColumn.enumerated()), id: \.element.id) { index, post in
+                NavigationLink(destination: BlogPostDetailView(post: post)) {
+                  BlogCard(post: post, index: index * 2)
+                }
+                .buttonStyle(.plain)
               }
             }
 
             // Right Column
             LazyVStack(spacing: 10) {
-              ForEach(rightColumn) { post in
-                BlogCard(post: post)
+              ForEach(Array(rightColumn.enumerated()), id: \.element.id) { index, post in
+                NavigationLink(destination: BlogPostDetailView(post: post)) {
+                  BlogCard(post: post, index: index * 2 + 1)
+                }
+                .buttonStyle(.plain)
               }
             }
           }
           .padding(10)
         }
+        .accessibilityIdentifier("BlogFeedView")
         .refreshable {
           await blogService.fetchPosts()
         }
@@ -480,6 +494,7 @@ struct BlogView: View {
 
 struct BlogCard: View {
   let post: BlogPostModel
+  let index: Int
 
   // Helper to produce color from string
   var imageColor: Color {
@@ -495,21 +510,39 @@ struct BlogCard: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      // Image Placeholder
-      Rectangle()
-        .fill(imageColor)
-        .frame(height: 180)  // Fixed height for simplicity or random interaction
-        .overlay(
-          Image(systemName: "photo")
-            .foregroundColor(.white.opacity(0.5))
-            .font(.largeTitle)
-        )
+      // Image area — show real image if available, otherwise color placeholder
+      if let firstUrl = post.imageUrls?.first, let url = URL(string: firstUrl) {
+        AsyncImage(url: url) { phase in
+          switch phase {
+          case .success(let image):
+            image.resizable().scaledToFill()
+              .frame(height: 180)
+              .clipped()
+          case .failure:
+            Rectangle().fill(imageColor).frame(height: 180)
+              .overlay(Image(systemName: "photo").foregroundColor(.white.opacity(0.5)).font(.largeTitle))
+          default:
+            Rectangle().fill(Color.gray.opacity(0.15)).frame(height: 180)
+              .overlay(ProgressView())
+          }
+        }
+      } else {
+        Rectangle()
+          .fill(imageColor)
+          .frame(height: 180)
+          .overlay(
+            Image(systemName: "photo")
+              .foregroundColor(.white.opacity(0.5))
+              .font(.largeTitle)
+          )
+      }
 
       VStack(alignment: .leading, spacing: 8) {
         Text(post.title)
           .font(.system(size: 14, weight: .medium))
           .lineLimit(2)
           .foregroundColor(.black)
+          .accessibilityIdentifier("BlogPostTitle_\(index)")
 
         HStack {
           HStack(spacing: 4) {
@@ -544,6 +577,7 @@ struct BlogCard: View {
     }
     .cornerRadius(8)
     .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+    .accessibilityIdentifier("BlogPostCell_\(index)")
   }
 }
 
@@ -755,6 +789,119 @@ struct PostBlogView: View {
         .padding()
       }
       .background(Color.white)
+    }
+  }
+}
+
+// MARK: - Blog Post Detail
+
+struct BlogPostDetailView: View {
+  let post: BlogPostModel
+  @State private var isLiked = false
+
+  var body: some View {
+    ScrollView {
+      VStack(alignment: .leading, spacing: 0) {
+
+        // Author row
+        HStack(spacing: 10) {
+          Image(systemName: post.authorAvatar.isEmpty ? "person.circle.fill" : post.authorAvatar)
+            .resizable().scaledToFit()
+            .frame(width: 36, height: 36)
+            .foregroundColor(.gray)
+          VStack(alignment: .leading, spacing: 2) {
+            Text(post.authorName)
+              .font(.system(size: 14, weight: .semibold))
+            if let ts = post.timestamp {
+              Text(ts)
+                .font(.system(size: 12))
+                .foregroundColor(.secondary)
+            }
+          }
+          Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+
+        // Image area — real images if available, color placeholder otherwise
+        if let imageUrls = post.imageUrls, !imageUrls.isEmpty {
+          TabView {
+            ForEach(imageUrls, id: \.self) { urlString in
+              if let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                  switch phase {
+                  case .success(let image):
+                    image.resizable().scaledToFill()
+                      .frame(maxWidth: .infinity)
+                      .frame(height: 300)
+                      .clipped()
+                  case .failure:
+                    Rectangle().fill(cardColor).frame(height: 300)
+                  default:
+                    Rectangle().fill(Color.gray.opacity(0.15)).frame(height: 300)
+                      .overlay(ProgressView())
+                  }
+                }
+              }
+            }
+          }
+          .tabViewStyle(.page)
+          .frame(height: 300)
+        } else {
+          Rectangle()
+            .fill(cardColor)
+            .frame(height: 260)
+            .overlay(
+              Image(systemName: "photo")
+                .font(.largeTitle)
+                .foregroundColor(.white.opacity(0.5))
+            )
+        }
+
+        // Title
+        if !post.title.isEmpty {
+          Text(post.title)
+            .font(.system(size: 20, weight: .bold))
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+        }
+
+        // Body
+        if let body = post.content, !body.isEmpty {
+          Text(body)
+            .font(.system(size: 15))
+            .foregroundColor(.primary.opacity(0.85))
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+        }
+
+        // Like button
+        HStack(spacing: 6) {
+          Button { isLiked.toggle() } label: {
+            Image(systemName: isLiked ? "heart.fill" : "heart")
+              .foregroundColor(isLiked ? .red : .gray)
+          }
+          Text("\(post.likes + (isLiked ? 1 : 0))")
+            .font(.system(size: 14))
+            .foregroundColor(.secondary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+        .padding(.bottom, 40)
+      }
+    }
+    .navigationTitle("")
+    .navigationBarTitleDisplayMode(.inline)
+  }
+
+  private var cardColor: Color {
+    switch post.imageColor {
+    case "mint": return .mint
+    case "orange": return .orange
+    case "pink": return .pink
+    case "yellow": return .yellow
+    case "green": return .green
+    default: return .blue
     }
   }
 }

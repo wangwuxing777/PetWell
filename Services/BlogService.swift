@@ -30,8 +30,16 @@ class BlogService: ObservableObject {
 
   @Published var currentUser: User?
   @Published var posts: [BlogPostModel] = []
+  private(set) var currentAvatarUrl: String = ""
 
-  private let baseURL = "https://api.petwell.example.com/v1"
+  private let baseURL = "http://localhost:8000"
+
+  /// Called by AuthViewModel after every successful login/register.
+  /// Replaces the old "Dev A" placeholder with the real logged-in user.
+  func setCurrentUser(id: String, name: String, avatarUrl: String) {
+    currentUser = User(id: id, name: name, role: "user")
+    currentAvatarUrl = avatarUrl
+  }
 
   func registerUser(name: String, role: String = "developer") async {
     let id = UUID().uuidString
@@ -67,7 +75,10 @@ class BlogService: ObservableObject {
   }
 
   func createPost(title: String, content: String, images: [UIImage] = []) async {
-    guard let user = currentUser else { return }
+    guard let user = currentUser else {
+      print("BlogService: cannot create post — no logged-in user")
+      return
+    }
 
     // Upload images first and get URLs
     var imageUrls: [String] = []
@@ -79,26 +90,26 @@ class BlogService: ObservableObject {
 
     guard let apiURL = URL(string: "\(baseURL)/posts") else { return }
 
-    let newPost = BlogPostModel(
-      id: "",  // Server assigns ID
-      authorName: user.name,
-      authorAvatar: "person.circle.fill",
-      title: title,
-      content: content,
-      imageColor: "blue",
-      likes: 0,
-      timestamp: nil,
-      imageUrls: imageUrls.isEmpty ? nil : imageUrls
-    )
+    // Body carries content only — author identity comes from headers
+    let body: [String: Any] = [
+      "title": title,
+      "content": content,
+      "imageColor": "blue",
+      "imageUrls": imageUrls
+    ]
 
     var request = URLRequest(url: apiURL)
     request.httpMethod = "POST"
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    // Author identity headers — backend reads these, not the body
+    request.setValue(user.id, forHTTPHeaderField: "X-User-Id")
+    request.setValue(user.name, forHTTPHeaderField: "X-User-Name")
+    request.setValue(currentAvatarUrl, forHTTPHeaderField: "X-User-Avatar")
 
     do {
-      request.httpBody = try JSONEncoder().encode(newPost)
+      request.httpBody = try JSONSerialization.data(withJSONObject: body)
       let _ = try await URLSession.shared.data(for: request)
-      await fetchPosts()  // Refresh list
+      await fetchPosts()
     } catch {
       print("Failed to create post: \(error)")
     }

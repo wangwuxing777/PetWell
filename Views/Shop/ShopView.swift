@@ -13,6 +13,7 @@ struct ShopView: View {
   @EnvironmentObject var languageManager: LanguageManager
   @EnvironmentObject var guideManager: GuideManager
   @State private var showFilter = false
+  @State private var searchText = ""
 
   let columns = [
     GridItem(.flexible(), spacing: 16),
@@ -61,6 +62,27 @@ struct ShopView: View {
         }
         .padding(.horizontal)
         .padding(.top, 10)  // Adjustment for status bar if needed, or rely on safe area
+
+        // Search Bar
+        HStack {
+          Image(systemName: "magnifyingglass")
+            .foregroundColor(.gray)
+          TextField(languageManager.isChinese ? "搜尋商品..." : "Search products...", text: $searchText)
+            .autocorrectionDisabled()
+            .onChange(of: searchText) { _, newValue in
+              shopifyService.search(query: newValue)
+            }
+          if !searchText.isEmpty {
+            Button { searchText = "" } label: {
+              Image(systemName: "xmark.circle.fill").foregroundColor(.gray)
+            }
+          }
+        }
+        .padding(10)
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+        .padding(.horizontal)
+        .padding(.bottom, 8)
 
         if guideManager.currentStep?.tab == .shop {
           HStack(spacing: 8) {
@@ -124,67 +146,70 @@ struct ShopView: View {
 struct ProductCard: View {
   let product: ShopProduct
 
+  // Fixed card dimensions for uniform grid
+  private let cardWidth: CGFloat = 170
+  private let cardHeight: CGFloat = 260
+  private let imageHeight: CGFloat = 170
+  private let textAreaHeight: CGFloat = 90
+
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
-      // Product Image
-      if let url = product.imageUrl {
-        AsyncImage(url: url) { phase in
-          switch phase {
-          case .empty:
-            RoundedRectangle(cornerRadius: 12)
-              .fill(Color.gray.opacity(0.1))
-              .aspectRatio(1, contentMode: .fit)
-              .overlay(ProgressView())
-          case .success(let image):
-            image
-              .resizable()
-              .aspectRatio(contentMode: .fill)
-              .cornerRadius(12)
-          case .failure:
-            RoundedRectangle(cornerRadius: 12)
-              .fill(Color.gray.opacity(0.1))
-              .aspectRatio(1, contentMode: .fit)
-              .overlay(
-                 Image(systemName: "photo")
-                   .font(.largeTitle)
-                   .foregroundColor(.gray)
-              )
-          @unknown default:
-            EmptyView()
-          }
-        }
-        .frame(height: 150)
-        .clipped()
-      } else {
+    VStack(alignment: .leading, spacing: 0) {
+      // Product Image - Fixed size container
+      ZStack {
         RoundedRectangle(cornerRadius: 12)
           .fill(Color.gray.opacity(0.1))
-          .aspectRatio(1, contentMode: .fit)
-          .overlay(
-            Image(systemName: "photo")
-              .font(.largeTitle)
-              .foregroundColor(.gray)
-          )
-      }
 
-      VStack(alignment: .leading, spacing: 6) {
+        if let url = product.imageUrl {
+          AsyncImage(url: url) { phase in
+            switch phase {
+            case .empty:
+              ProgressView()
+            case .success(let image):
+              image
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+            case .failure:
+              Image(systemName: "photo")
+                .font(.system(size: 40))
+                .foregroundColor(.gray)
+            @unknown default:
+              EmptyView()
+            }
+          }
+        } else {
+          Image(systemName: "photo")
+            .font(.system(size: 40))
+            .foregroundColor(.gray)
+        }
+      }
+      .frame(width: cardWidth, height: imageHeight)
+      .clipped()
+      .cornerRadius(12)
+
+      // Text Content - Fixed size area
+      VStack(alignment: .leading, spacing: 4) {
         Text(product.title)
-          .font(.system(size: 14, weight: .semibold))
-          .fontWeight(.medium)
+          .font(.system(size: 13, weight: .semibold))
           .lineLimit(2)
+          .frame(height: 34, alignment: .topLeading)
 
         Text(product.vendor)
           .font(.caption2)
           .foregroundColor(.secondary)
           .lineLimit(1)
+          .frame(height: 14, alignment: .topLeading)
 
         Text(product.formattedPrice)
           .font(.subheadline)
           .bold()
           .foregroundColor(Color(hex: "2563EB"))
+          .frame(height: 20, alignment: .topLeading)
       }
-      .padding(.horizontal, 10)
-      .padding(.bottom, 10)
+      .frame(width: cardWidth - 16, height: textAreaHeight - 12)
+      .padding(.horizontal, 8)
+      .padding(.vertical, 6)
     }
+    .frame(width: cardWidth, height: cardHeight)
     .background(Color.white.opacity(0.95))
     .overlay(
       RoundedRectangle(cornerRadius: 14)
