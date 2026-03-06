@@ -132,7 +132,7 @@ struct InsuranceCompareView: View {
 
   var body: some View {
     ZStack(alignment: .top) {
-      Color(hex: "F8F9FA").ignoresSafeArea()  // Light grey background
+      AppTheme.bgBase.ignoresSafeArea()  // Page background
 
       if insuranceService.isLoading {
         ProgressView("Loading policies...")
@@ -154,7 +154,7 @@ struct InsuranceCompareView: View {
           .pickerStyle(SegmentedPickerStyle())
           .padding(.horizontal)
           .padding(.vertical, 8)
-          .background(Color.white)
+          .background(AppTheme.bgElevated)
 
           if compareMode == .byInsurance {
             contentView
@@ -336,7 +336,7 @@ struct InsuranceCompareView: View {
         emptyHeaderCell(isLeft: false)
       }
     }
-    .background(Color.white)
+    .background(AppTheme.bgCard)
     .cornerRadius(16)
     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
     .padding(.horizontal)
@@ -386,12 +386,12 @@ struct InsuranceCompareView: View {
           .fontWeight(.medium)
           .padding(.horizontal, 16)
           .padding(.vertical, 8)
-          .background(Color.white)
-          .foregroundColor(.black)
+          .background(AppTheme.bgCard)
+          .foregroundColor(AppTheme.textPrimary)
           .cornerRadius(20)
           .overlay(
             RoundedRectangle(cornerRadius: 20)
-              .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+              .stroke(AppTheme.borderSubtle, lineWidth: 1)
           )
           .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
       }
@@ -838,7 +838,7 @@ struct InsuranceCompareView: View {
         .foregroundColor(.blue)
         .padding()
         .frame(maxWidth: .infinity)
-        .background(Color.white)
+        .background(AppTheme.bgCard)
         .cornerRadius(12)
         .overlay(
           RoundedRectangle(cornerRadius: 12)
@@ -860,7 +860,7 @@ struct InsuranceCompareView: View {
         .frame(maxWidth: .infinity, alignment: .center)
     }
     .padding(24)
-    .background(Color.white)
+    .background(AppTheme.bgCard)
     .cornerRadius(24)
     .padding(.horizontal)
     .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)

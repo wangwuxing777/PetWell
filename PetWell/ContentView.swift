@@ -418,7 +418,7 @@ struct BlogView: View {
           VStack(spacing: 4) {
             Text(languageManager.isChinese ? "探索" : "Explore")
               .font(.system(size: 17, weight: .bold))
-              .foregroundColor(.black)
+              .foregroundColor(AppTheme.textPrimary)
 
             RoundedRectangle(cornerRadius: 2)
               .fill(Color.blue)
@@ -442,12 +442,12 @@ struct BlogView: View {
           }) {
             Image(systemName: "plus.square")
               .font(.system(size: 22))
-              .foregroundColor(.black)
+              .foregroundColor(AppTheme.textPrimary)
           }
         }
         .padding(.horizontal)
         .padding(.bottom, 8)
-        .background(Color.white)
+        .background(AppTheme.bgElevated)
 
         // Content
         ScrollView {
@@ -541,7 +541,7 @@ struct BlogCard: View {
         Text(post.title)
           .font(.system(size: 14, weight: .medium))
           .lineLimit(2)
-          .foregroundColor(.black)
+          .foregroundColor(AppTheme.textPrimary)
           .accessibilityIdentifier("BlogPostTitle_\(index)")
 
         HStack {
@@ -573,7 +573,7 @@ struct BlogCard: View {
         }
       }
       .padding(8)
-      .background(Color.white)
+      .background(AppTheme.bgCard)
     }
     .cornerRadius(8)
     .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
@@ -606,7 +606,7 @@ struct PostBlogView: View {
         Button(action: { dismiss() }) {
           Image(systemName: "chevron.left")
             .font(.system(size: 20))
-            .foregroundColor(.black)
+            .foregroundColor(AppTheme.textPrimary)
         }
         Spacer()
       }
@@ -762,10 +762,10 @@ struct PostBlogView: View {
           }) {
             Text(languageManager.isChinese ? "存草稿" : "Save draft")
               .font(.system(size: 16, weight: .medium))
-              .foregroundColor(.black)
+              .foregroundColor(AppTheme.textPrimary)
               .padding(.vertical, 12)
               .padding(.horizontal, 24)
-              .background(Color.gray.opacity(0.1))
+              .background(AppTheme.bgInput)
               .cornerRadius(24)
           }
 
@@ -779,16 +779,16 @@ struct PostBlogView: View {
           }) {
             Text(languageManager.isChinese ? "發布" : "Post")
               .font(.system(size: 16, weight: .bold))
-              .foregroundColor(.white)
+              .foregroundColor(AppTheme.textInverse)
               .padding(.vertical, 12)
               .padding(.horizontal, 48)
-              .background(Color.blue)  // Standard app blue
+              .background(AppTheme.brandPrimary)
               .cornerRadius(24)
           }
         }
         .padding()
       }
-      .background(Color.white)
+      .background(AppTheme.bgElevated)
     }
   }
 }
@@ -921,7 +921,7 @@ struct TagButton: View {
     .padding(.horizontal, 12)
     .background(Color.gray.opacity(0.1))
     .cornerRadius(16)
-    .foregroundColor(.black)
+    .foregroundColor(AppTheme.textPrimary)
   }
 }
 
@@ -934,10 +934,10 @@ struct OptionRow: View {
     HStack {
       Image(systemName: icon)
         .frame(width: 24)
-        .foregroundColor(.black)
+        .foregroundColor(AppTheme.textPrimary)
 
       Text(text)
-        .foregroundColor(.black)
+        .foregroundColor(AppTheme.textPrimary)
 
       Spacer()
 
