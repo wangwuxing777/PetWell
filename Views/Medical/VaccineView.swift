@@ -210,7 +210,7 @@ struct VaccineView: View {
           }
         }
       }
-      .background(Color.white)
+      .background(AppTheme.bgBase)
       .task {
         loadData()
       }
@@ -549,7 +549,7 @@ private struct ServicePlaceholderView: View {
     }
     .padding(.top, 60)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.white)
+    .background(AppTheme.bgBase)
     .navigationBarTitleDisplayMode(.inline)
   }
 }
@@ -563,7 +563,7 @@ struct VaccineCard: View {
       ZStack(alignment: .topTrailing) {
         // Background Frame
         Rectangle()
-          .fill(Color.white)
+          .fill(AppTheme.bgCard)
           .frame(height: 140)
           .frame(maxWidth: .infinity)
 
@@ -757,7 +757,7 @@ private struct TestClinicEntryView: View {
           }
           .padding()
           .frame(maxWidth: .infinity, alignment: .leading)
-          .background(Color.white)
+          .background(AppTheme.bgCard)
           .cornerRadius(14)
           .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
