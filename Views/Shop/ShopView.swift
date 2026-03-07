@@ -5,7 +5,7 @@
 //  Created for Shopify Integration.
 //
 
-import SafariServices
+import StripePaymentSheet
 import SwiftUI
 
 struct ShopView: View {
@@ -229,6 +229,7 @@ struct ProductCard: View {
 
 struct ShopFilterView: View {
   @Environment(\.dismiss) var dismiss
+  @EnvironmentObject var languageManager: LanguageManager
   @ObservedObject var shopifyService = ShopifyService.shared
 
   // Local state to hold selections before applying
@@ -236,11 +237,15 @@ struct ShopFilterView: View {
   @State private var selectedBrand: String?
   @State private var priceRange: ClosedRange<Double> = 0...2000
 
+  private var maxPriceLimit: Double {
+    max(shopifyService.maxFilterPrice, 2000)
+  }
+
   var body: some View {
     VStack(spacing: 0) {
       // Header
       HStack {
-        Text("Filter")
+        Text(languageManager.isChinese ? "筛选" : "Filter")
           .font(.title2)
           .bold()
 
@@ -249,7 +254,7 @@ struct ShopFilterView: View {
         Button(action: resetFilters) {
           HStack(spacing: 4) {
             Image(systemName: "goforward")
-            Text("Reset")
+            Text(languageManager.isChinese ? "重置" : "Reset")
           }
           .font(.subheadline)
           .foregroundColor(.gray)
@@ -269,13 +274,13 @@ struct ShopFilterView: View {
 
           // Category Section
           VStack(alignment: .leading, spacing: 12) {
-            Text("Category")
+            Text(languageManager.isChinese ? "商品类别" : "Category")
               .font(.headline)
 
             ShopFilterChipLayout {
               // "All" Chip
               ShopFilterChip(
-                title: "All",
+                title: languageManager.isChinese ? "全部" : "All",
                 isSelected: selectedCategory == "" || selectedCategory == "All"
                   || selectedCategory == nil,
                 action: { selectedCategory = "All" }
@@ -285,7 +290,7 @@ struct ShopFilterView: View {
               Button(action: { selectedCategory = "For my pet" }) {
                 HStack(spacing: 4) {
                   Image(systemName: "sparkles")  // AI hint
-                  Text("For my pet")
+                  Text(languageManager.isChinese ? "适合我的宠物" : "For my pet")
                 }
                 .font(.subheadline)
                 .fontWeight(.medium)
@@ -320,11 +325,20 @@ struct ShopFilterView: View {
                 )
               }
             }
+
+            if shopifyService.isLoadingCategories && shopifyService.availableCategories.isEmpty {
+              ProgressView(languageManager.isChinese ? "正在同步 Shopify 类别..." : "Loading Shopify categories...")
+                .font(.caption)
+            } else if shopifyService.availableCategories.isEmpty {
+              Text(languageManager.isChinese ? "暂时没有可用类别" : "No categories available yet")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            }
           }
 
           // Brand Section
           VStack(alignment: .leading, spacing: 12) {
-            Text("Brand")
+            Text(languageManager.isChinese ? "品牌" : "Brand")
               .font(.headline)
 
             ShopFilterChipLayout {
@@ -340,7 +354,7 @@ struct ShopFilterView: View {
 
           // Price Range Section
           VStack(alignment: .leading, spacing: 12) {
-            Text("Price Range")
+            Text(languageManager.isChinese ? "价格区间" : "Price Range")
               .font(.headline)
 
             // Validating range for Slider
@@ -351,7 +365,7 @@ struct ShopFilterView: View {
                   let newMin = min(newValue, priceRange.upperBound)
                   priceRange = newMin...priceRange.upperBound
                 }
-              ), in: 0...2000)
+              ), in: 0...maxPriceLimit)
 
             HStack {
               Text("HK$ \(Int(priceRange.lowerBound))")
@@ -377,7 +391,7 @@ struct ShopFilterView: View {
       // Bottom Button
       VStack {
         Button(action: applyFilters) {
-          Text("Show Results")
+          Text(languageManager.isChinese ? "查看结果" : "Show Results")
             .font(.headline)
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
@@ -390,15 +404,19 @@ struct ShopFilterView: View {
       .background(Color.white.shadow(radius: 2))
     }
     .onAppear {
-      // Load current filter state if needed
+      syncFilterState()
+
+      if shopifyService.availableCategories.isEmpty, !shopifyService.isLoadingCategories {
+        shopifyService.fetchCategories()
+      }
     }
   }
 
   private func resetFilters() {
     selectedCategory = "All"
     selectedBrand = nil
-    priceRange = 0...2000
-    // Trigger update
+    priceRange = 0...maxPriceLimit
+    shopifyService.resetFilters()
   }
 
   private func applyFilters() {
@@ -427,6 +445,18 @@ struct ShopFilterView: View {
 
     shopifyService.applyFilter(criteria)
     dismiss()
+  }
+
+  private func syncFilterState() {
+    let activeCriteria = shopifyService.activeFilterCriteria
+    selectedCategory = activeCriteria.category ?? "All"
+    selectedBrand = activeCriteria.brand
+
+    let lowerBound = activeCriteria.minPrice ?? 0
+    let upperBound = activeCriteria.maxPrice ?? maxPriceLimit
+    let clampedLower = min(lowerBound, maxPriceLimit)
+    let clampedUpper = max(clampedLower, min(upperBound, maxPriceLimit))
+    priceRange = clampedLower...clampedUpper
   }
 }
 
@@ -509,9 +539,11 @@ struct CartView: View {
   @ObservedObject private var shopifyService = ShopifyService.shared
   @EnvironmentObject var languageManager: LanguageManager
 
-  @State private var checkoutSession: CheckoutSession?
+  @State private var paymentSheetSession: StripeCheckoutSession?
+  @State private var alertTitle: String?
   @State private var alertMessage: String?
   @State private var showOwnerProfileEditor = false
+  @State private var isPreparingCheckout = false
 
   var body: some View {
     VStack(spacing: 0) {
@@ -565,7 +597,7 @@ struct CartView: View {
       }
     }
     .alert(
-      languageManager.isChinese ? "結帳失敗" : "Checkout Failed",
+      alertTitle ?? (languageManager.isChinese ? "結帳提示" : "Checkout"),
       isPresented: Binding(
         get: { alertMessage != nil },
         set: { if !$0 { alertMessage = nil } }
@@ -575,12 +607,15 @@ struct CartView: View {
     } message: {
       Text(alertMessage ?? "")
     }
-    .sheet(item: $checkoutSession) { session in
-      ShopCheckoutContainer(
-        url: session.url,
-        title: languageManager.isChinese ? "安全結帳" : "Secure Checkout"
+    .fullScreenCover(
+      isPresented: Binding(
+        get: { paymentSheetSession != nil },
+        set: { if !$0 { paymentSheetSession = nil } }
       )
-      .ignoresSafeArea()
+    ) {
+      StripePaymentSheetFullScreenHost(session: $paymentSheetSession)
+        .presentationBackground(.clear)
+        .background(Color.clear)
     }
     .sheet(isPresented: $showOwnerProfileEditor) {
       OwnerProfileEditorSheet(isMandatory: true) { _ in }
@@ -603,8 +638,18 @@ struct CartView: View {
 
       Button(action: startCheckout) {
         HStack(spacing: 8) {
-          Image(systemName: "lock.shield.fill")
-          Text(languageManager.isChinese ? "在 App 內安全結帳" : "Checkout In App")
+          if isPreparingCheckout {
+            ProgressView()
+              .progressViewStyle(.circular)
+              .tint(.white)
+          } else {
+            Image(systemName: "creditcard.fill")
+          }
+          Text(
+            isPreparingCheckout
+              ? (languageManager.isChinese ? "正在准备支付..." : "Preparing payment...")
+              : (languageManager.isChinese ? "使用 Stripe 安全付款" : "Pay Securely with Stripe")
+          )
         }
           .font(.headline)
           .foregroundColor(.white)
@@ -619,6 +664,7 @@ struct CartView: View {
           )
           .cornerRadius(12)
       }
+      .disabled(isPreparingCheckout)
     }
     .padding()
     .background(Color.white.shadow(color: .black.opacity(0.06), radius: 8, y: -2))
@@ -673,7 +719,7 @@ struct CartView: View {
 
         Spacer()
 
-        Button(action: { shopifyService.removeFromCart(productId: item.product.id) }) {
+        Button(action: { shopifyService.removeFromCart(itemId: item.id) }) {
           Image(systemName: "trash")
             .foregroundColor(.red.opacity(0.85))
         }
@@ -704,7 +750,7 @@ struct CartView: View {
   private func quantityControl(item: CartItem) -> some View {
     HStack(spacing: 14) {
       Button(action: {
-        shopifyService.updateCartQuantity(productId: item.product.id, quantity: item.quantity - 1)
+        shopifyService.updateCartQuantity(itemId: item.id, quantity: item.quantity - 1)
       }) {
         Image(systemName: "minus")
           .font(.system(size: 12, weight: .bold))
@@ -719,7 +765,7 @@ struct CartView: View {
         .frame(minWidth: 20)
 
       Button(action: {
-        shopifyService.updateCartQuantity(productId: item.product.id, quantity: item.quantity + 1)
+        shopifyService.updateCartQuantity(itemId: item.id, quantity: item.quantity + 1)
       }) {
         Image(systemName: "plus")
           .font(.system(size: 12, weight: .bold))
@@ -740,11 +786,42 @@ struct CartView: View {
       showOwnerProfileEditor = true
       return
     }
-    if let checkoutURL = shopifyService.makeCheckoutURL() {
-      checkoutSession = CheckoutSession(url: checkoutURL)
-    } else {
-      let fallback = languageManager.isChinese ? "目前無法建立結帳連結。" : "Unable to create checkout link."
-      alertMessage = shopifyService.checkoutErrorMessage ?? fallback
+
+    isPreparingCheckout = true
+    let ownerProfile = OwnerProfileStore.shared.load()
+
+    shopifyService.createPaymentSheetSession(for: shopifyService.cartItems, customer: ownerProfile) { result in
+      isPreparingCheckout = false
+
+      switch result {
+      case .success(let configuration):
+        paymentSheetSession = makeStripeCheckoutSession(
+          from: configuration,
+          ownerProfile: ownerProfile,
+          onCompletion: handlePaymentResult
+        )
+
+      case .failure:
+        alertTitle = languageManager.isChinese ? "結帳失敗" : "Checkout Failed"
+        let fallback = languageManager.isChinese ? "目前無法建立 Stripe 付款頁。" : "Unable to prepare Stripe checkout."
+        alertMessage = shopifyService.checkoutErrorMessage ?? fallback
+      }
+    }
+  }
+
+  private func handlePaymentResult(_ result: PaymentSheetResult) {
+    switch result {
+    case .completed:
+      shopifyService.clearCart()
+      alertTitle = languageManager.isChinese ? "付款成功" : "Payment Successful"
+      alertMessage = languageManager.isChinese ? "已收到你的付款，訂單正在處理。" : "Your payment was received and the order is now being processed."
+
+    case .canceled:
+      break
+
+    case .failed(let error):
+      alertTitle = languageManager.isChinese ? "付款失敗" : "Payment Failed"
+      alertMessage = error.localizedDescription
     }
   }
 
@@ -756,41 +833,114 @@ struct CartView: View {
   }
 }
 
-private struct CheckoutSession: Identifiable {
-  let id = UUID()
-  let url: URL
+func makeStripeCheckoutSession(
+  from configuration: ShopifyService.PaymentSheetSessionConfiguration,
+  ownerProfile: OwnerProfile,
+  onCompletion: @escaping (PaymentSheetResult) -> Void
+) -> StripeCheckoutSession {
+  STPAPIClient.shared.publishableKey = configuration.publishableKey
+
+  var paymentConfiguration = PaymentSheet.Configuration()
+  paymentConfiguration.merchantDisplayName = configuration.merchantDisplayName
+  paymentConfiguration.allowsDelayedPaymentMethods = true
+  paymentConfiguration.returnURL = AppStripeConfiguration.returnURL
+
+  if let applePayMerchantID = AppStripeConfiguration.applePayMerchantID {
+    paymentConfiguration.applePay = .init(
+      merchantId: applePayMerchantID,
+      merchantCountryCode: "HK"
+    )
+  }
+
+  var billingDetails = PaymentSheet.BillingDetails()
+  billingDetails.name = ownerProfile.name
+  billingDetails.email = ownerProfile.email
+  billingDetails.phone = ownerProfile.phone
+  paymentConfiguration.defaultBillingDetails = billingDetails
+
+  let paymentSheet = PaymentSheet(
+    paymentIntentClientSecret: configuration.paymentIntentClientSecret,
+    configuration: paymentConfiguration
+  )
+
+  return StripeCheckoutSession(paymentSheet: paymentSheet, onCompletion: onCompletion)
 }
 
-struct ShopCheckoutContainer: View {
-  @Environment(\.dismiss) private var dismiss
-  let url: URL
-  let title: String
+struct StripeCheckoutSession: Identifiable {
+  let id = UUID()
+  let paymentSheet: PaymentSheet
+  let onCompletion: (PaymentSheetResult) -> Void
+}
+
+enum AppStripeConfiguration {
+  static let returnURL = "petwell://stripe-redirect"
+
+  static var applePayMerchantID: String? {
+    guard let value = Bundle.main.object(forInfoDictionaryKey: "ApplePayMerchantID") as? String,
+          !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+      return nil
+    }
+
+    return value
+  }
+}
+
+struct StripePaymentSheetFullScreenHost: View {
+  @Binding var session: StripeCheckoutSession?
 
   var body: some View {
-    NavigationStack {
-      InAppSafariView(url: url)
-        .navigationTitle(title)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-          ToolbarItem(placement: .topBarTrailing) {
-            Button("Done") {
-              dismiss()
-            }
-          }
-        }
+    ZStack {
+      Color.clear
+        .ignoresSafeArea()
+
+      StripePaymentSheetPresenter(session: $session)
+        .frame(width: 0, height: 0)
     }
+    .background(Color.clear)
   }
 }
 
-struct InAppSafariView: UIViewControllerRepresentable {
-  let url: URL
+struct StripePaymentSheetPresenter: UIViewControllerRepresentable {
+  @Binding var session: StripeCheckoutSession?
 
-  func makeUIViewController(context: Context) -> SFSafariViewController {
-    let vc = SFSafariViewController(url: url)
-    vc.dismissButtonStyle = .close
-    vc.preferredControlTintColor = UIColor(Color(hex: "2563EB"))
-    return vc
+  func makeCoordinator() -> Coordinator {
+    Coordinator(session: $session)
   }
 
-  func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
+  func makeUIViewController(context: Context) -> UIViewController {
+    let controller = UIViewController()
+    controller.view.backgroundColor = .clear
+    return controller
+  }
+
+  func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+    context.coordinator.hostViewController = uiViewController
+    context.coordinator.presentIfNeeded()
+  }
+
+  final class Coordinator {
+    @Binding private var session: StripeCheckoutSession?
+    weak var hostViewController: UIViewController?
+    var isPresenting = false
+
+    init(session: Binding<StripeCheckoutSession?>) {
+      _session = session
+    }
+
+    func presentIfNeeded() {
+      guard !isPresenting,
+            let session,
+            let hostViewController else { return }
+
+      isPresenting = true
+
+      DispatchQueue.main.async {
+        session.paymentSheet.present(from: hostViewController) { result in
+          session.onCompletion(result)
+          self.session = nil
+          self.isPresenting = false
+        }
+      }
+    }
+  }
 }
