@@ -274,6 +274,7 @@ struct ServiceCard: View {
   let subtitle: String
   let imageName: String
   let color: Color
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     VStack(alignment: .center, spacing: 10) {
@@ -302,7 +303,7 @@ struct ServiceCard: View {
     .padding(.horizontal, 8)
     .frame(maxWidth: .infinity)
     .aspectRatio(1, contentMode: .fill)
-    .background(AppTheme.bgCard)
+    .background(colorScheme == .dark ? AppTheme.bgCard : Color(hex: "ECECEE"))
     .cornerRadius(18)
     .overlay(
       RoundedRectangle(cornerRadius: 18, style: .continuous)
