@@ -20,7 +20,7 @@ struct ScenarioCompareHomeView: View {
   var body: some View {
     ScrollViewReader { proxy in
       ZStack {
-        Color.white.ignoresSafeArea()
+        AppTheme.bgBase.ignoresSafeArea()
 
         if scenarioService.isLoading {
           ProgressView("Loading scenarios...")
