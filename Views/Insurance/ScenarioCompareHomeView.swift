@@ -10,12 +10,12 @@ import SwiftUI
 struct ScenarioCompareHomeView: View {
   @StateObject private var scenarioService = ScenarioService.shared
   @State private var expandedScenarioId: String? = nil
-  @State private var pendingExpandId: String? = nil
-  private let accordionAnimation = Animation.spring(
-    response: 0.62,
-    dampingFraction: 0.9,
-    blendDuration: 0.3
-  )
+  @State private var toggleTask: Task<Void, Never>? = nil
+
+  // 快速收起：无弹跳，布局稳定后再做下一步
+  private let collapseAnimation = Animation.spring(response: 0.26, dampingFraction: 1.0)
+  // 展开：轻微弹性，有呼吸感
+  private let expandAnimation   = Animation.spring(response: 0.46, dampingFraction: 0.84)
 
   var body: some View {
     ScrollViewReader { proxy in
@@ -70,23 +70,42 @@ struct ScenarioCompareHomeView: View {
   }
 
   private func handleCardToggle(for scenarioId: String, proxy: ScrollViewProxy) {
+    // 取消任何未完成的切换操作，防止并发 Task 互相干扰
+    toggleTask?.cancel()
+
+    // 点击已展开的卡片 → 直接收起
     if expandedScenarioId == scenarioId {
-      pendingExpandId = nil
-      withAnimation(accordionAnimation) {
+      withAnimation(collapseAnimation) {
         expandedScenarioId = nil
       }
       return
     }
 
-    pendingExpandId = scenarioId
-    withAnimation(.easeInOut(duration: 0.4)) {
-      proxy.scrollTo(scenarioId, anchor: .top)
+    // 记录是否有卡片需要先收起（决定是否需要等待布局稳定）
+    let hadExpanded = expandedScenarioId != nil
+
+    // Step 1：立即收起当前展开的卡片，让布局先稳定
+    withAnimation(collapseAnimation) {
+      expandedScenarioId = nil
     }
 
-    Task { @MainActor in
-      try? await Task.sleep(nanoseconds: 240_000_000)
-      guard pendingExpandId == scenarioId else { return }
-      withAnimation(accordionAnimation) {
+    toggleTask = Task { @MainActor in
+      // Step 2：若有卡片收起，等收起动画完成后再滚动（避免滚动目标位置突变）
+      if hadExpanded {
+        try? await Task.sleep(nanoseconds: 200_000_000)  // 0.2s，与 collapseAnimation 匹配
+      }
+      guard !Task.isCancelled else { return }
+
+      // Step 3：滚动到目标卡片顶部
+      withAnimation(.easeInOut(duration: 0.30)) {
+        proxy.scrollTo(scenarioId, anchor: .top)
+      }
+
+      // Step 4：等滚动完成后再展开
+      try? await Task.sleep(nanoseconds: 320_000_000)  // 0.32s，覆盖滚动时长并留有余量
+      guard !Task.isCancelled else { return }
+
+      withAnimation(expandAnimation) {
         expandedScenarioId = scenarioId
       }
     }
@@ -131,7 +150,7 @@ struct ScenarioAccordionCard: View {
         )
     )
     .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 5)
-    .animation(.spring(response: 0.62, dampingFraction: 0.9, blendDuration: 0.3), value: isExpanded)
+    .animation(.spring(response: 0.46, dampingFraction: 0.84), value: isExpanded)
   }
 }
 
