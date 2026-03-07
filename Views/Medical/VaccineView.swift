@@ -302,11 +302,11 @@ struct ServiceCard: View {
     .padding(.horizontal, 8)
     .frame(maxWidth: .infinity)
     .aspectRatio(1, contentMode: .fill)
-    .background(Color(UIColor.systemBackground))
+    .background(AppTheme.bgCard)
     .cornerRadius(18)
     .overlay(
       RoundedRectangle(cornerRadius: 18, style: .continuous)
-        .stroke(Color(UIColor.systemGray5), lineWidth: 1)
+        .stroke(AppTheme.borderSubtle, lineWidth: 1)
     )
     .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
   }
@@ -625,10 +625,10 @@ struct VaccineCard: View {
         }
       }
       .padding(12)
-      .background(Color(UIColor.systemBackground))
+      .background(AppTheme.bgCard)
       .frame(maxWidth: .infinity)  // Ensure content fills the width strictly
     }
-    .background(Color(UIColor.systemBackground))  // Add background to the whole card container
+    .background(AppTheme.bgCard)  // Add background to the whole card container
     .frame(width: 200, height: 220)  // Specify fixed width again to ensure container is rigid
     .cornerRadius(16)
     .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)

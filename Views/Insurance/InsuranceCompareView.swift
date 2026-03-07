@@ -25,6 +25,7 @@ struct RemarkSheetContext: Identifiable {
 
 struct InsuranceCompareView: View {
   @Environment(\.presentationMode) var presentationMode
+  @Environment(\.colorScheme) private var colorScheme
   @EnvironmentObject var languageManager: LanguageManager
   @EnvironmentObject var guideManager: GuideManager
   @ObservedObject var insuranceService = InsuranceService.shared
@@ -277,7 +278,7 @@ struct InsuranceCompareView: View {
       .padding(.vertical, 12)
     }
     .frame(maxWidth: .infinity)
-    .background(Color(UIColor.systemBackground))  // Same as navigation bar
+    .background(AppTheme.bgElevated)  // Same as navigation bar
   }
 
   private func miniProviderCard(product: InsuranceProduct, company: InsuranceCompany, isLeft: Bool)
@@ -433,10 +434,10 @@ struct InsuranceCompareView: View {
   private func tagView(text: String) -> some View {
     Text(text)
       .font(.system(size: 11, weight: .medium))
-      .foregroundColor(Color(hex: "4A5568"))
+      .foregroundColor(AppTheme.textSecondary)
       .padding(.horizontal, 8)
       .padding(.vertical, 4)
-      .background(Color(hex: "EDF2F7"))
+      .background(AppTheme.bgInput)
       .cornerRadius(6)
       .lineLimit(1)
       .fixedSize()
@@ -472,20 +473,25 @@ struct InsuranceCompareView: View {
   }
 
   private func addOnCoverageGroup(items: [CoverageItem]) -> some View {
-    VStack(alignment: .leading, spacing: 14) {
+    let addOnBg    = colorScheme == .dark ? Color(hex: "4A2200") : Color(hex: "FFFBF5")
+    let addOnIcon  = colorScheme == .dark ? Color(hex: "FBBF24") : Color(hex: "B45309")
+    let addOnText  = colorScheme == .dark ? Color(hex: "FCD34D") : Color(hex: "92400E")
+    let addOnBorder = colorScheme == .dark ? Color(hex: "D97706").opacity(0.6) : Color(hex: "FDBA74").opacity(0.75)
+
+    return VStack(alignment: .leading, spacing: 14) {
       HStack(spacing: 8) {
         Image(systemName: "plus.circle.fill")
           .font(.system(size: 14, weight: .semibold))
-          .foregroundColor(Color(hex: "B45309"))
+          .foregroundColor(addOnIcon)
 
         Text(addOnGroupTitleText)
           .font(.system(size: 14, weight: .bold))
-          .foregroundColor(Color(hex: "92400E"))
+          .foregroundColor(addOnText)
       }
 
       Text(addOnExplanationText)
         .font(.system(size: 12, weight: .medium))
-        .foregroundColor(Color(hex: "92400E"))
+        .foregroundColor(addOnText)
 
       VStack(spacing: 16) {
         ForEach(items) { item in
@@ -494,10 +500,10 @@ struct InsuranceCompareView: View {
       }
     }
     .padding(14)
-    .background(Color(hex: "FFFBF5"))
+    .background(addOnBg)
     .overlay(
       RoundedRectangle(cornerRadius: 16)
-        .stroke(Color(hex: "FDBA74").opacity(0.75), lineWidth: 1.2)
+        .stroke(addOnBorder, lineWidth: 1.2)
     )
     .cornerRadius(16)
     .padding(.horizontal)
@@ -657,10 +663,10 @@ struct InsuranceCompareView: View {
                 Text(addOnBadgeText)
                   .font(.system(size: 11, weight: .bold))
               }
-              .foregroundColor(Color(hex: "92400E"))
+              .foregroundColor(colorScheme == .dark ? Color(hex: "FCD34D") : Color(hex: "92400E"))
               .padding(.horizontal, 8)
               .padding(.vertical, 4)
-              .background(Color(hex: "FFEDD5"))
+              .background(colorScheme == .dark ? Color(hex: "4A2200") : Color(hex: "FFEDD5"))
               .clipShape(Capsule())
             }
           }
@@ -777,11 +783,11 @@ struct InsuranceCompareView: View {
   private func backgroundColor(for mode: CoverageDisplayMode) -> Color {
     switch mode {
     case .checkmark:
-      return Color(hex: "F0FFF4")  // Light Green
+      return colorScheme == .dark ? Color(hex: "0D2B1A") : Color(hex: "F0FFF4")  // Green tint
     case .value:
-      return Color(hex: "F0F7FF")  // Light Blue
+      return colorScheme == .dark ? Color(hex: "0A1F3A") : Color(hex: "F0F7FF")  // Blue tint
     case .notCovered:
-      return Color(hex: "F8F9FA")  // Light Grey
+      return colorScheme == .dark ? AppTheme.bgCard : Color(hex: "F8F9FA")        // Neutral
     }
   }
 
