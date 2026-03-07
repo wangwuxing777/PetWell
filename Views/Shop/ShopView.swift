@@ -38,14 +38,14 @@ struct ShopView: View {
             }) {
               Image(systemName: "line.3.horizontal.decrease.circle")
                 .font(.title2)
-                .foregroundColor(.black)
+                .foregroundColor(AppTheme.textPrimary)
             }
 
             NavigationLink(destination: CartView()) {
               ZStack(alignment: .topTrailing) {
                 Image(systemName: "cart")
                   .font(.title2)
-                  .foregroundColor(.black)
+                  .foregroundColor(AppTheme.textPrimary)
 
                 if shopifyService.cartItemCount > 0 {
                   Text("\(min(shopifyService.cartItemCount, 99))")
@@ -210,10 +210,10 @@ struct ProductCard: View {
       .padding(.vertical, 6)
     }
     .frame(width: cardWidth, height: cardHeight)
-    .background(Color.white.opacity(0.95))
+    .background(AppTheme.bgCard)
     .overlay(
       RoundedRectangle(cornerRadius: 14)
-        .stroke(Color(hex: "E2E8F0"), lineWidth: 1)
+        .stroke(AppTheme.borderSubtle, lineWidth: 1)
     )
     .cornerRadius(14)
     .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
@@ -258,7 +258,7 @@ struct ShopFilterView: View {
         Button(action: { dismiss() }) {
           Image(systemName: "xmark")
             .font(.title3)
-            .foregroundColor(.black)
+            .foregroundColor(AppTheme.textPrimary)
             .padding(.leading, 16)
         }
       }
@@ -294,9 +294,9 @@ struct ShopFilterView: View {
                 .background(
                   selectedCategory == "For my pet"
                     ? Color.blue.opacity(0.1)
-                    : Color.white
+                    : AppTheme.bgCard
                 )
-                .foregroundColor(selectedCategory == "For my pet" ? .blue : .black)
+                .foregroundColor(selectedCategory == "For my pet" ? .blue : AppTheme.textPrimary)
                 .overlay(
                   RoundedRectangle(cornerRadius: 20)
                     .stroke(
@@ -387,7 +387,7 @@ struct ShopFilterView: View {
         }
       }
       .padding()
-      .background(Color.white.shadow(radius: 2))
+      .background(AppTheme.bgElevated.shadow(radius: 2))
     }
     .onAppear {
       // Load current filter state if needed
@@ -549,14 +549,7 @@ struct CartView: View {
         }
       }
     }
-    .background(
-      LinearGradient(
-        colors: [Color(hex: "EEF2FF"), Color(hex: "F8FAFC"), Color.white],
-        startPoint: .top,
-        endPoint: .bottom
-      )
-      .ignoresSafeArea()
-    )
+    .background(AppTheme.bgBase.ignoresSafeArea())
     .navigationTitle(languageManager.isChinese ? "購物車" : "Cart")
     .navigationBarTitleDisplayMode(.inline)
     .safeAreaInset(edge: .bottom) {
@@ -621,7 +614,7 @@ struct CartView: View {
       }
     }
     .padding()
-    .background(Color.white.shadow(color: .black.opacity(0.06), radius: 8, y: -2))
+    .background(AppTheme.bgElevated.shadow(color: .black.opacity(0.06), radius: 8, y: -2))
   }
 
   private func cartRow(item: CartItem) -> some View {
@@ -692,11 +685,11 @@ struct CartView: View {
     .padding(14)
     .background(
       RoundedRectangle(cornerRadius: 16)
-        .fill(Color.white.opacity(0.95))
+        .fill(AppTheme.bgCard)
     )
     .overlay(
       RoundedRectangle(cornerRadius: 16)
-        .stroke(Color(hex: "E2E8F0"), lineWidth: 1)
+        .stroke(AppTheme.borderSubtle, lineWidth: 1)
     )
     .shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: 3)
   }
@@ -709,7 +702,7 @@ struct CartView: View {
         Image(systemName: "minus")
           .font(.system(size: 12, weight: .bold))
           .frame(width: 24, height: 24)
-          .background(Color.white)
+          .background(AppTheme.bgCard)
           .clipShape(Circle())
       }
 
@@ -724,7 +717,7 @@ struct CartView: View {
         Image(systemName: "plus")
           .font(.system(size: 12, weight: .bold))
           .frame(width: 24, height: 24)
-          .background(Color.white)
+          .background(AppTheme.bgCard)
           .clipShape(Circle())
       }
     }

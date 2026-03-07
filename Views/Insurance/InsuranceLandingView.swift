@@ -31,12 +31,8 @@ struct InsuranceLandingView: View {
     NavigationStack {
       ZStack(alignment: .top) {
         // Scrollable content
-        LinearGradient(
-          colors: [Color.white, Color(hex: "F8F9FA")],
-          startPoint: .top,
-          endPoint: .bottom
-        )
-        .ignoresSafeArea()
+        AppTheme.bgBase
+          .ignoresSafeArea()
 
         ScrollView(.vertical, showsIndicators: false) {
           VStack(spacing: 0) {
@@ -208,7 +204,7 @@ struct InsuranceLandingView: View {
             .foregroundColor(.primary)
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
-            .background(Color.white)
+            .background(AppTheme.bgElevated)
             .clipShape(Capsule())
             .overlay(
               Capsule()

@@ -629,7 +629,7 @@ struct InsuranceCompareView: View {
           }
         }
       }
-      .background(shouldHighlightAddOn ? Color(hex: "FFFBF5") : Color.white)
+      .background(shouldHighlightAddOn ? Color(hex: "FFFBF5") : AppTheme.bgCard)
       .overlay(
         RoundedRectangle(cornerRadius: 16)
           .stroke(

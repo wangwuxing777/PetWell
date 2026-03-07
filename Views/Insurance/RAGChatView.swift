@@ -22,7 +22,7 @@ struct RAGChatView: View {
         // ── INPUT AREA ──
         inputAreaView
       }
-      .background(Color.white.ignoresSafeArea())
+      .background(AppTheme.bgBase.ignoresSafeArea())
       .navigationTitle("PetWell Assistant")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -32,7 +32,7 @@ struct RAGChatView: View {
           }) {
             Image(systemName: "chevron.backward")
               .font(.system(size: 17, weight: .medium))
-              .foregroundColor(.black)
+              .foregroundColor(AppTheme.textPrimary)
           }
         }
       }
@@ -85,7 +85,7 @@ struct RAGChatView: View {
             HStack {
               ProgressView()
                 .padding(8)
-                .background(Color.white)
+                .background(AppTheme.bgCard)
                 .clipShape(Circle())
                 .shadow(radius: 2)
               Spacer()
@@ -237,7 +237,7 @@ struct RAGChatView: View {
       .padding(.horizontal, 16)
       .padding(.top, 10)
       .padding(.bottom, 12)
-      .background(Color.white)
+      .background(AppTheme.bgElevated)
     }
   }
 
