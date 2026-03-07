@@ -410,6 +410,272 @@ func callOpenAIExtract(apiKey: String, text: String) async throws -> SlotExtract
 }
 }
 
+// MARK: - Multi-agent report extraction + fusion (profile pipeline)
+
+final class HealthReportFusionService {
+
+    struct VendorConfig {
+        var vendorId: String
+        var endpoint: URL?
+        var apiKey: String?
+        var model: String
+        /// Optional per-vendor reliability weight (0~1), tuned from offline evaluation.
+        var reliability: Double = 0.8
+    }
+
+    struct Config {
+        var vendors: [VendorConfig]
+        var timeoutSeconds: TimeInterval = 45
+
+        /// Placeholder config for 3 vendors.
+        /// Fill endpoint/apiKey later and keep integration style identical to existing assistant API calls.
+        static let placeholder = Config(
+            vendors: [
+                .init(vendorId: "vendor_a", endpoint: nil, apiKey: nil, model: "MODEL_A", reliability: 0.80),
+                .init(vendorId: "vendor_b", endpoint: nil, apiKey: nil, model: "MODEL_B", reliability: 0.85),
+                .init(vendorId: "vendor_c", endpoint: nil, apiKey: nil, model: "MODEL_C", reliability: 0.90),
+            ]
+        )
+    }
+
+    struct ExtractionField: Codable, Equatable {
+        var metricKey: String
+        var valueNumber: Double?
+        var valueText: String?
+        var unit: String?
+        var confidence: Double
+        var sourcePage: Int?
+        var sourceLine: String?
+        var sourceBBox: [Double]?
+    }
+
+    struct VendorExtractionResult {
+        var vendorId: String
+        var fields: [ExtractionField]
+    }
+
+    enum ReviewStatus: String, Codable {
+        case autoPass = "auto_pass"
+        case pendingReview = "pending_review"
+        case manualConfirmRequired = "manual_confirm_required"
+    }
+
+    struct FusedField: Codable {
+        var metricKey: String
+        var valueNumber: Double?
+        var valueText: String?
+        var unit: String?
+        var fusionConfidence: Double
+        var consensusScore: Double
+        var status: ReviewStatus
+        var contributingVendors: [String]
+    }
+
+    struct FusionResult: Codable {
+        var reportId: String
+        var fields: [FusedField]
+        var perVendorFieldCount: [String: Int]
+    }
+
+    private let config: Config
+    private let session: URLSession
+
+    init(config: Config, session: URLSession = .shared) {
+        self.config = config
+        self.session = session
+    }
+
+    /// Main entry: run all configured vendors and fuse by field-level voting.
+    /// Rules:
+    /// 1) High consistency -> auto pass
+    /// 2) Conflict but close -> pending review
+    /// 3) Severe conflict -> manual confirm required
+    func extractAndFuse(reportId: String, imageBase64: String) async throws -> FusionResult {
+        let vendorResults = try await fetchAllVendors(imageBase64: imageBase64)
+        let fused = fuse(vendorResults: vendorResults)
+        let counts = Dictionary(uniqueKeysWithValues: vendorResults.map { ($0.vendorId, $0.fields.count) })
+        return FusionResult(reportId: reportId, fields: fused, perVendorFieldCount: counts)
+    }
+}
+
+private extension HealthReportFusionService {
+
+    struct VendorRequest: Codable {
+        var model: String
+        var imageBase64: String
+    }
+
+    struct VendorResponse: Codable {
+        var fields: [ExtractionField]
+    }
+
+    enum FusionError: Error {
+        case noConfiguredVendors
+        case invalidResponse
+        case serverError(status: Int, body: String)
+    }
+
+    func fetchAllVendors(imageBase64: String) async throws -> [VendorExtractionResult] {
+        let active = config.vendors.filter { $0.endpoint != nil }
+        guard !active.isEmpty else { throw FusionError.noConfiguredVendors }
+
+        return try await withThrowingTaskGroup(of: VendorExtractionResult.self) { group in
+            for vendor in active {
+                group.addTask {
+                    let fields = try await self.callVendor(vendor, imageBase64: imageBase64)
+                    return VendorExtractionResult(vendorId: vendor.vendorId, fields: fields)
+                }
+            }
+
+            var results: [VendorExtractionResult] = []
+            for try await result in group {
+                results.append(result)
+            }
+            return results
+        }
+    }
+
+    func callVendor(_ vendor: VendorConfig, imageBase64: String) async throws -> [ExtractionField] {
+        guard let url = vendor.endpoint else { return [] }
+
+        var req = URLRequest(url: url, timeoutInterval: config.timeoutSeconds)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        if let key = vendor.apiKey, !key.isEmpty {
+            req.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
+        }
+        req.httpBody = try JSONEncoder().encode(VendorRequest(model: vendor.model, imageBase64: imageBase64))
+
+        let (data, resp) = try await session.data(for: req)
+        guard let http = resp as? HTTPURLResponse else { throw FusionError.invalidResponse }
+        guard (200..<300).contains(http.statusCode) else {
+            throw FusionError.serverError(status: http.statusCode, body: String(data: data, encoding: .utf8) ?? "")
+        }
+
+        return try JSONDecoder().decode(VendorResponse.self, from: data).fields
+    }
+
+    func fuse(vendorResults: [VendorExtractionResult]) -> [FusedField] {
+        var bucket: [String: [(vendorId: String, field: ExtractionField, reliability: Double)]] = [:]
+        let reliabilities = Dictionary(uniqueKeysWithValues: config.vendors.map { ($0.vendorId, $0.reliability) })
+
+        for vendorResult in vendorResults {
+            let rel = reliabilities[vendorResult.vendorId] ?? 0.8
+            for field in vendorResult.fields {
+                let key = field.metricKey.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                bucket[key, default: []].append((vendorResult.vendorId, field, rel))
+            }
+        }
+
+        return bucket.keys.sorted().compactMap { key in
+            guard let items = bucket[key], !items.isEmpty else { return nil }
+
+            let picked = pickFusedValue(items: items)
+            let consensus = consensusScore(items: items)
+            let status: ReviewStatus
+            if consensus >= 0.85 {
+                status = .autoPass
+            } else if consensus >= 0.55 {
+                status = .pendingReview
+            } else {
+                status = .manualConfirmRequired
+            }
+
+            let weightedConfidence = weightedAverage(
+                items.map { max(0, min(1, $0.field.confidence)) * max(0, min(1, $0.reliability)) }
+            )
+
+            return FusedField(
+                metricKey: key,
+                valueNumber: picked.valueNumber,
+                valueText: picked.valueText,
+                unit: picked.unit,
+                fusionConfidence: weightedConfidence,
+                consensusScore: consensus,
+                status: status,
+                contributingVendors: Array(Set(items.map { $0.vendorId })).sorted()
+            )
+        }
+    }
+
+    func pickFusedValue(items: [(vendorId: String, field: ExtractionField, reliability: Double)]) -> ExtractionField {
+        let numericItems = items.compactMap { item -> (Double, String?, Double)? in
+            guard let v = item.field.valueNumber else { return nil }
+            let weight = max(0, min(1, item.field.confidence)) * max(0, min(1, item.reliability))
+            return (v, item.field.unit, max(weight, 0.0001))
+        }
+
+        if !numericItems.isEmpty {
+            let totalWeight = numericItems.reduce(0) { $0 + $1.2 }
+            let fusedNumber = numericItems.reduce(0) { $0 + ($1.0 * $1.2) } / totalWeight
+            let unit = majorityText(numericItems.compactMap { $0.1 })
+            return ExtractionField(metricKey: items[0].field.metricKey, valueNumber: fusedNumber, valueText: nil, unit: unit, confidence: 1, sourcePage: nil, sourceLine: nil, sourceBBox: nil)
+        }
+
+        let textItems = items.compactMap { item -> (String, String?, Double)? in
+            guard let t = item.field.valueText?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty else { return nil }
+            let weight = max(0, min(1, item.field.confidence)) * max(0, min(1, item.reliability))
+            return (t.lowercased(), item.field.unit, max(weight, 0.0001))
+        }
+
+        let text = weightedMajorityText(textItems)
+        let unit = majorityText(textItems.compactMap { $0.1 })
+        return ExtractionField(metricKey: items[0].field.metricKey, valueNumber: nil, valueText: text, unit: unit, confidence: 1, sourcePage: nil, sourceLine: nil, sourceBBox: nil)
+    }
+
+    func consensusScore(items: [(vendorId: String, field: ExtractionField, reliability: Double)]) -> Double {
+        if items.count == 1 { return 0.5 }
+
+        var scores: [Double] = []
+        for i in 0..<items.count {
+            for j in (i + 1)..<items.count {
+                scores.append(pairSimilarity(lhs: items[i].field, rhs: items[j].field))
+            }
+        }
+        return weightedAverage(scores)
+    }
+
+    func pairSimilarity(lhs: ExtractionField, rhs: ExtractionField) -> Double {
+        if let lv = lhs.valueNumber, let rv = rhs.valueNumber {
+            let maxV = max(abs(lv), abs(rv), 0.0001)
+            let relativeDiff = abs(lv - rv) / maxV
+            if relativeDiff <= 0.03 { return 1.0 }      // high consistency
+            if relativeDiff <= 0.10 { return 0.65 }     // conflict but close
+            return 0.20                                  // severe conflict
+        }
+
+        let lt = lhs.valueText?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
+        let rt = rhs.valueText?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
+        if lt.isEmpty || rt.isEmpty { return 0.2 }
+        if lt == rt { return 1.0 }
+        if lt.contains(rt) || rt.contains(lt) { return 0.65 }
+        return 0.2
+    }
+
+    func weightedAverage(_ values: [Double]) -> Double {
+        guard !values.isEmpty else { return 0 }
+        return values.reduce(0, +) / Double(values.count)
+    }
+
+    func majorityText(_ values: [String]) -> String? {
+        guard !values.isEmpty else { return nil }
+        var counter: [String: Int] = [:]
+        for v in values where !v.isEmpty {
+            counter[v, default: 0] += 1
+        }
+        return counter.max(by: { $0.value < $1.value })?.key
+    }
+
+    func weightedMajorityText(_ values: [(String, String?, Double)]) -> String? {
+        guard !values.isEmpty else { return nil }
+        var scoreMap: [String: Double] = [:]
+        for (value, _, weight) in values where !value.isEmpty {
+            scoreMap[value, default: 0] += weight
+        }
+        return scoreMap.max(by: { $0.value < $1.value })?.key
+    }
+}
+
 // MARK: - Models
 
 extension AIService {
@@ -620,4 +886,3 @@ JSON Schema：
     return try JSONDecoder().decode(TriageResult.self, from: jsonData)
 }
 }
-
