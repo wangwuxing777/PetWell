@@ -47,7 +47,7 @@ struct ScenarioCompareHomeView: View {
                 .foregroundColor(.secondary)
                 .padding(.horizontal)
 
-              LazyVStack(spacing: 16) {
+              VStack(spacing: 16) {
                 ForEach(scenarioService.scenarios) { scenario in
                   ScenarioAccordionCard(
                     scenario: scenario,
@@ -90,9 +90,9 @@ struct ScenarioCompareHomeView: View {
     }
 
     toggleTask = Task { @MainActor in
-      // Step 2：若有卡片收起，等收起动画完成后再滚动（避免滚动目标位置突变）
+      // Step 2：若有卡片收起，等收起 spring 落定后再滚动（response=0.26s，等 0.28s 确保完全稳定）
       if hadExpanded {
-        try? await Task.sleep(nanoseconds: 200_000_000)  // 0.2s，与 collapseAnimation 匹配
+        try? await Task.sleep(nanoseconds: 280_000_000)
       }
       guard !Task.isCancelled else { return }
 
