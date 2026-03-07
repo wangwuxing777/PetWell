@@ -15,15 +15,9 @@ struct ShopView: View {
   @State private var showFilter = false
   @State private var searchText = ""
 
-  let columns = [
-    GridItem(.flexible(), spacing: 16),
-    GridItem(.flexible(), spacing: 16),
-  ]
-
   var body: some View {
     NavigationStack {
       VStack(spacing: 0) {
-        // Custom Header
         HStack {
           Text(languageManager.isChinese ? "商店" : "Shop")
             .font(.largeTitle)
@@ -61,9 +55,8 @@ struct ShopView: View {
           }
         }
         .padding(.horizontal)
-        .padding(.top, 10)  // Adjustment for status bar if needed, or rely on safe area
+        .padding(.top, 10)
 
-        // Search Bar
         HStack {
           Image(systemName: "magnifyingglass")
             .foregroundColor(.gray)
@@ -119,15 +112,23 @@ struct ShopView: View {
               .padding(.top, 50)
               .frame(maxWidth: .infinity)
             } else {
-              LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(shopifyService.filteredProducts) { product in
-                  NavigationLink(destination: ProductDetailView(product: product)) {
-                    ProductCard(product: product)
+              let productColumns = waterfallColumns(for: shopifyService.filteredProducts)
+
+              HStack(alignment: .top, spacing: 12) {
+                ForEach(Array(productColumns.enumerated()), id: \.offset) { _, columnProducts in
+                  LazyVStack(spacing: 12) {
+                    ForEach(columnProducts) { product in
+                      NavigationLink(destination: ProductDetailView(product: product)) {
+                        ProductCard(product: product)
+                      }
+                      .buttonStyle(PlainButtonStyle())
+                    }
                   }
-                  .buttonStyle(PlainButtonStyle())
+                  .frame(maxWidth: .infinity, alignment: .top)
                 }
               }
-              .padding()
+              .padding(.horizontal, 12)
+              .padding(.vertical, 12)
             }
           }
         }
@@ -141,22 +142,51 @@ struct ShopView: View {
       shopifyService.fetchProducts()
     }
   }
+
+  private func waterfallColumns(for products: [ShopProduct], count: Int = 2) -> [[ShopProduct]] {
+    guard count > 1 else { return [products] }
+
+    var columns = Array(repeating: [ShopProduct](), count: count)
+    var heights = Array(repeating: CGFloat.zero, count: count)
+
+    for product in products {
+      let targetColumn = heights.enumerated().min(by: { $0.element < $1.element })?.offset ?? 0
+      columns[targetColumn].append(product)
+      heights[targetColumn] += estimatedCardHeight(for: product)
+    }
+
+    return columns
+  }
+
+  private func estimatedCardHeight(for product: ShopProduct) -> CGFloat {
+    let imageHeight = ProductCard.estimatedImageHeight(for: product)
+    let titleLineEstimate = max(2, min(2, Int(ceil(Double(product.title.count) / 15.0))))
+
+    return imageHeight + 92 + CGFloat(titleLineEstimate * 18)
+  }
 }
 
 struct ProductCard: View {
   let product: ShopProduct
 
-  // Fixed card dimensions for uniform grid
-  private let cardWidth: CGFloat = 170
-  private let cardHeight: CGFloat = 260
-  private let imageHeight: CGFloat = 170
-  private let textAreaHeight: CGFloat = 90
+  static func estimatedImageHeight(for product: ShopProduct) -> CGFloat {
+    let seed = product.id.unicodeScalars.reduce(0) { $0 + Int($1.value) }
+    let heights: [CGFloat] = [172, 198, 224, 186]
+    return heights[seed % heights.count]
+  }
+
+  private var imageHeight: CGFloat {
+    Self.estimatedImageHeight(for: product)
+  }
+
+  private var categoryLabel: String {
+    product.categories.first ?? product.productType
+  }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
-      // Product Image - Fixed size container
-      ZStack {
-        RoundedRectangle(cornerRadius: 12)
+      ZStack(alignment: .topLeading) {
+        RoundedRectangle(cornerRadius: 18)
           .fill(Color.gray.opacity(0.1))
 
         if let url = product.imageUrl {
@@ -181,42 +211,53 @@ struct ProductCard: View {
             .font(.system(size: 40))
             .foregroundColor(.gray)
         }
+
+        if !categoryLabel.isEmpty {
+          Text(categoryLabel)
+            .font(.caption2.weight(.semibold))
+            .foregroundColor(Color(hex: "1E293B"))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(Color.white.opacity(0.9))
+            .clipShape(Capsule())
+            .padding(12)
+        }
       }
-      .frame(width: cardWidth, height: imageHeight)
+      .frame(maxWidth: .infinity)
+      .frame(height: imageHeight)
       .clipped()
-      .cornerRadius(12)
+      .cornerRadius(18)
 
-      // Text Content - Fixed size area
-      VStack(alignment: .leading, spacing: 4) {
+      VStack(alignment: .leading, spacing: 8) {
         Text(product.title)
-          .font(.system(size: 13, weight: .semibold))
+          .font(.system(size: 14, weight: .semibold))
+          .foregroundColor(Color(hex: "0F172A"))
           .lineLimit(2)
-          .frame(height: 34, alignment: .topLeading)
+          .fixedSize(horizontal: false, vertical: true)
 
-        Text(product.vendor)
-          .font(.caption2)
-          .foregroundColor(.secondary)
-          .lineLimit(1)
-          .frame(height: 14, alignment: .topLeading)
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+          Text(product.formattedPrice)
+            .font(.subheadline.weight(.bold))
+            .foregroundColor(Color(hex: "2563EB"))
 
-        Text(product.formattedPrice)
-          .font(.subheadline)
-          .bold()
-          .foregroundColor(Color(hex: "2563EB"))
-          .frame(height: 20, alignment: .topLeading)
+          Spacer(minLength: 0)
+
+          Text(product.vendor)
+            .font(.caption2)
+            .foregroundColor(.secondary)
+            .lineLimit(1)
+        }
       }
-      .frame(width: cardWidth - 16, height: textAreaHeight - 12)
-      .padding(.horizontal, 8)
-      .padding(.vertical, 6)
+      .padding(12)
     }
-    .frame(width: cardWidth, height: cardHeight)
+    .frame(maxWidth: .infinity, alignment: .topLeading)
     .background(Color.white.opacity(0.95))
     .overlay(
-      RoundedRectangle(cornerRadius: 14)
+      RoundedRectangle(cornerRadius: 18)
         .stroke(Color(hex: "E2E8F0"), lineWidth: 1)
     )
-    .cornerRadius(14)
-    .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
+    .cornerRadius(18)
+    .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 4)
   }
 }
 
@@ -232,7 +273,6 @@ struct ShopFilterView: View {
   @EnvironmentObject var languageManager: LanguageManager
   @ObservedObject var shopifyService = ShopifyService.shared
 
-  // Local state to hold selections before applying
   @State private var selectedCategory: String?
   @State private var selectedBrand: String?
   @State private var priceRange: ClosedRange<Double> = 0...2000
@@ -243,7 +283,6 @@ struct ShopFilterView: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      // Header
       HStack {
         Text(languageManager.isChinese ? "筛选" : "Filter")
           .font(.title2)
