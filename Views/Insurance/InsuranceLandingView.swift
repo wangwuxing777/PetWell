@@ -24,6 +24,9 @@ struct InsuranceLandingView: View {
   @State private var showPetSelector = false
   @State private var selectedPetForYou: PetModel?
   @State private var showForYouProgress = false
+  /// 专用标志：只有用户在 PetSelectorSheet 中实际选中宠物时才为 true。
+  /// Cancel 不设置此标志，防止 onDismiss 误触发 pipeline。
+  @State private var petSelectedFromSheet = false
 
   // Header heights
   private let fullHeaderHeight: CGFloat = 280
@@ -125,14 +128,17 @@ struct InsuranceLandingView: View {
       .navigationBarHidden(true)
     }
     .sheet(isPresented: $showPetSelector, onDismiss: {
-      // sheet 动画完全结束后再弹出 fullScreenCover，避免两个 modal 转场冲突导致白屏
-      if selectedPetForYou != nil {
+      // sheet 动画完全结束后再弹出 fullScreenCover，避免两个 modal 转场冲突导致白屏。
+      // 必须检查 petSelectedFromSheet 而非 selectedPetForYou：
+      //   后者可能残留上次选择，导致 Cancel 也误触发 pipeline。
+      if petSelectedFromSheet {
+        petSelectedFromSheet = false
         showForYouProgress = true
       }
     }) {
       PetSelectorSheet { pet in
         selectedPetForYou = pet
-        // 注意：不在这里设置 showForYouProgress，由 onDismiss 回调处理
+        petSelectedFromSheet = true   // 只有真正选了宠物才置 true
       }
     }
     .fullScreenCover(isPresented: $showForYouProgress) {
