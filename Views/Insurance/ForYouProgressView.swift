@@ -35,6 +35,7 @@ struct ForYouProgressView: View {
                         .opacity(animateIn ? 1 : 0)
                         .offset(y: animateIn ? 0 : 20)
                 }
+                .accessibilityIdentifier("ForYouStepperScrollView")
 
                 Spacer(minLength: 0)
 
@@ -82,6 +83,7 @@ struct ForYouProgressView: View {
                 }
             }
         }
+        .accessibilityIdentifier("ForYouProgressView")
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { isPresented = false }) {
@@ -89,6 +91,7 @@ struct ForYouProgressView: View {
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(AppTheme.textPrimary)
                 }
+                .accessibilityIdentifier("ForYouCloseButton")
             }
         }
     }
@@ -184,8 +187,10 @@ struct StepperProgressView: View {
                     }
                     .padding(.bottom, 24)
                 }
+                .accessibilityIdentifier("ForYouStep_\(step.id)")
             }
         }
+        .accessibilityIdentifier("ForYouStepperList")
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: steps.map { $0.status })
     }
 

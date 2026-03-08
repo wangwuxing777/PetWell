@@ -236,6 +236,7 @@ struct InsuranceLandingView: View {
                 )
             )
           }
+          .accessibilityIdentifier("ForYouButton")
           .fixedSize()
         }
       }

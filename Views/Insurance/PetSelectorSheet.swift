@@ -25,9 +25,11 @@ struct PetSelectorSheet: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") { dismiss() }
+                        .accessibilityIdentifier("PetSelectorCancelButton")
                 }
             }
         }
+        .accessibilityIdentifier("PetSelectorSheet")
     }
 
     // MARK: - Pet List
@@ -77,7 +79,9 @@ struct PetSelectorSheet: View {
                 .padding(.vertical, 4)
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("PetSelectorRow_\(pet.name)")
         }
+        .accessibilityIdentifier("PetSelectorList")
         .listStyle(.insetGrouped)
     }
 
