@@ -108,6 +108,15 @@ struct ScenarioCompareHomeView: View {
       withAnimation(expandAnimation) {
         expandedScenarioId = scenarioId
       }
+
+      // Step 5：等展开 spring 落定后，再次锚定到卡片顶部
+      // expandAnimation: response=0.46s, dampingFraction=0.84 → ~520ms 完全稳定
+      try? await Task.sleep(nanoseconds: 520_000_000)
+      guard !Task.isCancelled else { return }
+
+      withAnimation(.easeOut(duration: 0.22)) {
+        proxy.scrollTo(scenarioId, anchor: .top)
+      }
     }
   }
 }

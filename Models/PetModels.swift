@@ -80,6 +80,9 @@ final class PetModel {
 
   @Relationship(deleteRule: .cascade)
   var weightEntries: [WeightEntryModel] = []
+  
+  @Relationship(deleteRule: .cascade)
+  var healthReports: [HealthReportModel] = []
 
   init(
     name: String,
@@ -113,6 +116,30 @@ final class PetModel {
     self.medicalVisits = medicalVisits
     self.medications = medications
     self.weightEntries = weightEntries
+    self.healthReports = []
+  }
+}
+
+@Model
+final class HealthReportModel {
+  var date: Date
+  var category: String
+  var markdownContent: String
+  var originalFileType: String // "pdf" or "image"
+  var originalFileData: Data
+
+  init(
+    date: Date,
+    category: String,
+    markdownContent: String,
+    originalFileType: String,
+    originalFileData: Data
+  ) {
+    self.date = date
+    self.category = category
+    self.markdownContent = markdownContent
+    self.originalFileType = originalFileType
+    self.originalFileData = originalFileData
   }
 }
 

@@ -6,6 +6,8 @@
 import PhotosUI
 import SwiftUI
 import VisionKit
+import PDFKit
+import SwiftData
 
 // MARK: - VisionKit Document Scanner Wrapper
 
@@ -57,7 +59,10 @@ struct HealthReportUploadView: View {
 
   @State private var selectedItem: PhotosPickerItem?
   @State private var selectedImage: UIImage?
+  @State private var originalFileType: String?
+  @State private var originalFileData: Data?
   @State private var showScanner = false
+  @State private var showFileImporter = false
   @State private var isLoading = false
   @State private var agentResults: [String] = []
   @State private var errorMessage: String?
@@ -102,6 +107,49 @@ struct HealthReportUploadView: View {
         }
       }
       .ignoresSafeArea()
+    }
+    .fileImporter(
+      isPresented: $showFileImporter,
+      allowedContentTypes: [.pdf, .image],
+      allowsMultipleSelection: false
+    ) { result in
+      switch result {
+      case .success(let urls):
+        guard let url = urls.first else { return }
+        _ = url.startAccessingSecurityScopedResource()
+        defer { url.stopAccessingSecurityScopedResource() }
+        
+        do {
+          let data = try Data(contentsOf: url)
+          originalFileData = data
+          if url.pathExtension.lowercased() == "pdf" {
+            originalFileType = "pdf"
+            if let pdfDoc = PDFDocument(data: data), let page = pdfDoc.page(at: 0) {
+              let pageRect = page.bounds(for: .mediaBox)
+              let format = UIGraphicsImageRendererFormat()
+              format.scale = 2.0 // High res
+              let renderer = UIGraphicsImageRenderer(size: pageRect.size, format: format)
+              let img = renderer.image { ctx in
+                UIColor.white.set()
+                ctx.fill(pageRect)
+                ctx.cgContext.translateBy(x: 0, y: pageRect.size.height)
+                ctx.cgContext.scaleBy(x: 1.0, y: -1.0)
+                page.draw(with: .mediaBox, to: ctx.cgContext)
+              }
+              selectedImage = img
+            }
+          } else {
+            originalFileType = "image"
+            selectedImage = UIImage(data: data)
+          }
+          agentResults = []
+          errorMessage = nil
+        } catch {
+          errorMessage = "Failed to load file: \(error.localizedDescription)"
+        }
+      case .failure(let error):
+        errorMessage = error.localizedDescription
+      }
     }
   }
 
@@ -156,6 +204,19 @@ struct HealthReportUploadView: View {
       } else {
         inputButtons(isReplacing: false)
       }
+      
+      // File Importer Option
+      Button {
+        showFileImporter = true
+      } label: {
+        Label("Import from File", systemImage: "folder")
+          .font(.subheadline.weight(.semibold))
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 13)
+          .background(Color(.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+          .foregroundStyle(.primary)
+      }
+      .padding(.horizontal)
     }
   }
 
@@ -203,6 +264,8 @@ struct HealthReportUploadView: View {
             let uiImage = UIImage(data: data)
           {
             selectedImage = uiImage
+            originalFileType = "image"
+            originalFileData = data
             agentResults = []
             errorMessage = nil
           }
@@ -287,6 +350,46 @@ struct HealthReportUploadView: View {
 
   // MARK: - Actions
 
+  @Environment(\.modelContext) private var modelContext
+  @Environment(\.dismiss) private var dismiss
+
+  private func extractDateAndCategory(from markdown: String) -> (Date, String) {
+    var date = Date()
+    var category = "General"
+    
+    // Very simple heuristic parser: look for "Date: YYYY-MM-DD" or similar
+    let lines = markdown.components(separatedBy: .newlines)
+    for line in lines {
+      let lowerLine = line.lowercased()
+      if lowerLine.contains("date:") {
+        let scanner = Scanner(string: line)
+        _ = scanner.scanUpToCharacters(from: .decimalDigits)
+        if let y = scanner.scanInt() {
+           _ = scanner.scanCharacter()
+           if let m = scanner.scanInt() {
+              _ = scanner.scanCharacter()
+              if let d = scanner.scanInt() {
+                var comps = DateComponents()
+                comps.year = y
+                comps.month = m
+                comps.day = d
+                if let parsedDate = Calendar.current.date(from: comps) {
+                  date = parsedDate
+                }
+              }
+           }
+        }
+      }
+      if lowerLine.contains("category:") || lowerLine.contains("type:") {
+        let parts = line.split(separator: ":")
+        if parts.count > 1 {
+          category = parts[1].trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+      }
+    }
+    return (date, category)
+  }
+
   private func analyze() async {
     guard let image = selectedImage else { return }
     isLoading = true
@@ -296,6 +399,25 @@ struct HealthReportUploadView: View {
 
     do {
       agentResults = try await service.uploadAndAnalyze(image: image, petID: pet.petID)
+      
+      // Save results
+      if let markdown = agentResults.first {
+        let (extractedDate, extCategory) = extractDateAndCategory(from: markdown)
+        let type = originalFileType ?? "image"
+        let fallbackData = image.jpegData(compressionQuality: 0.8) ?? Data()
+        
+        let report = HealthReportModel(
+          date: extractedDate,
+          category: extCategory,
+          markdownContent: agentResults.joined(separator: "\n\n---\n\n"),
+          originalFileType: type,
+          originalFileData: originalFileData ?? fallbackData
+        )
+        
+        pet.healthReports.append(report)
+        try modelContext.save()
+      }
+      
     } catch {
       errorMessage = error.localizedDescription
     }

@@ -25,6 +25,10 @@ struct RecordsView: View {
   @State private var showPetIDFor: PetModel? = nil
   @State private var petPendingDelete: PetModel? = nil
   @State private var showDeleteConfirm: Bool = false
+
+  // MARK: - Navigation State
+  @State private var selectedPetForDetail: PetModel?
+
   @State private var showOwnerEditor = false
   @State private var ownerProfile: OwnerProfile = OwnerProfileStore.shared.load()
 
@@ -35,137 +39,144 @@ struct RecordsView: View {
 
   var body: some View {
     NavigationStack {
-      ScrollView {
-        VStack(alignment: .leading, spacing: 16) {
+      applyNavigationDestinations(to:
+        ScrollView {
+          VStack(alignment: .leading, spacing: 16) {
 
-          // MARK: Header
-          HStack(alignment: .center, spacing: 12) {
-            Button {
-              showOwnerEditor = true
-            } label: {
-              if let data = ownerProfile.avatarImageData, let ui = UIImage(data: data) {
-                Image(uiImage: ui)
-                  .resizable()
-                  .scaledToFill()
-                  .frame(width: 52, height: 52)
-                  .clipShape(Circle())
-              } else {
-                Image(systemName: "person.crop.circle")
-                  .font(.system(size: 44))
-                  .foregroundStyle(.secondary)
-              }
-            }
-
-            VStack(alignment: .leading, spacing: 2) {
-              Text(languageManager.isChinese ? "個人檔案" : "Profile")
-                .font(.title2).bold()
-              Text(ownerProfile.name.isEmpty ? (languageManager.isChinese ? "點擊頭像補齊主人資料" : "Tap avatar to complete owner profile") : ownerProfile.name)
-              .font(.subheadline)
-              .foregroundStyle(.secondary)
-            }
-
-            Spacer()
-
-            Menu {
-              Picker("Language", selection: $languageManager.currentLanguage) {
-                ForEach(AppLanguage.allCases) { language in
-                  Text(language.displayName).tag(language)
+            // MARK: Header
+            HStack(alignment: .center, spacing: 12) {
+              Button {
+                showOwnerEditor = true
+              } label: {
+                if let data = ownerProfile.avatarImageData, let ui = UIImage(data: data) {
+                  Image(uiImage: ui)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 52, height: 52)
+                    .clipShape(Circle())
+                } else {
+                  Image(systemName: "person.crop.circle")
+                    .font(.system(size: 44))
+                    .foregroundStyle(.secondary)
                 }
               }
-            } label: {
-              Image(systemName: "globe")
-                .font(.system(size: 20))
-                .padding(8)
-                .background(Color.secondary.opacity(0.1))
-                .clipShape(Circle())
-            }
 
-            Button {
-              showAddPet = true
-              guideManager.mark(.profileTappedAddPet)
-            } label: {
-              Image(systemName: "plus")
+              VStack(alignment: .leading, spacing: 2) {
+                Text(languageManager.isChinese ? "個人檔案" : "Profile")
+                  .font(.title2).bold()
+                Text(ownerProfile.name.isEmpty ? (languageManager.isChinese ? "點擊頭像補齊主人資料" : "Tap avatar to complete owner profile") : ownerProfile.name)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+              }
+
+              Spacer()
+
+              Menu {
+                Picker("Language", selection: $languageManager.currentLanguage) {
+                  ForEach(AppLanguage.allCases) { language in
+                    Text(language.displayName).tag(language)
+                  }
+                }
+              } label: {
+                Image(systemName: "globe")
+                  .font(.system(size: 20))
+                  .padding(8)
+                  .background(Color.secondary.opacity(0.1))
+                  .clipShape(Circle())
+              }
+
+              Button {
+                showAddPet = true
+                guideManager.mark(.profileTappedAddPet)
+              } label: {
+                Image(systemName: "plus")
+                  .font(.headline)
+                  .padding(10)
+                  .background(.thinMaterial, in: Circle())
+              }
+              .accessibilityLabel("Add Pet")
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
+
+            // MARK: Pet Profile list
+            VStack(alignment: .leading, spacing: 10) {
+              Text("Pet Profile")
                 .font(.headline)
-                .padding(10)
-                .background(.thinMaterial, in: Circle())
-            }
-            .accessibilityLabel("Add Pet")
-          }
-          .padding(.horizontal)
-          .padding(.top, 8)
+                .padding(.horizontal)
 
-          // MARK: Pet Profile list
-          VStack(alignment: .leading, spacing: 10) {
-            Text("Pet Profile")
-              .font(.headline)
-              .padding(.horizontal)
-
-            if pets.isEmpty {
-              ContentUnavailableView(
-                "No Pets",
-                systemImage: "pawprint",
-                description: Text("Add your first pet to start tracking health records.")
-              )
-              .padding(.horizontal)
-            } else {
-              LazyVStack(spacing: 12) {
-                ForEach(pets) { pet in
-                  PetProfileCard(
-                    pet: pet,
-                    onShowPetID: { showPetIDFor = pet }
-                  )
-                  .padding(.horizontal)
-                  .contextMenu {
-                    Button(role: .destructive) {
-                      petPendingDelete = pet
-                      showDeleteConfirm = true
-                    } label: {
-                      Label("Delete", systemImage: "trash")
+              if pets.isEmpty {
+                ContentUnavailableView(
+                  "No Pets",
+                  systemImage: "pawprint",
+                  description: Text("Add your first pet to start tracking health records.")
+                )
+                .padding(.horizontal)
+              } else {
+                LazyVStack(spacing: 12) {
+                  ForEach(pets) { pet in
+                    PetProfileCard(
+                      pet: pet,
+                      onShowPetID: { showPetIDFor = pet },
+                      onCardTapped: { selectedPetForDetail = pet }
+                    )
+                    .padding(.horizontal)
+                    .contextMenu {
+                      Button(role: .destructive) {
+                        petPendingDelete = pet
+                        showDeleteConfirm = true
+                      } label: {
+                        Label("Delete", systemImage: "trash")
+                      }
                     }
                   }
                 }
               }
             }
-          }
 
-          // MARK: Pet Management
-          VStack(alignment: .leading, spacing: 10) {
-            Text("Pet Management")
-              .font(.headline)
+            // MARK: Pet Management
+            VStack(alignment: .leading, spacing: 10) {
+              Text("Pet Management")
+                .font(.headline)
+                .padding(.horizontal)
+
+              LazyVGrid(columns: gridCols, spacing: 12) {
+                ModuleTile(title: "Booking Record", systemImage: "calendar.badge.clock") {
+                  BookingRecordView()
+                }
+                
+                ModuleTile(title: "Pet Health Reports", systemImage: "doc.text.magnifyingglass") {
+                  HealthReportsListView()
+                }
+
+                ModuleTile(title: "Recent Purchase", systemImage: "cart") {
+                  RecentPurchaseView()
+                }
+
+                ModuleTile(title: "Insurance", systemImage: "shield") {
+                  InsuranceLandingView()
+                }
+
+                ModuleTile(title: "Activity Tracking", systemImage: "figure.walk") {
+                  ActivityTrackingView()
+                }
+
+                ModuleTile(title: "Travel Document", systemImage: "doc.text") {
+                  TravelDocumentView()
+                }
+
+                ModuleTile(title: "Pet Care Tips", systemImage: "lightbulb") {
+                  PetCareTipsView()
+                }
+              }
               .padding(.horizontal)
-
-            LazyVGrid(columns: gridCols, spacing: 12) {
-              ModuleTile(title: "Booking Record", systemImage: "calendar.badge.clock") {
-                BookingRecordView()
-              }
-
-              ModuleTile(title: "Recent Purchase", systemImage: "cart") {
-                RecentPurchaseView()
-              }
-
-              ModuleTile(title: "Insurance", systemImage: "shield") {
-                InsuranceLandingView()
-              }
-
-              ModuleTile(title: "Activity Tracking", systemImage: "figure.walk") {
-                ActivityTrackingView()
-              }
-
-              ModuleTile(title: "Travel Document", systemImage: "doc.text") {
-                TravelDocumentView()
-              }
-
-              ModuleTile(title: "Pet Care Tips", systemImage: "lightbulb") {
-                PetCareTipsView()
-              }
             }
-            .padding(.horizontal)
-          }
 
-          Spacer(minLength: 24)
+            Spacer(minLength: 24)
+          }
+          .padding(.bottom, 18)
         }
-        .padding(.bottom, 18)
-      }
+      )
       .navigationBarTitleDisplayMode(.inline)
       .sheet(isPresented: $showAddPet) {
         AddPetView()
@@ -204,12 +215,24 @@ struct RecordsView: View {
   }
 }
 
+// MARK: - Navigation Helper View
+// Added navigation destination cleanly to the top-level ScrollView or View
+extension RecordsView {
+    @ViewBuilder
+    func applyNavigationDestinations(to view: some View) -> some View {
+        view.navigationDestination(item: $selectedPetForDetail) { pet in
+            PetDetailView(pet: pet)
+        }
+    }
+}
+
 // MARK: - Profile UI Components
 
 private struct PetProfileCard: View {
 
   let pet: PetModel
   let onShowPetID: () -> Void
+  let onCardTapped: () -> Void
 
   private var ageText: String {
     let year = Calendar.current.component(.year, from: Date())
@@ -325,16 +348,6 @@ private struct PetProfileCard: View {
           .accessibilityLabel("Pet ID")
 
           NavigationLink {
-            PetDetailView(pet: pet)
-          } label: {
-            Image(systemName: "heart.text.square")
-              .font(.headline)
-              .padding(8)
-              .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-          }
-          .accessibilityLabel("Health Profile")
-
-          NavigationLink {
             HealthReportUploadView(pet: pet)
           } label: {
             Image(systemName: "doc.viewfinder")
@@ -346,23 +359,30 @@ private struct PetProfileCard: View {
         }
       }
 
-      HStack {
-        Text("Next Vaccination:")
-          .font(.caption)
-          .foregroundStyle(.secondary)
-        Spacer()
-        Text(nextVaccinationLabel)
-          .font(.caption)
-          .foregroundStyle(.secondary)
-      }
+      if latestVaccination != nil {
+        HStack {
+          Text("Next Vaccination:")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+          Spacer()
+          Text(nextVaccinationLabel)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
 
-      ProgressView(value: vaccinationProgress)
-        .tint(.green)
+        ProgressView(value: vaccinationProgress)
+          .tint(.green)
+      }
     }
     .padding(14)
     .background(
-      RoundedRectangle(cornerRadius: 16, style: .continuous)
-        .fill(Color(.secondarySystemBackground))
+      Button {
+        onCardTapped()
+      } label: {
+        RoundedRectangle(cornerRadius: 16, style: .continuous)
+          .fill(Color(.secondarySystemBackground))
+      }
+      .buttonStyle(.plain)
     )
     .overlay(
       RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -490,8 +510,8 @@ private struct PetIDSheet: View {
         Spacer()
       }
       .padding()
-      .navigationTitle("Pet ID")
-      .navigationBarTitleDisplayMode(.inline)
+      .navigationTitle("Profile")
+      .navigationBarTitleDisplayMode(.large)
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
           Button("Done") { dismiss() }

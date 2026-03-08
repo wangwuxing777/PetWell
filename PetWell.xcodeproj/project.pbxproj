@@ -36,9 +36,6 @@
 		207519222F251CFD00B1FD1A /* EmergencyClinicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519212F251CFD00B1FD1A /* EmergencyClinicsView.swift */; };
 		207519242F2520B400B1FD1A /* ClinicDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519232F2520B400B1FD1A /* ClinicDetailView.swift */; };
 		207519262F25232400B1FD1A /* HealthCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519252F25232400B1FD1A /* HealthCheckView.swift */; };
-		AA001BC12F9B000000000001 /* MedicalServiceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA001BC02F9B000000000001 /* MedicalServiceDetailView.swift */; };
-		AA001BF12F9C000000000001 /* HealthReportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA001BF02F9C000000000001 /* HealthReportService.swift */; };
-		AA001BF32F9C000000000001 /* HealthReportUploadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA001BF22F9C000000000001 /* HealthReportUploadView.swift */; };
 		207519282F2524A800B1FD1A /* VaccineBookingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519272F2524A800B1FD1A /* VaccineBookingView.swift */; };
 		2075192A2F25289700B1FD1A /* ClinicSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519292F25289700B1FD1A /* ClinicSelectionView.swift */; };
 		20833D5A2F20B39A00D59583 /* VaccineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20833D592F20B39A00D59583 /* VaccineDetailView.swift */; };
@@ -49,7 +46,6 @@
 		20SOCIAL012F42B000004CAA54 /* SharePetProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */; };
 		20SOCIAL032F42B000004CAA54 /* SocialSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */; };
 		21B7A1012F60000100AABBCC /* BlogTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7A1002F60000100AABBCC /* BlogTagsView.swift */; };
-		AA002BC12F9C000000000001 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA002BC02F9C000000000001 /* AppTheme.swift */; };
 		21B7A1032F60000100AABBCC /* InsuranceRecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7A1022F60000100AABBCC /* InsuranceRecommendationView.swift */; };
 		21B7A1202F60000100AABBCC /* BookingRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7A1102F60000100AABBCC /* BookingRecordView.swift */; };
 		21B7A1212F60000100AABBCC /* RecentPurchaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7A1112F60000100AABBCC /* RecentPurchaseView.swift */; };
@@ -63,19 +59,25 @@
 		5254A20A2F14D0BB002C6BFB /* InsuranceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254A20B2F14D0BB002C6BFB /* InsuranceService.swift */; };
 		5809467036E9C1D483F6EDF1 /* VetMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B48B43AC4603AD6BE6678259 /* VetMapViewModel.swift */; };
 		5D76E2067F9710ABED5E50F4 /* VetMapContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AAB46C63991E9ABB508494D /* VetMapContainerView.swift */; };
+		5E1FE169654F64D311E1C09E /* HealthReportsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41C844BE304A49C9398D62F /* HealthReportsListView.swift */; };
 		6A0296CEE0996BC91EA15904 /* VetClinic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70BE189DFC88DA0CA634B870 /* VetClinic.swift */; };
 		82E386E4958DE00A444D9CEE /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40938F3FFFB3538C4F3D6253 /* ViewModifiers.swift */; };
 		84306D6F5E9BD0F01109AC13 /* MapViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08DBA259051C33E01E78244 /* MapViewWrapper.swift */; };
 		9832EC2E43DAA4D24B69C514 /* ShopifyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84900EA374F123F44735A689 /* ShopifyService.swift */; };
-		EE1000012F9C000100000001 /* StripePaymentSheet in Frameworks */ = {isa = PBXBuildFile; productRef = EE1000022F9C000100000001 /* StripePaymentSheet */; };
+		AA001BC12F9B000000000001 /* MedicalServiceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA001BC02F9B000000000001 /* MedicalServiceDetailView.swift */; };
+		AA001BF12F9C000000000001 /* HealthReportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA001BF02F9C000000000001 /* HealthReportService.swift */; };
+		AA001BF32F9C000000000001 /* HealthReportUploadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA001BF22F9C000000000001 /* HealthReportUploadView.swift */; };
+		AA002BC12F9C000000000001 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA002BC02F9C000000000001 /* AppTheme.swift */; };
 		C88014AB7980E56FB2B5238A /* ScenarioModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202BB0CCA17CFED11EEDD1E1 /* ScenarioModels.swift */; };
 		CC19638A2F386A8E00FA8CF3 /* Buy in Frameworks */ = {isa = PBXBuildFile; productRef = CC1963892F386A8E00FA8CF3 /* Buy */; };
 		CCABA6A92F3ED7AB00BF9151 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = CCABA6A82F3ED7AB00BF9151 /* GoogleMaps */; };
 		DF27EFB9398D02F4E15D9AEF /* VetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9333426B811F6EBE9D8C1337 /* VetService.swift */; };
+		EE1000012F9C000100000001 /* StripePaymentSheet in Frameworks */ = {isa = PBXBuildFile; productRef = EE1000022F9C000100000001 /* StripePaymentSheet */; };
 		F1640ED1E7E136CAF64BAC4A /* RAGChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DBB5D947F0DD76560408AA /* RAGChatView.swift */; };
 		F17000012F20B102004900F1 /* ProviderSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17000022F20B102004900F1 /* ProviderSelectionView.swift */; };
 		F1D39B6708A777E1D304E5B8 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */; };
 		F75332655DE91D68E539B658 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCAF2763C99096209B63097 /* LoginView.swift */; };
+		FD812DB10DD7AACCF064D92B /* HealthReportDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A58C5F521AD6F681EAC680 /* HealthReportDetailView.swift */; };
 		FDD97A82D9D5A4388469E9A7 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8D216CCC7A9DF21E1D41A4 /* AuthViewModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -114,9 +116,6 @@
 		207519212F251CFD00B1FD1A /* EmergencyClinicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmergencyClinicsView.swift; sourceTree = "<group>"; };
 		207519232F2520B400B1FD1A /* ClinicDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicDetailView.swift; sourceTree = "<group>"; };
 		207519252F25232400B1FD1A /* HealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCheckView.swift; sourceTree = "<group>"; };
-		AA001BC02F9B000000000001 /* MedicalServiceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicalServiceDetailView.swift; sourceTree = "<group>"; };
-		AA001BF02F9C000000000001 /* HealthReportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthReportService.swift; sourceTree = "<group>"; };
-		AA001BF22F9C000000000001 /* HealthReportUploadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthReportUploadView.swift; sourceTree = "<group>"; };
 		207519272F2524A800B1FD1A /* VaccineBookingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineBookingView.swift; sourceTree = "<group>"; };
 		207519292F25289700B1FD1A /* ClinicSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicSelectionView.swift; sourceTree = "<group>"; };
 		20833D592F20B39A00D59583 /* VaccineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineDetailView.swift; sourceTree = "<group>"; };
@@ -127,7 +126,6 @@
 		20SOCIAL022F42B000004CAA54 /* SharePetProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePetProfileView.swift; sourceTree = "<group>"; };
 		20SOCIAL042F42B000004CAA54 /* SocialSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialSearchView.swift; sourceTree = "<group>"; };
 		21B7A1002F60000100AABBCC /* BlogTagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogTagsView.swift; sourceTree = "<group>"; };
-		AA002BC02F9C000000000001 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		21B7A1022F60000100AABBCC /* InsuranceRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsuranceRecommendationView.swift; sourceTree = "<group>"; };
 		21B7A1102F60000100AABBCC /* BookingRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookingRecordView.swift; sourceTree = "<group>"; };
 		21B7A1112F60000100AABBCC /* RecentPurchaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPurchaseView.swift; sourceTree = "<group>"; };
@@ -140,14 +138,20 @@
 		62DBB5D947F0DD76560408AA /* RAGChatView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RAGChatView.swift; path = Views/Insurance/RAGChatView.swift; sourceTree = "<group>"; };
 		6FCAF2763C99096209B63097 /* LoginView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LoginView.swift; path = Views/Auth/LoginView.swift; sourceTree = "<group>"; };
 		70BE189DFC88DA0CA634B870 /* VetClinic.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetClinic.swift; sourceTree = "<group>"; };
+		74A58C5F521AD6F681EAC680 /* HealthReportDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HealthReportDetailView.swift; sourceTree = "<group>"; };
 		84900EA374F123F44735A689 /* ShopifyService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopifyService.swift; sourceTree = "<group>"; };
 		86363FF50F3F61B4EC53D780 /* ScenarioService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScenarioService.swift; path = Services/ScenarioService.swift; sourceTree = "<group>"; };
 		88B4AC9F1FB44E2FED3EF68E /* ScenarioCompareHomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScenarioCompareHomeView.swift; path = Views/Insurance/ScenarioCompareHomeView.swift; sourceTree = "<group>"; };
 		8E8D216CCC7A9DF21E1D41A4 /* AuthViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthViewModel.swift; path = ViewModels/AuthViewModel.swift; sourceTree = "<group>"; };
 		9333426B811F6EBE9D8C1337 /* VetService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetService.swift; sourceTree = "<group>"; };
+		AA001BC02F9B000000000001 /* MedicalServiceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicalServiceDetailView.swift; sourceTree = "<group>"; };
+		AA001BF02F9C000000000001 /* HealthReportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthReportService.swift; sourceTree = "<group>"; };
+		AA001BF22F9C000000000001 /* HealthReportUploadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthReportUploadView.swift; sourceTree = "<group>"; };
+		AA002BC02F9C000000000001 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		B08DBA259051C33E01E78244 /* MapViewWrapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapViewWrapper.swift; sourceTree = "<group>"; };
 		B48B43AC4603AD6BE6678259 /* VetMapViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetMapViewModel.swift; sourceTree = "<group>"; };
 		D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = Views/Onboarding/OnboardingView.swift; sourceTree = "<group>"; };
+		D41C844BE304A49C9398D62F /* HealthReportsListView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HealthReportsListView.swift; sourceTree = "<group>"; };
 		DBCDEA159103732D87EBD44C /* Vet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Vet.swift; sourceTree = "<group>"; };
 		F17000022F20B102004900F1 /* ProviderSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderSelectionView.swift; sourceTree = "<group>"; };
 		F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopModels.swift; sourceTree = "<group>"; };
@@ -296,6 +300,8 @@
 				21B7A1122F60000100AABBCC /* ActivityTrackingView.swift */,
 				21B7A1132F60000100AABBCC /* TravelDocumentView.swift */,
 				21B7A1142F60000100AABBCC /* PetCareTipsView.swift */,
+				D41C844BE304A49C9398D62F /* HealthReportsListView.swift */,
+				74A58C5F521AD6F681EAC680 /* HealthReportDetailView.swift */,
 			);
 			path = Records;
 			sourceTree = "<group>";
@@ -339,6 +345,7 @@
 				D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */,
 				6FCAF2763C99096209B63097 /* LoginView.swift */,
 				206606652EFBEBB5004CAA54 /* PetWellApp.swift */,
+				B8409B1555A6A094973A90B1 /* Views */,
 			);
 			path = PetWell;
 			sourceTree = "<group>";
@@ -408,12 +415,27 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		B8409B1555A6A094973A90B1 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E45EE577C46DC81BF41A86B0 /* Records */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
 		BFB68C28FC0FC4D462EC5DE3 /* ScenarioCompareHomeView.swift */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			name = ScenarioCompareHomeView.swift;
 			path = Views/Insurance/ScenarioCompareHomeView.swift;
+			sourceTree = "<group>";
+		};
+		E45EE577C46DC81BF41A86B0 /* Records */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Records;
 			sourceTree = "<group>";
 		};
 		F5B0A3C45C9AB61C60DD9430 /* ScenarioDetailView.swift */ = {
@@ -570,6 +592,8 @@
 				F75332655DE91D68E539B658 /* LoginView.swift in Sources */,
 				F1D39B6708A777E1D304E5B8 /* OnboardingView.swift in Sources */,
 				FDD97A82D9D5A4388469E9A7 /* AuthViewModel.swift in Sources */,
+				5E1FE169654F64D311E1C09E /* HealthReportsListView.swift in Sources */,
+				FD812DB10DD7AACCF064D92B /* HealthReportDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
