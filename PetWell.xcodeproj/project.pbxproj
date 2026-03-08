@@ -67,6 +67,7 @@
 		82E386E4958DE00A444D9CEE /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40938F3FFFB3538C4F3D6253 /* ViewModifiers.swift */; };
 		84306D6F5E9BD0F01109AC13 /* MapViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08DBA259051C33E01E78244 /* MapViewWrapper.swift */; };
 		9832EC2E43DAA4D24B69C514 /* ShopifyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84900EA374F123F44735A689 /* ShopifyService.swift */; };
+		EE1000012F9C000100000001 /* StripePaymentSheet in Frameworks */ = {isa = PBXBuildFile; productRef = EE1000022F9C000100000001 /* StripePaymentSheet */; };
 		C88014AB7980E56FB2B5238A /* ScenarioModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202BB0CCA17CFED11EEDD1E1 /* ScenarioModels.swift */; };
 		CC19638A2F386A8E00FA8CF3 /* Buy in Frameworks */ = {isa = PBXBuildFile; productRef = CC1963892F386A8E00FA8CF3 /* Buy */; };
 		CCABA6A92F3ED7AB00BF9151 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = CCABA6A82F3ED7AB00BF9151 /* GoogleMaps */; };
@@ -157,6 +158,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EE1000012F9C000100000001 /* StripePaymentSheet in Frameworks */,
 				CC19638A2F386A8E00FA8CF3 /* Buy in Frameworks */,
 				CCABA6A92F3ED7AB00BF9151 /* GoogleMaps in Frameworks */,
 			);
@@ -438,6 +440,11 @@
 			dependencies = (
 			);
 			name = PetWell;
+			packageProductDependencies = (
+				CC1963892F386A8E00FA8CF3 /* Buy */,
+				CCABA6A82F3ED7AB00BF9151 /* GoogleMaps */,
+				EE1000022F9C000100000001 /* StripePaymentSheet */,
+			);
 			productName = PetWell;
 			productReference = 2066063D2EFBB4B2004CAA54 /* PetWell.app */;
 			productType = "com.apple.product-type.application";
@@ -469,6 +476,7 @@
 			packageReferences = (
 				CC1963882F386A8E00FA8CF3 /* XCRemoteSwiftPackageReference "mobile-buy-sdk-ios" */,
 				CCABA6A72F3ED7AB00BF9151 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */,
+				EE1000032F9C000100000001 /* XCRemoteSwiftPackageReference "stripe-ios-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2066063E2EFBB4B2004CAA54 /* Products */;
@@ -801,6 +809,14 @@
 				minimumVersion = 10.8.0;
 			};
 		};
+		EE1000032F9C000100000001 /* XCRemoteSwiftPackageReference "stripe-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stripe/stripe-ios-spm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 24.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -813,6 +829,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CCABA6A72F3ED7AB00BF9151 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
 			productName = GoogleMaps;
+		};
+		EE1000022F9C000100000001 /* StripePaymentSheet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EE1000032F9C000100000001 /* XCRemoteSwiftPackageReference "stripe-ios-spm" */;
+			productName = StripePaymentSheet;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

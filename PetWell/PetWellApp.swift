@@ -7,6 +7,7 @@
 
 import Combine
 import GoogleMaps
+import StripePaymentSheet
 import SwiftData
 import SwiftUI
 
@@ -70,6 +71,9 @@ struct PetWellApp: App {
             .environmentObject(authViewModel)
             .environment(\.locale, .init(identifier: languageManager.currentLanguage.rawValue))
         }
+      }
+      .onOpenURL { url in
+        _ = StripeAPI.handleURLCallback(with: url)
       }
     }
     .modelContainer(for: [
