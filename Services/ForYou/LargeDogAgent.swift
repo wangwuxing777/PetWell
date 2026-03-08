@@ -17,7 +17,9 @@ enum LargeDogAgent {
             .replacingOccurrences(of: "-", with: " ")
             .trimmingCharacters(in: .whitespaces)
 
-        return largeDogBreeds.contains(where: { normalised.contains($0) })
+        return largeDogBreeds.contains(where: {
+            normalised.contains($0.replacingOccurrences(of: "-", with: " "))
+        })
     }
 
     // MARK: - Breed List

@@ -37,8 +37,8 @@ struct PetSelectorSheet: View {
     private var petList: some View {
         List(pets) { pet in
             Button(action: {
-                dismiss()
-                onSelect(pet)
+                onSelect(pet)   // 先记录选择
+                dismiss()       // 再关闭 sheet（onDismiss 回调完成后才弹出 fullScreenCover）
             }) {
                 HStack(spacing: 14) {
                     // Avatar

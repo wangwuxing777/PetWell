@@ -77,15 +77,15 @@ final class AgeFilterAgentParseTests: XCTestCase {
         XCTAssertEqual(AgeFilterAgent.parseToYears("0 years"),   0.0)
     }
 
-    func test_parseYears_months() {
-        XCTAssertEqual(AgeFilterAgent.parseToYears("6 months"),  6.0 / 12.0,  accuracy: 1e-9)
-        XCTAssertEqual(AgeFilterAgent.parseToYears("12 months"), 12.0 / 12.0, accuracy: 1e-9)
-        XCTAssertEqual(AgeFilterAgent.parseToYears("3 month"),   3.0 / 12.0,  accuracy: 1e-9)
+    func test_parseYears_months() throws {
+        XCTAssertEqual(try XCTUnwrap(AgeFilterAgent.parseToYears("6 months")),  6.0 / 12.0,  accuracy: 1e-9)
+        XCTAssertEqual(try XCTUnwrap(AgeFilterAgent.parseToYears("12 months")), 12.0 / 12.0, accuracy: 1e-9)
+        XCTAssertEqual(try XCTUnwrap(AgeFilterAgent.parseToYears("3 month")),   3.0 / 12.0,  accuracy: 1e-9)
     }
 
-    func test_parseYears_weeks() {
-        XCTAssertEqual(AgeFilterAgent.parseToYears("8 weeks"), 8.0 / 52.0,  accuracy: 1e-9)
-        XCTAssertEqual(AgeFilterAgent.parseToYears("1 week"),  1.0 / 52.0,  accuracy: 1e-9)
+    func test_parseYears_weeks() throws {
+        XCTAssertEqual(try XCTUnwrap(AgeFilterAgent.parseToYears("8 weeks")), 8.0 / 52.0, accuracy: 1e-9)
+        XCTAssertEqual(try XCTUnwrap(AgeFilterAgent.parseToYears("1 week")),  1.0 / 52.0, accuracy: 1e-9)
     }
 
     func test_parseYears_noLimit_returnsNil() {

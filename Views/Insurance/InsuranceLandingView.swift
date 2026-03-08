@@ -124,10 +124,15 @@ struct InsuranceLandingView: View {
       .animation(.easeInOut(duration: 0.25), value: showMiniHeader)
       .navigationBarHidden(true)
     }
-    .sheet(isPresented: $showPetSelector) {
+    .sheet(isPresented: $showPetSelector, onDismiss: {
+      // sheet 动画完全结束后再弹出 fullScreenCover，避免两个 modal 转场冲突导致白屏
+      if selectedPetForYou != nil {
+        showForYouProgress = true
+      }
+    }) {
       PetSelectorSheet { pet in
         selectedPetForYou = pet
-        showForYouProgress = true
+        // 注意：不在这里设置 showForYouProgress，由 onDismiss 回调处理
       }
     }
     .fullScreenCover(isPresented: $showForYouProgress) {
