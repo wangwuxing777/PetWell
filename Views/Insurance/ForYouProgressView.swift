@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 
 // MARK: - ForYouProgressView
 // Full-screen progress sheet shown while the pipeline runs.
@@ -8,9 +7,8 @@ import SwiftData
 struct ForYouProgressView: View {
     let pet: PetModel
 
-    @Environment(\.modelContext) private var modelContext
     @ObservedObject private var orchestrator = ForYouOrchestrator.shared
-    @EnvironmentObject private var insuranceService: InsuranceService
+    @ObservedObject private var insuranceService = InsuranceService.shared
 
     @Binding var isPresented: Bool
     @State private var showChat = false
@@ -52,8 +50,15 @@ struct ForYouProgressView: View {
                 }
             }
         }
-        .onAppear {
+        .task {
             withAnimation(.easeOut(duration: 0.35)) { animateIn = true }
+            // Wait for InsuranceService to finish loading (max 3s)
+            if insuranceService.products.isEmpty {
+                for _ in 0..<30 {
+                    try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
+                    if !insuranceService.products.isEmpty { break }
+                }
+            }
             orchestrator.start(pet: pet, allProducts: insuranceService.products)
         }
         .onChange(of: orchestrator.hasNewResult) { _, newValue in

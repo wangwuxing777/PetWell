@@ -183,9 +183,7 @@ final class ForYouOrchestrator: ObservableObject {
         risks: [BreedRisk], isLargeDog: Bool
     ) -> String {
         var parts: [String] = ["\(eligible)/\(total) plans eligible"]
-        if let riskStr = BreedRiskAgent.riskSummary(forBreed: "") {
-            parts.append("⚠️ \(riskStr)")
-        } else if !risks.isEmpty {
+        if !risks.isEmpty {
             let abbr = risks.map { $0.abbreviation }.joined(separator: ", ")
             parts.append("⚠️ \(abbr) risk detected")
         }

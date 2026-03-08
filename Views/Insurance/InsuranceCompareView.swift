@@ -237,7 +237,6 @@ struct InsuranceCompareView: View {
       if let pet = selectedPetForYou {
         NavigationStack {
           ForYouProgressView(pet: pet, isPresented: $showForYouProgress)
-            .environmentObject(insuranceService as InsuranceService)
         }
       }
     }

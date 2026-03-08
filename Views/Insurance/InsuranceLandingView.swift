@@ -18,11 +18,9 @@ private struct ScrollOffsetPreferenceKey: PreferenceKey {
 struct InsuranceLandingView: View {
   @EnvironmentObject var languageManager: LanguageManager
   @EnvironmentObject var guideManager: GuideManager
-  @EnvironmentObject var insuranceService: InsuranceService
   @Query(sort: \PetModel.name) private var pets: [PetModel]
 
   @State private var scrollOffset: CGFloat = 0
-  @State private var isShowingRecommendation = false
   @State private var showPetSelector = false
   @State private var selectedPetForYou: PetModel?
   @State private var showForYouProgress = false
@@ -136,7 +134,6 @@ struct InsuranceLandingView: View {
       if let pet = selectedPetForYou {
         NavigationStack {
           ForYouProgressView(pet: pet, isPresented: $showForYouProgress)
-            .environmentObject(insuranceService)
         }
       }
     }
