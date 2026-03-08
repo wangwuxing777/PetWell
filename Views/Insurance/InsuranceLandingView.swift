@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 // MARK: - Scroll Offset Preference Key
 private struct ScrollOffsetPreferenceKey: PreferenceKey {
@@ -17,8 +18,14 @@ private struct ScrollOffsetPreferenceKey: PreferenceKey {
 struct InsuranceLandingView: View {
   @EnvironmentObject var languageManager: LanguageManager
   @EnvironmentObject var guideManager: GuideManager
+  @EnvironmentObject var insuranceService: InsuranceService
+  @Query(sort: \PetModel.name) private var pets: [PetModel]
+
   @State private var scrollOffset: CGFloat = 0
   @State private var isShowingRecommendation = false
+  @State private var showPetSelector = false
+  @State private var selectedPetForYou: PetModel?
+  @State private var showForYouProgress = false
 
   // Header heights
   private let fullHeaderHeight: CGFloat = 280
@@ -119,10 +126,19 @@ struct InsuranceLandingView: View {
       .animation(.easeInOut(duration: 0.25), value: showMiniHeader)
       .navigationBarHidden(true)
     }
-    .fullScreenCover(isPresented: $isShowingRecommendation) {
-      RAGChatView(
-        contextString: languageManager.isChinese ? "為我推薦寵物保險" : "Pet Insurance Recommendation",
-        isPresented: $isShowingRecommendation)
+    .sheet(isPresented: $showPetSelector) {
+      PetSelectorSheet { pet in
+        selectedPetForYou = pet
+        showForYouProgress = true
+      }
+    }
+    .fullScreenCover(isPresented: $showForYouProgress) {
+      if let pet = selectedPetForYou {
+        NavigationStack {
+          ForYouProgressView(pet: pet, isPresented: $showForYouProgress)
+            .environmentObject(insuranceService)
+        }
+      }
     }
   }
 
@@ -193,7 +209,12 @@ struct InsuranceLandingView: View {
 
           // For You Button
           Button(action: {
-            isShowingRecommendation = true
+            if pets.count == 1, let pet = pets.first {
+              selectedPetForYou = pet
+              showForYouProgress = true
+            } else {
+              showPetSelector = true
+            }
           }) {
             HStack(spacing: 4) {
               Image(systemName: "sparkles")

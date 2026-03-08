@@ -11,6 +11,7 @@ struct RAGChatView: View {
   // Context Management
   var contextString: String?
   var initialModel: ChatModel = .insurance
+  var initialAIMessage: String? = nil   // ForYou pre-filled recommendation
   @Binding var isPresented: Bool
 
   var body: some View {
@@ -44,12 +45,19 @@ struct RAGChatView: View {
       }
 
       if ragService.messages.isEmpty {
-        let greetingText =
-          initialModel == .medical
-          ? "Hello, I am your medical assistant, how can I help you?"
-          : "Hello, I am your insurance assistant, how can I help you?"
-        let greeting = ChatMessage(content: greetingText, isUser: false)
-        ragService.messages.append(greeting)
+        if let prefilledMsg = initialAIMessage {
+          // ForYou flow: show recommendation directly as first AI message
+          let aiMsg = ChatMessage(content: prefilledMsg, isUser: false)
+          ragService.messages.append(aiMsg)
+        } else {
+          // Standard flow: show greeting
+          let greetingText =
+            initialModel == .medical
+            ? "Hello, I am your medical assistant, how can I help you?"
+            : "Hello, I am your insurance assistant, how can I help you?"
+          let greeting = ChatMessage(content: greetingText, isUser: false)
+          ragService.messages.append(greeting)
+        }
       }
       ragService.createSession()
     }

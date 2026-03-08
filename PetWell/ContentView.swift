@@ -202,6 +202,7 @@ struct ContentView: View {
   @State private var guardianButtonDragOffset: CGSize = .zero
   @StateObject private var blogService = BlogService.shared
   @StateObject private var guideManager = GuideManager()
+  @ObservedObject private var forYouOrchestrator = ForYouOrchestrator.shared
 
   var body: some View {
     GeometryReader { geo in
@@ -253,13 +254,28 @@ struct ContentView: View {
         Button {
           isGuardianPresented = true
         } label: {
-          Image(systemName: "sparkles")
-            .font(.system(size: 18, weight: .semibold))
-            .foregroundStyle(.white)
-            .padding(14)
-            .background(Circle().fill(Color.accentColor))
-            .shadow(radius: 6)
-            .accessibilityLabel("PetWell Guardian")
+          ZStack(alignment: .topTrailing) {
+            Image(systemName: "sparkles")
+              .font(.system(size: 18, weight: .semibold))
+              .foregroundStyle(.white)
+              .padding(14)
+              .background(Circle().fill(Color.accentColor))
+              .shadow(radius: 6)
+
+            // Red dot: ForYou recommendation ready
+            if forYouOrchestrator.hasNewResult {
+              Circle()
+                .fill(Color.red)
+                .frame(width: 12, height: 12)
+                .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                .offset(x: 2, y: -2)
+                .transition(.scale.combined(with: .opacity))
+            }
+          }
+          .animation(.spring(response: 0.35, dampingFraction: 0.7), value: forYouOrchestrator.hasNewResult)
+          .accessibilityLabel(forYouOrchestrator.hasNewResult
+            ? "PetWell Guardian — Insurance recommendation ready"
+            : "PetWell Guardian")
         }
         .position(
           x: guardianButtonPosition.x + guardianButtonDragOffset.width,
@@ -301,11 +317,23 @@ struct ContentView: View {
       }
     }
     .sheet(isPresented: $isGuardianPresented) {
-      RAGChatView(
-        contextString: languageManager.isChinese ? "寵物醫療諮詢" : "Pet medical consultation",
-        initialModel: .medical,
-        isPresented: $isGuardianPresented
-      )
+      if forYouOrchestrator.hasNewResult, let result = forYouOrchestrator.latestResult {
+        // ForYou result available → open Insurance chat with recommendation pre-filled
+        RAGChatView(
+          contextString: result.enrichedContext,
+          initialModel: .insurance,
+          initialAIMessage: result.initialAIMessage,
+          isPresented: $isGuardianPresented
+        )
+        .onDisappear { forYouOrchestrator.clearResult() }
+      } else {
+        // Standard Guardian → Medical assistant
+        RAGChatView(
+          contextString: languageManager.isChinese ? "寵物醫療諮詢" : "Pet medical consultation",
+          initialModel: .medical,
+          isPresented: $isGuardianPresented
+        )
+      }
     }
   }
 }

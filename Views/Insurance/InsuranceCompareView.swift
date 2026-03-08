@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 // MARK: - Scroll Offset Preference Key
 private struct ScrollOffsetPreferenceKey: PreferenceKey {
@@ -29,6 +30,7 @@ struct InsuranceCompareView: View {
   @EnvironmentObject var languageManager: LanguageManager
   @EnvironmentObject var guideManager: GuideManager
   @ObservedObject var insuranceService = InsuranceService.shared
+  @Query(sort: \PetModel.name) private var pets: [PetModel]
 
   // Default selection keys (Product IDs)
   @State private var leftProductId: Int?
@@ -42,6 +44,11 @@ struct InsuranceCompareView: View {
   @State private var remarkContext: RemarkSheetContext?
 
   @State private var showRAGChat = false
+
+  // ForYou flow
+  @State private var showPetSelectorForYou = false
+  @State private var selectedPetForYou: PetModel?
+  @State private var showForYouProgress = false
 
   // Comparison Mode
   enum CompareMode {
@@ -219,6 +226,20 @@ struct InsuranceCompareView: View {
     }
     .fullScreenCover(isPresented: $showRAGChat) {
       RAGChatView(contextString: "General pet insurance comparison", isPresented: $showRAGChat)
+    }
+    .sheet(isPresented: $showPetSelectorForYou) {
+      PetSelectorSheet { pet in
+        selectedPetForYou = pet
+        showForYouProgress = true
+      }
+    }
+    .fullScreenCover(isPresented: $showForYouProgress) {
+      if let pet = selectedPetForYou {
+        NavigationStack {
+          ForYouProgressView(pet: pet, isPresented: $showForYouProgress)
+            .environmentObject(insuranceService as InsuranceService)
+        }
+      }
     }
   }
 
@@ -833,7 +854,12 @@ struct InsuranceCompareView: View {
       .lineSpacing(4)
 
       Button(action: {
-        showRAGChat = true
+        if pets.count == 1, let pet = pets.first {
+          selectedPetForYou = pet
+          showForYouProgress = true
+        } else {
+          showPetSelectorForYou = true
+        }
       }) {
         HStack {
           Image(systemName: "sparkles")  // Added Sparkle to match AI theme

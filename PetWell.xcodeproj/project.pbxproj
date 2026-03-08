@@ -79,6 +79,14 @@
 		F75332655DE91D68E539B658 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCAF2763C99096209B63097 /* LoginView.swift */; };
 		FD812DB10DD7AACCF064D92B /* HealthReportDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A58C5F521AD6F681EAC680 /* HealthReportDetailView.swift */; };
 		FDD97A82D9D5A4388469E9A7 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8D216CCC7A9DF21E1D41A4 /* AuthViewModel.swift */; };
+		FY001BLD2F9D000000000001 /* AgeFilterAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FY001REF2F9D000000000001 /* AgeFilterAgent.swift */; };
+		FY002BLD2F9D000000000001 /* LargeDogAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FY002REF2F9D000000000001 /* LargeDogAgent.swift */; };
+		FY003BLD2F9D000000000001 /* BreedRiskAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FY003REF2F9D000000000001 /* BreedRiskAgent.swift */; };
+		FY004BLD2F9D000000000001 /* HealthReportExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FY004REF2F9D000000000001 /* HealthReportExtractor.swift */; };
+		FY005BLD2F9D000000000001 /* ContextAssemblerAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FY005REF2F9D000000000001 /* ContextAssemblerAgent.swift */; };
+		FY006BLD2F9D000000000001 /* ForYouOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FY006REF2F9D000000000001 /* ForYouOrchestrator.swift */; };
+		FY007BLD2F9D000000000001 /* ForYouProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FY007REF2F9D000000000001 /* ForYouProgressView.swift */; };
+		FY008BLD2F9D000000000001 /* PetSelectorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FY008REF2F9D000000000001 /* PetSelectorSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -155,6 +163,14 @@
 		DBCDEA159103732D87EBD44C /* Vet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Vet.swift; sourceTree = "<group>"; };
 		F17000022F20B102004900F1 /* ProviderSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderSelectionView.swift; sourceTree = "<group>"; };
 		F279FBC4883C1A58A0A4E2BE /* ShopModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShopModels.swift; sourceTree = "<group>"; };
+		FY001REF2F9D000000000001 /* AgeFilterAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeFilterAgent.swift; sourceTree = "<group>"; };
+		FY002REF2F9D000000000001 /* LargeDogAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeDogAgent.swift; sourceTree = "<group>"; };
+		FY003REF2F9D000000000001 /* BreedRiskAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreedRiskAgent.swift; sourceTree = "<group>"; };
+		FY004REF2F9D000000000001 /* HealthReportExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthReportExtractor.swift; sourceTree = "<group>"; };
+		FY005REF2F9D000000000001 /* ContextAssemblerAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextAssemblerAgent.swift; sourceTree = "<group>"; };
+		FY006REF2F9D000000000001 /* ForYouOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForYouOrchestrator.swift; sourceTree = "<group>"; };
+		FY007REF2F9D000000000001 /* ForYouProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForYouProgressView.swift; sourceTree = "<group>"; };
+		FY008REF2F9D000000000001 /* PetSelectorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetSelectorSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -189,6 +205,8 @@
 				F17000022F20B102004900F1 /* ProviderSelectionView.swift */,
 				BFB68C28FC0FC4D462EC5DE3 /* ScenarioCompareHomeView.swift */,
 				F5B0A3C45C9AB61C60DD9430 /* ScenarioDetailView.swift */,
+				FY007REF2F9D000000000001 /* ForYouProgressView.swift */,
+				FY008REF2F9D000000000001 /* PetSelectorSheet.swift */,
 			);
 			path = Insurance;
 			sourceTree = "<group>";
@@ -330,8 +348,22 @@
 				84900EA374F123F44735A689 /* ShopifyService.swift */,
 				9333426B811F6EBE9D8C1337 /* VetService.swift */,
 				2B4686BF1736E825EEC323F0 /* ScenarioService.swift */,
+				FY000GRP2F9D000000000001 /* ForYou */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		FY000GRP2F9D000000000001 /* ForYou */ = {
+			isa = PBXGroup;
+			children = (
+				FY001REF2F9D000000000001 /* AgeFilterAgent.swift */,
+				FY002REF2F9D000000000001 /* LargeDogAgent.swift */,
+				FY003REF2F9D000000000001 /* BreedRiskAgent.swift */,
+				FY004REF2F9D000000000001 /* HealthReportExtractor.swift */,
+				FY005REF2F9D000000000001 /* ContextAssemblerAgent.swift */,
+				FY006REF2F9D000000000001 /* ForYouOrchestrator.swift */,
+			);
+			path = ForYou;
 			sourceTree = "<group>";
 		};
 		206606662EFBEBB5004CAA54 /* PetWell */ = {
@@ -594,6 +626,14 @@
 				FDD97A82D9D5A4388469E9A7 /* AuthViewModel.swift in Sources */,
 				5E1FE169654F64D311E1C09E /* HealthReportsListView.swift in Sources */,
 				FD812DB10DD7AACCF064D92B /* HealthReportDetailView.swift in Sources */,
+				FY001BLD2F9D000000000001 /* AgeFilterAgent.swift in Sources */,
+				FY002BLD2F9D000000000001 /* LargeDogAgent.swift in Sources */,
+				FY003BLD2F9D000000000001 /* BreedRiskAgent.swift in Sources */,
+				FY004BLD2F9D000000000001 /* HealthReportExtractor.swift in Sources */,
+				FY005BLD2F9D000000000001 /* ContextAssemblerAgent.swift in Sources */,
+				FY006BLD2F9D000000000001 /* ForYouOrchestrator.swift in Sources */,
+				FY007BLD2F9D000000000001 /* ForYouProgressView.swift in Sources */,
+				FY008BLD2F9D000000000001 /* PetSelectorSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
