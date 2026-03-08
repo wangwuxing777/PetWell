@@ -21,5 +21,7 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We need your location to show vet clinics near you.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>PetWell needs camera access to scan your pet's health report documents.</string>
 </dict>
 </plist>

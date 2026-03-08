@@ -37,6 +37,8 @@
 		207519242F2520B400B1FD1A /* ClinicDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519232F2520B400B1FD1A /* ClinicDetailView.swift */; };
 		207519262F25232400B1FD1A /* HealthCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519252F25232400B1FD1A /* HealthCheckView.swift */; };
 		AA001BC12F9B000000000001 /* MedicalServiceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA001BC02F9B000000000001 /* MedicalServiceDetailView.swift */; };
+		AA001BF12F9C000000000001 /* HealthReportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA001BF02F9C000000000001 /* HealthReportService.swift */; };
+		AA001BF32F9C000000000001 /* HealthReportUploadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA001BF22F9C000000000001 /* HealthReportUploadView.swift */; };
 		207519282F2524A800B1FD1A /* VaccineBookingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519272F2524A800B1FD1A /* VaccineBookingView.swift */; };
 		2075192A2F25289700B1FD1A /* ClinicSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207519292F25289700B1FD1A /* ClinicSelectionView.swift */; };
 		20833D5A2F20B39A00D59583 /* VaccineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20833D592F20B39A00D59583 /* VaccineDetailView.swift */; };
@@ -112,6 +114,8 @@
 		207519232F2520B400B1FD1A /* ClinicDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicDetailView.swift; sourceTree = "<group>"; };
 		207519252F25232400B1FD1A /* HealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCheckView.swift; sourceTree = "<group>"; };
 		AA001BC02F9B000000000001 /* MedicalServiceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicalServiceDetailView.swift; sourceTree = "<group>"; };
+		AA001BF02F9C000000000001 /* HealthReportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthReportService.swift; sourceTree = "<group>"; };
+		AA001BF22F9C000000000001 /* HealthReportUploadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthReportUploadView.swift; sourceTree = "<group>"; };
 		207519272F2524A800B1FD1A /* VaccineBookingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineBookingView.swift; sourceTree = "<group>"; };
 		207519292F25289700B1FD1A /* ClinicSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicSelectionView.swift; sourceTree = "<group>"; };
 		20833D592F20B39A00D59583 /* VaccineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineDetailView.swift; sourceTree = "<group>"; };
@@ -281,6 +285,7 @@
 		2066065A2EFBE5ED004CAA54 /* Records */ = {
 			isa = PBXGroup;
 			children = (
+				AA001BF22F9C000000000001 /* HealthReportUploadView.swift */,
 				20CCB6002F04190A00CE57E7 /* PetDetailView.swift */,
 				20CCB5FE2F0418F000CE57E7 /* AddPetView.swift */,
 				2066065E2EFBE668004CAA54 /* RecordsView.swift */,
@@ -304,6 +309,7 @@
 		2066065C2EFBE621004CAA54 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				AA001BF02F9C000000000001 /* HealthReportService.swift */,
 				20B365DB2F5868C9000F2B3A /* ScenarioService.swift */,
 				20175EA22F40F1A9000A3910 /* LocationManager.swift */,
 				20175E9E2F40E32C000A3910 /* CachedImageLoader.swift */,
@@ -527,6 +533,8 @@
 				2075191E2F251CD000B1FD1A /* Clinic.swift in Sources */,
 				207519262F25232400B1FD1A /* HealthCheckView.swift in Sources */,
 				AA001BC12F9B000000000001 /* MedicalServiceDetailView.swift in Sources */,
+				AA001BF12F9C000000000001 /* HealthReportService.swift in Sources */,
+				AA001BF32F9C000000000001 /* HealthReportUploadView.swift in Sources */,
 				207519282F2524A800B1FD1A /* VaccineBookingView.swift in Sources */,
 				2066066A2EFBEF8C004CAA54 /* GuardianChatView.swift in Sources */,
 				206606682EFBEBB5004CAA54 /* PetWellApp.swift in Sources */,
@@ -694,6 +702,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "PetWell needs camera access to scan your pet's health report documents.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "PetWell uses your location to show nearby vet clinics.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -727,6 +737,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "PetWell needs camera access to scan your pet's health report documents.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "PetWell uses your location to show nearby vet clinics.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

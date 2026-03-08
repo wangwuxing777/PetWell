@@ -333,6 +333,16 @@ private struct PetProfileCard: View {
               .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
           }
           .accessibilityLabel("Health Profile")
+
+          NavigationLink {
+            HealthReportUploadView(pet: pet)
+          } label: {
+            Image(systemName: "doc.viewfinder")
+              .font(.headline)
+              .padding(8)
+              .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+          }
+          .accessibilityLabel("Upload Report")
         }
       }
 

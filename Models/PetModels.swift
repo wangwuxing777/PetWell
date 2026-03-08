@@ -49,6 +49,9 @@ final class OwnerProfileStore {
 
 @Model
 final class PetModel {
+  // Stable string ID used as pet_id in backend API calls
+  var petID: String = UUID().uuidString
+
   // Basic
   var name: String
   var species: String  // Dog / Cat / etc.
@@ -92,8 +95,10 @@ final class PetModel {
     notes: String,
     medicalVisits: [MedicalVisitModel] = [],
     medications: [MedicationModel] = [],
-    weightEntries: [WeightEntryModel] = []
+    weightEntries: [WeightEntryModel] = [],
+    petID: String = UUID().uuidString
   ) {
+    self.petID = petID
     self.name = name
     self.species = species
     self.breed = breed
