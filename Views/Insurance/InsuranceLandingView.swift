@@ -22,11 +22,12 @@ struct InsuranceLandingView: View {
 
   @State private var scrollOffset: CGFloat = 0
   @State private var showPetSelector = false
-  @State private var selectedPetForYou: PetModel?
-  @State private var showForYouProgress = false
-  /// 专用标志：只有用户在 PetSelectorSheet 中实际选中宠物时才为 true。
-  /// Cancel 不设置此标志，防止 onDismiss 误触发 pipeline。
-  @State private var petSelectedFromSheet = false
+  /// 驱动 fullScreenCover(item:)：non-nil 时弹出进度页，nil 时关闭。
+  /// 使用 item: 绑定替代 isPresented + if-let 组合，
+  /// 彻底消除 onDismiss 时序问题导致的白屏。
+  @State private var petForYouProgress: PetModel?
+  /// sheet 关闭前暂存用户选择的宠物，onDismiss 中再赋给 petForYouProgress。
+  @State private var pendingPetForYou: PetModel?
 
   // Header heights
   private let fullHeaderHeight: CGFloat = 280
@@ -128,24 +129,25 @@ struct InsuranceLandingView: View {
       .navigationBarHidden(true)
     }
     .sheet(isPresented: $showPetSelector, onDismiss: {
-      // sheet 动画完全结束后再弹出 fullScreenCover，避免两个 modal 转场冲突导致白屏。
-      // 必须检查 petSelectedFromSheet 而非 selectedPetForYou：
-      //   后者可能残留上次选择，导致 Cancel 也误触发 pipeline。
-      if petSelectedFromSheet {
-        petSelectedFromSheet = false
-        showForYouProgress = true
-      }
+      // sheet 动画完全结束后再赋值给 petForYouProgress，触发 fullScreenCover(item:)。
+      // 用 pendingPetForYou 中转，彻底避免 @State 时序问题。
+      guard let pet = pendingPetForYou else { return }
+      pendingPetForYou = nil
+      petForYouProgress = pet
     }) {
       PetSelectorSheet { pet in
-        selectedPetForYou = pet
-        petSelectedFromSheet = true   // 只有真正选了宠物才置 true
+        pendingPetForYou = pet
       }
     }
-    .fullScreenCover(isPresented: $showForYouProgress) {
-      if let pet = selectedPetForYou {
-        NavigationStack {
-          ForYouProgressView(pet: pet, isPresented: $showForYouProgress)
-        }
+    .fullScreenCover(item: $petForYouProgress) { pet in
+      NavigationStack {
+        ForYouProgressView(
+          pet: pet,
+          isPresented: Binding(
+            get: { petForYouProgress != nil },
+            set: { if !$0 { petForYouProgress = nil } }
+          )
+        )
       }
     }
   }
@@ -218,8 +220,7 @@ struct InsuranceLandingView: View {
           // For You Button
           Button(action: {
             if pets.count == 1, let pet = pets.first {
-              selectedPetForYou = pet
-              showForYouProgress = true
+              petForYouProgress = pet   // 直接触发 fullScreenCover(item:)，无需中间状态
             } else {
               showPetSelector = true
             }
