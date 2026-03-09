@@ -199,10 +199,14 @@ struct ContentView: View {
   @State private var selectedTab: Tab = .blog  // Default to Blog as per request "Blog button to the first one"
   @State private var isGuardianPresented = false
   @State private var guardianButtonPosition: CGPoint = .zero
-  @State private var guardianButtonDragOffset: CGSize = .zero
+  @State private var guardianIsDragging = false
+  @State private var guardianDragStartPosition: CGPoint = .zero
+  @State private var guardianSuppressNextTap = false
   @StateObject private var blogService = BlogService.shared
   @StateObject private var guideManager = GuideManager()
   @ObservedObject private var forYouOrchestrator = ForYouOrchestrator.shared
+  private let guardianButtonRadius: CGFloat = 28
+  private let guardianButtonPadding: CGFloat = 12
 
   var body: some View {
     GeometryReader { geo in
@@ -251,65 +255,99 @@ struct ContentView: View {
         }
 
         // Floating PetWell Guardian button (draggable)
-        Button {
-          isGuardianPresented = true
-        } label: {
-          ZStack(alignment: .topTrailing) {
-            Image(systemName: "sparkles")
-              .font(.system(size: 18, weight: .semibold))
-              .foregroundStyle(.white)
-              .padding(14)
-              .background(Circle().fill(Color.accentColor))
-              .shadow(radius: 6)
+        ZStack(alignment: .topTrailing) {
+          Image(systemName: "sparkles")
+            .font(.system(size: 18, weight: .semibold))
+            .foregroundStyle(.white)
+            .padding(14)
+            .background(Circle().fill(Color.accentColor))
+            .shadow(radius: 6)
 
-            // Red dot: ForYou recommendation ready
-            if forYouOrchestrator.hasNewResult {
-              Circle()
-                .fill(Color.red)
-                .frame(width: 12, height: 12)
-                .overlay(Circle().stroke(Color.white, lineWidth: 2))
-                .offset(x: 2, y: -2)
-                .transition(.scale.combined(with: .opacity))
-            }
+          // Red dot: ForYou recommendation ready
+          if forYouOrchestrator.hasNewResult {
+            Circle()
+              .fill(Color.red)
+              .frame(width: 12, height: 12)
+              .overlay(Circle().stroke(Color.white, lineWidth: 2))
+              .offset(x: 2, y: -2)
+              .transition(.scale.combined(with: .opacity))
           }
-          .animation(.spring(response: 0.35, dampingFraction: 0.7), value: forYouOrchestrator.hasNewResult)
-          .accessibilityLabel(forYouOrchestrator.hasNewResult
-            ? "PetWell Guardian — Insurance recommendation ready"
-            : "PetWell Guardian")
+        }
+        .animation(.spring(response: 0.35, dampingFraction: 0.7), value: forYouOrchestrator.hasNewResult)
+        .accessibilityLabel(forYouOrchestrator.hasNewResult
+          ? "PetWell Guardian — Insurance recommendation ready"
+          : "PetWell Guardian")
+        .contentShape(Circle())
+        .onTapGesture {
+          if guardianSuppressNextTap {
+            guardianSuppressNextTap = false
+            return
+          }
+          if !guardianIsDragging {
+            isGuardianPresented = true
+          }
         }
         .position(
-          x: guardianButtonPosition.x + guardianButtonDragOffset.width,
-          y: guardianButtonPosition.y + guardianButtonDragOffset.height
+          x: clampedGuardianX(guardianButtonPosition.x, in: geo.size),
+          y: clampedGuardianY(guardianButtonPosition.y, in: geo.size)
         )
-        .gesture(
-          DragGesture(minimumDistance: 0)
+        .highPriorityGesture(
+          DragGesture(minimumDistance: 1)
             .onChanged { value in
-              guardianButtonDragOffset = value.translation
+              if !guardianIsDragging {
+                guardianDragStartPosition = guardianButtonPosition
+                guardianIsDragging = true
+              }
+
+              let movedDistance = abs(value.translation.width) + abs(value.translation.height)
+              if movedDistance > 4 {
+                guardianSuppressNextTap = true
+              }
+
+              guardianButtonPosition = CGPoint(
+                x: clampedGuardianX(
+                  guardianDragStartPosition.x + value.translation.width,
+                  in: geo.size
+                ),
+                y: clampedGuardianY(
+                  guardianDragStartPosition.y + value.translation.height,
+                  in: geo.size
+                )
+              )
             }
             .onEnded { value in
-              let buttonRadius: CGFloat = 28  // approx half of button diameter
-              let padding: CGFloat = 12
+              let droppedX = clampedGuardianX(
+                guardianDragStartPosition.x + value.translation.width,
+                in: geo.size
+              )
+              let droppedY = clampedGuardianY(
+                guardianDragStartPosition.y + value.translation.height,
+                in: geo.size
+              )
+              let predictedX = clampedGuardianX(
+                guardianDragStartPosition.x + value.predictedEndTranslation.width,
+                in: geo.size
+              )
 
-              var newX = guardianButtonPosition.x + value.translation.width
-              var newY = guardianButtonPosition.y + value.translation.height
-
-              // Clamp inside the screen
-              newX = min(max(newX, buttonRadius + padding), geo.size.width - buttonRadius - padding)
-              newY = min(
-                max(newY, buttonRadius + padding), geo.size.height - buttonRadius - padding)
-
-              guardianButtonPosition = CGPoint(x: newX, y: newY)
-              guardianButtonDragOffset = .zero
+              // Keep Y fixed immediately; animate only horizontal snap.
+              guardianButtonPosition = CGPoint(x: droppedX, y: droppedY)
+              withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.82)) {
+                guardianButtonPosition.x = snappedGuardianX(
+                  from: droppedX,
+                  predictedX: predictedX,
+                  in: geo.size
+                )
+              }
+              guardianIsDragging = false
             }
         )
         .onAppear {
           // Set default position (bottom-right) once
           if guardianButtonPosition == .zero {
-            let buttonRadius: CGFloat = 28
             let padding: CGFloat = 18
             guardianButtonPosition = CGPoint(
-              x: geo.size.width - buttonRadius - padding,
-              y: geo.size.height - buttonRadius - padding
+              x: geo.size.width - guardianButtonRadius - padding,
+              y: geo.size.height - guardianButtonRadius - padding
             )
           }
         }
@@ -335,6 +373,33 @@ struct ContentView: View {
         )
       }
     }
+  }
+
+  private func clampedGuardianX(_ x: CGFloat, in size: CGSize) -> CGFloat {
+    min(
+      max(x, guardianButtonRadius + guardianButtonPadding),
+      size.width - guardianButtonRadius - guardianButtonPadding
+    )
+  }
+
+  private func clampedGuardianY(_ y: CGFloat, in size: CGSize) -> CGFloat {
+    min(
+      max(y, guardianButtonRadius + guardianButtonPadding),
+      size.height - guardianButtonRadius - guardianButtonPadding
+    )
+  }
+
+  private func snappedGuardianX(from currentX: CGFloat, predictedX: CGFloat, in size: CGSize) -> CGFloat {
+    let leftX = guardianButtonRadius + guardianButtonPadding
+    let rightX = size.width - guardianButtonRadius - guardianButtonPadding
+    let inertiaX = predictedX - currentX
+    if abs(inertiaX) > 24 {
+      return inertiaX > 0 ? rightX : leftX
+    }
+
+    let distanceToLeft = abs(currentX - leftX)
+    let distanceToRight = abs(currentX - rightX)
+    return distanceToLeft <= distanceToRight ? leftX : rightX
   }
 }
 

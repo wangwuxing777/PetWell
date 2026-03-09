@@ -10,6 +10,8 @@ import PhotosUI
 
 struct TravelDocumentView: View {
     @EnvironmentObject var languageManager: LanguageManager
+    let pet: PetModel?
+
     @State private var documents: [PetDocument] = []
     @State private var isLoading = false
     @State private var showAddDocument = false
@@ -29,7 +31,7 @@ struct TravelDocumentView: View {
                 }
             }
             .navigationTitle(languageManager.isChinese ? "旅行證件" : "Travel Documents")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -40,7 +42,7 @@ struct TravelDocumentView: View {
                 }
             }
             .sheet(isPresented: $showAddDocument) {
-                AddDocumentView { newDoc in
+                AddDocumentView(initialPetName: pet?.name) { newDoc in
                     documents.append(newDoc)
                 }
             }
@@ -97,7 +99,7 @@ struct TravelDocumentView: View {
             Image(systemName: "doc.text")
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
-            Text(languageManager.isChinese ? "暫無旅行證件" : "No Travel Documents")
+            Text(languageManager.isChinese ? "暫無旅行證件" : (pet != nil ? "No Travel Documents for \(pet!.name)" : "No Travel Documents"))
                 .font(.headline)
             Text(languageManager.isChinese ? "添加寵物的健康證明和疫苗證書" : "Add health certificates and vaccination records for your pet")
                 .font(.subheadline)
@@ -122,9 +124,15 @@ struct TravelDocumentView: View {
     // MARK: - Actions
     private func loadDocuments() {
         isLoading = true
-        // Mock data for demo
+        // Load documents for specific pet, or all if no pet specified
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            documents = PetDocument.mockData
+            if let pet = pet {
+                // Filter documents for this pet by name
+                documents = PetDocument.mockData.filter { $0.petName == pet.name }
+            } else {
+                // Show all documents if no specific pet
+                documents = PetDocument.mockData
+            }
             isLoading = false
         }
     }
@@ -253,11 +261,12 @@ private struct AddDocumentView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var languageManager: LanguageManager
 
+    let initialPetName: String?
     @State private var selectedType: DocumentType = .healthCert
     @State private var documentNumber: String = ""
     @State private var issueDate: Date = Date()
     @State private var expiryDate: Date = Date().addingTimeInterval(365 * 24 * 60 * 60)
-    @State private var selectedPet: String = "Max"
+    @State private var selectedPet: String = ""
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var selectedImage: UIImage?
     @State private var isUploading = false
@@ -265,6 +274,12 @@ private struct AddDocumentView: View {
     let pets = ["Max", "Bella", "Charlie"]
 
     let onSave: (PetDocument) -> Void
+
+    init(initialPetName: String? = nil, onSave: @escaping (PetDocument) -> Void) {
+        self.initialPetName = initialPetName
+        self.onSave = onSave
+        _selectedPet = State(initialValue: initialPetName ?? "Max")
+    }
 
     var body: some View {
         NavigationStack {
@@ -551,6 +566,6 @@ enum DocumentError: Error {
 }
 
 #Preview {
-    TravelDocumentView()
+    TravelDocumentView(pet: nil)
         .environmentObject(LanguageManager())
 }

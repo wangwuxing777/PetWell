@@ -76,11 +76,11 @@ struct PetDetailView: View {
                                 ContactActionButton(icon: "doc.text.magnifyingglass", title: "Reports")
                             }
 
-                            NavigationLink(destination: InsuranceLandingView()) {
+                            NavigationLink(destination: PetInsurancePlaceholderView(pet: pet)) {
                                 ContactActionButton(icon: "shield.fill", title: "Insurance")
                             }
 
-                            NavigationLink(destination: TravelDocumentView()) {
+                            NavigationLink(destination: TravelDocumentView(pet: pet)) {
                                 ContactActionButton(icon: "airplane", title: "Travel")
                             }
                         }

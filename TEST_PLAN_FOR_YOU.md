@@ -33,6 +33,7 @@
    - **Product Name:** `PetWellTests`
    - **Language:** Swift
    - **Target to be Tested:** `PetWell`
+   - com.wwx
 5. Finish
 6. Xcode 會自動生成 `PetWellTests/PetWellTests.swift` — **刪除此檔案**
 7. 在 Project Navigator 中找到剛才新建的 `PetWellTests` group

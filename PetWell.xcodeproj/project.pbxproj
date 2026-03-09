@@ -89,6 +89,23 @@
 		FY008BLD2F9D000000000001 /* PetSelectorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FY008REF2F9D000000000001 /* PetSelectorSheet.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		CC406F972F5DDE190015784B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 206606352EFBB4B2004CAA54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2066063C2EFBB4B2004CAA54;
+			remoteInfo = PetWell;
+		};
+		CC406FA82F5DDEC70015784B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 206606352EFBB4B2004CAA54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2066063C2EFBB4B2004CAA54;
+			remoteInfo = PetWell;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		179F5F3575FDE3DBE576028D /* ScenarioDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScenarioDetailView.swift; path = Views/Insurance/ScenarioDetailView.swift; sourceTree = "<group>"; };
 		200650152F20B102004900F1 /* BlogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogView.swift; sourceTree = "<group>"; };
@@ -158,6 +175,8 @@
 		AA002BC02F9C000000000001 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		B08DBA259051C33E01E78244 /* MapViewWrapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapViewWrapper.swift; sourceTree = "<group>"; };
 		B48B43AC4603AD6BE6678259 /* VetMapViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VetMapViewModel.swift; sourceTree = "<group>"; };
+		CC406F932F5DDE190015784B /* PetWellTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PetWellTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC406FA22F5DDEC60015784B /* PetWellUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PetWellUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D313D3AE4CAA93A5D9477F71 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = Views/Onboarding/OnboardingView.swift; sourceTree = "<group>"; };
 		D41C844BE304A49C9398D62F /* HealthReportsListView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HealthReportsListView.swift; sourceTree = "<group>"; };
 		DBCDEA159103732D87EBD44C /* Vet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Vet.swift; sourceTree = "<group>"; };
@@ -173,6 +192,19 @@
 		FY008REF2F9D000000000001 /* PetSelectorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetSelectorSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		CC406F942F5DDE190015784B /* PetWellTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PetWellTests;
+			sourceTree = "<group>";
+		};
+		CC406FA32F5DDEC60015784B /* PetWellUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PetWellUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		2066063A2EFBB4B2004CAA54 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -181,6 +213,20 @@
 				EE1000012F9C000100000001 /* StripePaymentSheet in Frameworks */,
 				CC19638A2F386A8E00FA8CF3 /* Buy in Frameworks */,
 				CCABA6A92F3ED7AB00BF9151 /* GoogleMaps in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC406F902F5DDE190015784B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC406F9F2F5DDEC60015784B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,6 +300,8 @@
 				2066065C2EFBE621004CAA54 /* Services */,
 				206606592EFBE5E1004CAA54 /* Views */,
 				206606582EFBE5CB004CAA54 /* Models */,
+				CC406F942F5DDE190015784B /* PetWellTests */,
+				CC406FA32F5DDEC60015784B /* PetWellUITests */,
 				2066063E2EFBB4B2004CAA54 /* Products */,
 				62DBB5D947F0DD76560408AA /* RAGChatView.swift */,
 				98B299DA0A09820E808069C0 /* Frameworks */,
@@ -269,6 +317,8 @@
 			isa = PBXGroup;
 			children = (
 				2066063D2EFBB4B2004CAA54 /* PetWell.app */,
+				CC406F932F5DDE190015784B /* PetWellTests.xctest */,
+				CC406FA22F5DDEC60015784B /* PetWellUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -351,19 +401,6 @@
 				FY000GRP2F9D000000000001 /* ForYou */,
 			);
 			path = Services;
-			sourceTree = "<group>";
-		};
-		FY000GRP2F9D000000000001 /* ForYou */ = {
-			isa = PBXGroup;
-			children = (
-				FY001REF2F9D000000000001 /* AgeFilterAgent.swift */,
-				FY002REF2F9D000000000001 /* LargeDogAgent.swift */,
-				FY003REF2F9D000000000001 /* BreedRiskAgent.swift */,
-				FY004REF2F9D000000000001 /* HealthReportExtractor.swift */,
-				FY005REF2F9D000000000001 /* ContextAssemblerAgent.swift */,
-				FY006REF2F9D000000000001 /* ForYouOrchestrator.swift */,
-			);
-			path = ForYou;
 			sourceTree = "<group>";
 		};
 		206606662EFBEBB5004CAA54 /* PetWell */ = {
@@ -478,6 +515,19 @@
 			path = Views/Insurance/ScenarioDetailView.swift;
 			sourceTree = "<group>";
 		};
+		FY000GRP2F9D000000000001 /* ForYou */ = {
+			isa = PBXGroup;
+			children = (
+				FY001REF2F9D000000000001 /* AgeFilterAgent.swift */,
+				FY002REF2F9D000000000001 /* LargeDogAgent.swift */,
+				FY003REF2F9D000000000001 /* BreedRiskAgent.swift */,
+				FY004REF2F9D000000000001 /* HealthReportExtractor.swift */,
+				FY005REF2F9D000000000001 /* ContextAssemblerAgent.swift */,
+				FY006REF2F9D000000000001 /* ForYouOrchestrator.swift */,
+			);
+			path = ForYou;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -503,6 +553,52 @@
 			productReference = 2066063D2EFBB4B2004CAA54 /* PetWell.app */;
 			productType = "com.apple.product-type.application";
 		};
+		CC406F922F5DDE190015784B /* PetWellTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC406F9B2F5DDE190015784B /* Build configuration list for PBXNativeTarget "PetWellTests" */;
+			buildPhases = (
+				CC406F8F2F5DDE190015784B /* Sources */,
+				CC406F902F5DDE190015784B /* Frameworks */,
+				CC406F912F5DDE190015784B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC406F982F5DDE190015784B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CC406F942F5DDE190015784B /* PetWellTests */,
+			);
+			name = PetWellTests;
+			packageProductDependencies = (
+			);
+			productName = PetWellTests;
+			productReference = CC406F932F5DDE190015784B /* PetWellTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CC406FA12F5DDEC60015784B /* PetWellUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC406FAA2F5DDEC70015784B /* Build configuration list for PBXNativeTarget "PetWellUITests" */;
+			buildPhases = (
+				CC406F9E2F5DDEC60015784B /* Sources */,
+				CC406F9F2F5DDEC60015784B /* Frameworks */,
+				CC406FA02F5DDEC60015784B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC406FA92F5DDEC70015784B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CC406FA32F5DDEC60015784B /* PetWellUITests */,
+			);
+			name = PetWellUITests;
+			packageProductDependencies = (
+			);
+			productName = PetWellUITests;
+			productReference = CC406FA22F5DDEC60015784B /* PetWellUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -510,11 +606,19 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					2066063C2EFBB4B2004CAA54 = {
 						CreatedOnToolsVersion = 16.0;
+					};
+					CC406F922F5DDE190015784B = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 2066063C2EFBB4B2004CAA54;
+					};
+					CC406FA12F5DDEC60015784B = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 2066063C2EFBB4B2004CAA54;
 					};
 				};
 			};
@@ -538,6 +642,8 @@
 			projectRoot = "";
 			targets = (
 				2066063C2EFBB4B2004CAA54 /* PetWell */,
+				CC406F922F5DDE190015784B /* PetWellTests */,
+				CC406FA12F5DDEC60015784B /* PetWellUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -550,6 +656,20 @@
 				206606692EFBEBB5004CAA54 /* Assets.xcassets in Resources */,
 				2075191C2F251CB900B1FD1A /* clinics.csv in Resources */,
 				2006501D2F20B102004900F1 /* insurance_list_test.sql in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC406F912F5DDE190015784B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC406FA02F5DDEC60015784B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -637,7 +757,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC406F8F2F5DDE190015784B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC406F9E2F5DDEC60015784B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CC406F982F5DDE190015784B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2066063C2EFBB4B2004CAA54 /* PetWell */;
+			targetProxy = CC406F972F5DDE190015784B /* PBXContainerItemProxy */;
+		};
+		CC406FA92F5DDEC70015784B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2066063C2EFBB4B2004CAA54 /* PetWell */;
+			targetProxy = CC406FA82F5DDEC70015784B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		206606462EFBB4B3004CAA54 /* Debug */ = {
@@ -833,6 +980,92 @@
 			};
 			name = Release;
 		};
+		CC406F992F5DDE190015784B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wwx.PetWellTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PetWell.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PetWell";
+			};
+			name = Debug;
+		};
+		CC406F9A2F5DDE190015784B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wwx.PetWellTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PetWell.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PetWell";
+			};
+			name = Release;
+		};
+		CC406FAB2F5DDEC70015784B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wwx.PetWellUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PetWell;
+			};
+			name = Debug;
+		};
+		CC406FAC2F5DDEC70015784B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wwx.PetWellUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PetWell;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -850,6 +1083,24 @@
 			buildConfigurations = (
 				206606492EFBB4B3004CAA54 /* Debug */,
 				2066064A2EFBB4B3004CAA54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC406F9B2F5DDE190015784B /* Build configuration list for PBXNativeTarget "PetWellTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC406F992F5DDE190015784B /* Debug */,
+				CC406F9A2F5DDE190015784B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC406FAA2F5DDEC70015784B /* Build configuration list for PBXNativeTarget "PetWellUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC406FAB2F5DDEC70015784B /* Debug */,
+				CC406FAC2F5DDEC70015784B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

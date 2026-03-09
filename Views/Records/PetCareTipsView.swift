@@ -80,7 +80,7 @@ struct PetCareTipsView: View {
                 }
             }
             .navigationTitle(languageManager.isChinese ? "護理提示" : "Pet Care Tips")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if selectedCategory != nil {
                     ToolbarItem(placement: .navigationBarLeading) {

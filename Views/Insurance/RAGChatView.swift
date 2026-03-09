@@ -184,12 +184,10 @@ struct RAGChatView: View {
             )
             .clipShape(Circle())
 
-          Text(LocalizedStringKey(message.content))
-            .font(.body)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+          MarkdownContentView(content: message.content)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
             .background(bubbleColorAI)
-            .foregroundColor(.primary)
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
           Spacer()
         }

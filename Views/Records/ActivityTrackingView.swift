@@ -50,7 +50,7 @@ struct ActivityTrackingView: View {
                 }
             }
             .navigationTitle(languageManager.isChinese ? "活動追蹤" : "Activity Tracking")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {

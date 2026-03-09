@@ -77,6 +77,7 @@ struct PetSelectorSheet: View {
                         .foregroundColor(Color(.systemGray3))
                 }
                 .padding(.vertical, 4)
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("PetSelectorRow_\(pet.name)")
