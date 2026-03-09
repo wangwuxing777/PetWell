@@ -182,45 +182,43 @@ final class AgeFilterAgentFilterTests: XCTestCase {
 
 final class LargeDogAgentTests: XCTestCase {
 
-    func test_largeDog_returnsTrueForKnownLargeBreed() {
-        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Dog",    breed: "Labrador"))
-        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Dog",    breed: "Golden Retriever"))
-        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Dog",    breed: "German Shepherd"))
-        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Dog",    breed: "Great Dane"))
-        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Dog",    breed: "Rottweiler"))
-        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Dog",    breed: "Siberian Husky"))
+    // HK Dangerous Dogs Ordinance: dog > 20 kg → large dog
+    private let threshold = LargeDogAgent.largeWeightThresholdKg  // 20.0
+
+    func test_largeDog_aboveThreshold_returnsTrue() {
+        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Dog", weightKg: 20.1))
+        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Dog", weightKg: 28.0))  // Pet-A Labrador
+        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Dog", weightKg: 30.0))  // Pet-D German Shepherd
     }
 
-    func test_largeDog_returnsFalseForSmallBreed() {
-        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Dog", breed: "Chihuahua"))
-        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Dog", breed: "Pomeranian"))
-        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Dog", breed: "Shih Tzu"))
-        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Dog", breed: "Corgi"))
+    func test_largeDog_atThreshold_returnsFalse() {
+        // Exactly 20 kg is NOT over the threshold
+        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Dog", weightKg: 20.0))
     }
 
-    func test_largeDog_returnsFalseForCatSpecies() {
-        // Cats are never large dogs, even with a dog-sounding breed name
-        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Cat",    breed: "Maine Coon"))
-        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Cat",    breed: "Labrador"))  // absurd, but safe
-        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Feline", breed: "Rottweiler"))
+    func test_largeDog_belowThreshold_returnsFalse() {
+        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Dog", weightKg: 3.0))   // Pet-B Chihuahua
+        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Dog", weightKg: 10.0))
+        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Dog", weightKg: 19.9))
+    }
+
+    func test_largeDog_catSpecies_alwaysFalse() {
+        // Cats are never classified as large dogs regardless of weight
+        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Cat",    weightKg: 25.0))
+        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Feline", weightKg: 30.0))
     }
 
     func test_largeDog_acceptsCanineSpecies() {
-        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Canine", breed: "German Shepherd"))
+        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Canine", weightKg: 25.0))
     }
 
-    func test_largeDog_caseInsensitive() {
-        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "DOG",  breed: "LABRADOR"))
-        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "dog",  breed: "rottweiler"))
+    func test_largeDog_speciesCaseInsensitive() {
+        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "DOG", weightKg: 21.0))
+        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "dog", weightKg: 21.0))
     }
 
-    func test_largeDog_hyphenatedBreedNormalized() {
-        // "flat-coated retriever" → hyphen stripped → matches "flat-coated retriever" in list
-        XCTAssertTrue(LargeDogAgent.isLargeDog(species: "Dog", breed: "flat-coated retriever"))
-    }
-
-    func test_largeDog_emptyBreed_returnsFalse() {
-        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Dog", breed: ""))
+    func test_largeDog_zeroWeight_returnsFalse() {
+        XCTAssertFalse(LargeDogAgent.isLargeDog(species: "Dog", weightKg: 0.0))
     }
 }
 

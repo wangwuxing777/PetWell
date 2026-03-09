@@ -89,7 +89,7 @@ final class ForYouOrchestrator: ObservableObject {
         markRunning(1)
         let eligible   = AgeFilterAgent.filter(petAgeYears: petAge, products: allProducts)
         let risks      = BreedRiskAgent.risks(forBreed: pet.breed)
-        let isLargeDog = LargeDogAgent.isLargeDog(species: pet.species, breed: pet.breed)
+        let isLargeDog = LargeDogAgent.isLargeDog(species: pet.species, weightKg: pet.weightKg)
         markCompleted(1, summary: buildStage1Summary(
             eligible: eligible.count, total: allProducts.count,
             risks: risks, isLargeDog: isLargeDog))
