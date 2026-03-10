@@ -73,6 +73,7 @@ struct BookingRecordView: View {
         }
         .navigationTitle(languageManager.isChinese ? "預約記錄" : "Booking Record")
         .navigationBarTitleDisplayMode(.inline)
+        .hideTabBarWhenPushed()
         .onAppear {
             loadBookings()
         }

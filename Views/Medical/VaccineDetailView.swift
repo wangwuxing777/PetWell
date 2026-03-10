@@ -148,7 +148,7 @@ struct VaccineDetailView: View {
         }
         .edgesIgnoringSafeArea(.top)
         .background(Color(UIColor.systemGroupedBackground))
-        .toolbar(.hidden, for: .tabBar) // Hide Bottom Tab Bar
+        .hideTabBarWhenPushed()
     }
     
     // Dynamic Title Logic

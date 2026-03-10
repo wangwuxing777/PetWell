@@ -15,7 +15,7 @@ struct RAGChatView: View {
   @Binding var isPresented: Bool
 
   var body: some View {
-    NavigationView {
+    NavigationStack {
       VStack(spacing: 0) {
         // ── CHAT AREA ──
         chatScrollView
@@ -35,6 +35,7 @@ struct RAGChatView: View {
               .font(.system(size: 17, weight: .medium))
               .foregroundColor(AppTheme.textPrimary)
           }
+          .contentShape(Rectangle())
         }
       }
     }

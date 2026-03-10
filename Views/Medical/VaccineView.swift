@@ -411,6 +411,7 @@ private struct VaccinationHubView: View {
     .background(Color(UIColor.systemGroupedBackground))
     .navigationTitle("Vaccination")
     .navigationBarTitleDisplayMode(.inline)
+    .hideTabBarWhenPushed()
   }
 }
 
@@ -776,6 +777,7 @@ private struct TestClinicEntryView: View {
     .navigationTitle("Test Clinic")
     .navigationBarTitleDisplayMode(.inline)
     .background(Color(UIColor.systemGroupedBackground))
+    .hideTabBarWhenPushed()
     .task {
       do {
         clinics = try await ClinicService.shared.fetchAllClinics()

@@ -514,7 +514,7 @@ struct TableView: View {
       ForEach(Array(headers.enumerated()), id: \.offset) { colIndex, header in
         VStack(alignment: .leading, spacing: 0) {
           // Header
-          Text(header)
+          Text(LocalizedStringKey(header))
             .font(.system(size: 13, weight: .semibold))
             .foregroundColor(.primary)
             .padding(.horizontal, 10)
@@ -529,7 +529,7 @@ struct TableView: View {
           // Data rows for this column
           ForEach(Array(rows.enumerated()), id: \.offset) { rowIndex, row in
             if colIndex < row.count {
-              Text(row[colIndex])
+              Text(LocalizedStringKey(row[colIndex]))
                 .font(.system(size: 13))
                 .foregroundColor(.primary)
                 .padding(.horizontal, 10)
@@ -622,6 +622,104 @@ struct PetInsurancePlaceholderView: View {
           }
         }
       }
+    }
+    .hideTabBarWhenPushed()
+  }
+}
+
+// MARK: - Tab Bar Auto-Hide
+
+extension View {
+  /// Apply to any child view that is pushed onto a NavigationStack.
+  /// Hides the UITabBar while the view is on screen, synchronized with the
+  /// push/pop animation — no sudden jump. Works correctly for multi-level
+  /// navigation (only shows tab bar when returning all the way to the root).
+  func hideTabBarWhenPushed() -> some View {
+    background(TabBarAutoHideRepresentable())
+  }
+}
+
+struct TabBarAutoHideRepresentable: UIViewControllerRepresentable {
+  func makeUIViewController(context: Context) -> Impl { Impl() }
+  func updateUIViewController(_ uiViewController: Impl, context: Context) {}
+
+  final class Impl: UIViewController {
+    // Associated-object key for the hide-request counter stored on UITabBar.
+    // Counter tracks how many child views are currently requesting the tab bar
+    // to be hidden, so multi-level navigation works correctly (tab bar only
+    // reappears when ALL child views have been popped).
+    private nonisolated(unsafe) static var hideCountKey: UInt8 = 0
+
+    /// Remember the bar so we can decrement even if the VC hierarchy is
+    /// already torn down during viewWillDisappear.
+    private weak var trackedBar: UITabBar?
+
+    override func viewWillAppear(_ animated: Bool) {
+      super.viewWillAppear(animated)
+      guard let bar = findTabBar() else { return }
+      trackedBar = bar
+      let count = Self.hideCount(for: bar) + 1
+      Self.setHideCount(count, for: bar)
+      if count == 1 { setTabBar(bar, hidden: true, animated: animated) }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+      super.viewWillDisappear(animated)
+      guard let bar = trackedBar ?? findTabBar() else { return }
+      let count = max(0, Self.hideCount(for: bar) - 1)
+      Self.setHideCount(count, for: bar)
+      if count == 0 { setTabBar(bar, hidden: false, animated: animated) }
+    }
+
+    // MARK: - Counter helpers
+
+    private static func hideCount(for bar: UITabBar) -> Int {
+      objc_getAssociatedObject(bar, &hideCountKey) as? Int ?? 0
+    }
+
+    private static func setHideCount(_ count: Int, for bar: UITabBar) {
+      objc_setAssociatedObject(bar, &hideCountKey, count, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    }
+
+    // MARK: - Animation
+
+    private func setTabBar(_ bar: UITabBar, hidden: Bool, animated: Bool) {
+      guard bar.isHidden != hidden else { return }
+
+      let duration = animated ? 0.25 : 0.0
+      if hidden {
+        UIView.animate(withDuration: duration) { bar.alpha = 0 }
+        completion: { _ in
+          bar.isHidden = true
+          bar.alpha = 1
+        }
+      } else {
+        bar.isHidden = false
+        bar.alpha = 0
+        UIView.animate(withDuration: duration) { bar.alpha = 1 }
+      }
+    }
+
+    // MARK: - Tab bar discovery
+
+    private func findTabBar() -> UITabBar? {
+      var r: UIResponder? = self
+      while let cur = r {
+        if let tbc = cur as? UITabBarController { return tbc.tabBar }
+        r = cur.next
+      }
+      return UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .flatMap(\.windows)
+        .first(where: \.isKeyWindow)?
+        .rootViewController
+        .flatMap { self.searchTabBarController($0) }?
+        .tabBar
+    }
+
+    private func searchTabBarController(_ vc: UIViewController) -> UITabBarController? {
+      if let tbc = vc as? UITabBarController { return tbc }
+      return vc.children.lazy.compactMap { self.searchTabBarController($0) }.first
     }
   }
 }

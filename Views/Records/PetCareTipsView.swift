@@ -96,6 +96,7 @@ struct PetCareTipsView: View {
                 loadTips()
             }
         }
+        .hideTabBarWhenPushed()
     }
 
     // MARK: - Category Grid

@@ -51,6 +51,7 @@ struct HealthReportDetailView: View {
     }
     .navigationTitle("Report Details")
     .navigationBarTitleDisplayMode(.inline)
+    .hideTabBarWhenPushed()
   }
 }
 

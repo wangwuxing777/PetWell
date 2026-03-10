@@ -192,7 +192,7 @@ struct InsuranceCompareView: View {
     }
     .navigationTitle("Coverage Breakdown")
     .navigationBarTitleDisplayMode(.inline)
-    .toolbar(.hidden, for: .tabBar)
+    .hideTabBarWhenPushed()
     .onAppear {
       // Set defaults if not set
       if leftProductId == nil, let first = insuranceService.products.first {

@@ -50,6 +50,7 @@ struct TravelDocumentView: View {
                 loadDocuments()
             }
         }
+        .hideTabBarWhenPushed()
     }
 
     // MARK: - Document List

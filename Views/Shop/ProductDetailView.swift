@@ -294,6 +294,7 @@ struct ProductDetailView: View {
                 .background(Color.clear)
         }
         .onAppear(perform: loadProductDetail)
+        .hideTabBarWhenPushed()
     }
 
     private var productImageSection: some View {

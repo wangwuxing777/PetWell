@@ -655,6 +655,7 @@ struct CartView: View {
     .sheet(isPresented: $showOwnerProfileEditor) {
       OwnerProfileEditorSheet(isMandatory: true) { _ in }
     }
+    .hideTabBarWhenPushed()
   }
 
   private var checkoutBar: some View {

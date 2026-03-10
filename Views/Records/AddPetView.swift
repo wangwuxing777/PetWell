@@ -182,6 +182,7 @@ struct AddPetView: View {
             } message: {
                 Text(validationMessage)
             }
+            .hideTabBarWhenPushed()
             .onAppear {
                 guard !didLoadExisting else { return }
                 if let pet = petToEdit {

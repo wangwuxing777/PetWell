@@ -366,7 +366,7 @@ struct EmergencyClinicsView: View {
       }
     }
     .navigationBarHidden(true)
-    .toolbar(.hidden, for: .tabBar)
+    .hideTabBarWhenPushed()
     .ignoresSafeArea(.all, edges: [.top, .bottom])
     .sheet(isPresented: $showSortSheet) {
       SortSheetView(

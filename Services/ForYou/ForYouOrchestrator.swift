@@ -85,7 +85,7 @@ final class ForYouOrchestrator: ObservableObject {
     private func run(pet: PetModel, allProducts: [InsuranceProduct]) async {
         let petAge = Calendar.current.component(.year, from: .now) - pet.birthYear
 
-        // ── Stage 1: Local agents (parallel) ─────────────────
+        // ── Stage 1: Local agents ─────────────────────────────
         markRunning(1)
         let eligible   = AgeFilterAgent.filter(petAgeYears: petAge, products: allProducts)
         let risks      = BreedRiskAgent.risks(forBreed: pet.breed)
@@ -95,6 +95,7 @@ final class ForYouOrchestrator: ObservableObject {
             risks: risks, isLargeDog: isLargeDog))
 
         guard !Task.isCancelled else { finish(); return }
+        try? await Task.sleep(nanoseconds: 500_000_000)   // card gap
 
         // ── Stage 2: Health report extraction ────────────────
         markRunning(2)
@@ -104,6 +105,7 @@ final class ForYouOrchestrator: ObservableObject {
             : "No health reports found")
 
         guard !Task.isCancelled else { finish(); return }
+        try? await Task.sleep(nanoseconds: 500_000_000)   // card gap
 
         // ── Stage 3: Medical RAG (network) ───────────────────
         var clinicalSummary: String?
@@ -120,6 +122,7 @@ final class ForYouOrchestrator: ObservableObject {
         }
 
         guard !Task.isCancelled else { finish(); return }
+        try? await Task.sleep(nanoseconds: 500_000_000)   // card gap
 
         // ── Stage 4: Context assembly ─────────────────────────
         markRunning(4)
@@ -130,6 +133,7 @@ final class ForYouOrchestrator: ObservableObject {
         markCompleted(4, summary: "Context ready · Sending to Insurance AI…")
 
         guard !Task.isCancelled else { finish(); return }
+        try? await Task.sleep(nanoseconds: 500_000_000)   // card gap
 
         // ── Stage 5: Insurance RAG (network) ──────────────────
         markRunning(5)
@@ -137,8 +141,8 @@ final class ForYouOrchestrator: ObservableObject {
             ?? "Sorry, I couldn't generate a recommendation right now. Please try again."
         markCompleted(5, summary: "Recommendation ready ✓")
 
-        // Brief pause so user sees final ✅ before result is available
-        try? await Task.sleep(nanoseconds: 500_000_000)
+        // Final pause — ensures card 5's animation finishes before transition
+        try? await Task.sleep(nanoseconds: 800_000_000)
 
         latestResult = ForYouChatResult(
             initialAIMessage: recommendation,

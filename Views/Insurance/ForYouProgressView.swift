@@ -12,7 +12,6 @@ struct ForYouProgressView: View {
 
     @Binding var isPresented: Bool
     @State private var showChat = false
-    @State private var animateIn = false
 
     var body: some View {
         ZStack {
@@ -27,32 +26,28 @@ struct ForYouProgressView: View {
 
                 Divider()
 
-                // ── Stepper Progress List ─────────────────────
-                ScrollView {
-                    StepperProgressView(steps: orchestrator.steps)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 24)
-                        .opacity(animateIn ? 1 : 0)
-                        .offset(y: animateIn ? 0 : 20)
+                // ── Step Cards ───────────────────────────────
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        StepCardListView(steps: orchestrator.steps)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 20)
+                    }
+                    .onChange(of: orchestrator.steps.map { $0.status }) { _, _ in
+                        guard let last = orchestrator.steps.last(where: { $0.status != .pending })
+                        else { return }
+                        // Small delay lets the insertion spring animation begin first
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            withAnimation(.easeInOut(duration: 0.35)) {
+                                proxy.scrollTo(last.id, anchor: .bottom)
+                            }
+                        }
+                    }
                 }
                 .accessibilityIdentifier("ForYouStepperScrollView")
-
-                Spacer(minLength: 0)
-
-                // ── Bottom Dismiss Note ───────────────────────
-                VStack(spacing: 6) {
-                    Divider()
-                    Text("Analysis running in background · You'll be notified when done")
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 10)
-                }
             }
         }
         .task {
-            withAnimation(.easeOut(duration: 0.35)) { animateIn = true }
             // Wait for InsuranceService to finish loading (max 3s)
             if insuranceService.products.isEmpty {
                 for _ in 0..<30 {
@@ -144,62 +139,73 @@ struct ForYouProgressView: View {
     }
 }
 
-// MARK: - StepperProgressView
+// MARK: - StepCardListView
 
-struct StepperProgressView: View {
+struct StepCardListView: View {
     let steps: [ForYouPipelineStep]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
-                HStack(alignment: .top, spacing: 16) {
-                    // Left: vertical connector + status icon
-                    VStack(spacing: 0) {
-                        StepStatusIcon(status: step.status)
-                            .frame(width: 28, height: 28)
-
-                        if index < steps.count - 1 {
-                            Rectangle()
-                                .fill(connectorColor(for: step.status))
-                                .frame(width: 2)
-                                .frame(maxHeight: .infinity)
-                                .padding(.vertical, 2)
-                        }
-                    }
-                    .frame(width: 28)
-
-                    // Right: content
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(step.title)
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(AppTheme.textPrimary)
-
-                        Text(step.subtitle)
-                            .font(.system(size: 13))
-                            .foregroundColor(.secondary)
-
-                        // Expandable result sub-card
-                        if step.status == .completed || step.status == .skipped,
-                           let summary = step.resultSummary {
-                            ResultSubCard(text: summary, isSkipped: step.status == .skipped)
-                                .transition(.move(edge: .top).combined(with: .opacity))
-                        }
-                    }
-                    .padding(.bottom, 24)
+        VStack(spacing: 12) {
+            ForEach(steps) { step in
+                if step.status == .completed || step.status == .skipped || step.status == .failed {
+                    StepCard(step: step)
+                        .id(step.id)
+                        .transition(.asymmetric(
+                            insertion: .offset(y: 28).combined(with: .opacity),
+                            removal: .opacity
+                        ))
+                        .accessibilityIdentifier("ForYouStep_\(step.id)")
                 }
-                .accessibilityIdentifier("ForYouStep_\(step.id)")
             }
         }
+        .animation(
+            .spring(response: 0.48, dampingFraction: 0.78),
+            value: steps.map { $0.status }
+        )
         .accessibilityIdentifier("ForYouStepperList")
-        .animation(.spring(response: 0.4, dampingFraction: 0.85), value: steps.map { $0.status })
     }
+}
 
-    private func connectorColor(for status: ForYouPipelineStep.StepStatus) -> Color {
-        switch status {
-        case .completed: return .green.opacity(0.4)
-        case .skipped:   return Color(.systemGray4)
-        default:         return Color(.systemGray5)
+// MARK: - StepCard
+
+struct StepCard: View {
+    let step: ForYouPipelineStep
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            // Header row
+            HStack(spacing: 12) {
+                StepStatusIcon(status: step.status)
+                    .frame(width: 26, height: 26)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(step.title)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(AppTheme.textPrimary)
+                    Text(step.subtitle)
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            // Result sub-card — revealed after completion/skip
+            if step.status == .completed || step.status == .skipped,
+               let summary = step.resultSummary {
+                ResultSubCard(text: summary, isSkipped: step.status == .skipped)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
         }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 3)
+        .animation(
+            .spring(response: 0.4, dampingFraction: 0.82),
+            value: step.status
+        )
     }
 }
 

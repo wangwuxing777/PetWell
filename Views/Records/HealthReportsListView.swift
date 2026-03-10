@@ -72,6 +72,7 @@ struct HealthReportsListView: View {
         self.selectedPet = pets.first
       }
     }
+    .hideTabBarWhenPushed()
   }
 
   private var petSelector: some View {

@@ -154,7 +154,7 @@ struct VetMapContainerView: View {
       }
     }
     .navigationBarHidden(true)
-    .toolbar(.hidden, for: .tabBar)
+    .hideTabBarWhenPushed()
     .blur(radius: showFilterSheet ? 5 : 0)
     .sheet(isPresented: $showFilterSheet) {
       FilterSheetView(viewModel: viewModel)

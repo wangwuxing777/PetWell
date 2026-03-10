@@ -985,6 +985,7 @@ struct BlogPostDetailView: View {
     }
     .navigationTitle("")
     .navigationBarTitleDisplayMode(.inline)
+    .hideTabBarWhenPushed()
   }
 
   private var cardColor: Color {

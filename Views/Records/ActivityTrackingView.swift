@@ -64,6 +64,7 @@ struct ActivityTrackingView: View {
                 loadActivities()
             }
         }
+        .hideTabBarWhenPushed()
     }
 
     // MARK: - Pet Selector

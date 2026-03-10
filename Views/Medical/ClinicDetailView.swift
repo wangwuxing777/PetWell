@@ -134,8 +134,9 @@ struct ClinicDetailView: View {
         }
         .edgesIgnoringSafeArea(.top)
         .navigationBarTitleDisplayMode(.inline)
+        .hideTabBarWhenPushed()
     }
-    
+
     func call(_ phone: String) {
         let cleanPhone = phone.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
         if let url = URL(string: "tel:\(cleanPhone)") {
