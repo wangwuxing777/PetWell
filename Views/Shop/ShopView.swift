@@ -66,7 +66,9 @@ struct ShopView: View {
               shopifyService.search(query: newValue)
             }
           if !searchText.isEmpty {
-            Button { searchText = "" } label: {
+            Button {
+              searchText = ""
+            } label: {
               Image(systemName: "xmark.circle.fill").foregroundColor(.gray)
             }
           }
@@ -114,9 +116,9 @@ struct ShopView: View {
             } else {
               let productColumns = waterfallColumns(for: shopifyService.filteredProducts)
 
-              HStack(alignment: .top, spacing: 12) {
+              HStack(alignment: .top, spacing: 8) {
                 ForEach(Array(productColumns.enumerated()), id: \.offset) { _, columnProducts in
-                  LazyVStack(spacing: 12) {
+                  LazyVStack(spacing: 8) {
                     ForEach(columnProducts) { product in
                       NavigationLink(destination: ProductDetailView(product: product)) {
                         ProductCard(product: product)
@@ -127,8 +129,8 @@ struct ShopView: View {
                   .frame(maxWidth: .infinity, alignment: .top)
                 }
               }
-              .padding(.horizontal, 12)
-              .padding(.vertical, 12)
+              .padding(.horizontal, 8)
+              .padding(.vertical, 8)
             }
           }
         }
@@ -178,9 +180,6 @@ struct ProductCard: View {
   private var imageHeight: CGFloat {
     Self.estimatedImageHeight(for: product)
   }
-
-  private let cardWidth: CGFloat = 170
-  private let cardHeight: CGFloat = 260
 
   private var categoryLabel: String {
     product.categories.first ?? product.productType
@@ -253,7 +252,7 @@ struct ProductCard: View {
       }
       .padding(12)
     }
-    .frame(width: cardWidth, height: cardHeight)
+    .frame(maxWidth: .infinity)
     .background(AppTheme.bgCard)
     .overlay(
       RoundedRectangle(cornerRadius: 14)
@@ -369,8 +368,10 @@ struct ShopFilterView: View {
             }
 
             if shopifyService.isLoadingCategories && shopifyService.availableCategories.isEmpty {
-              ProgressView(languageManager.isChinese ? "正在同步 Shopify 类别..." : "Loading Shopify categories...")
-                .font(.caption)
+              ProgressView(
+                languageManager.isChinese ? "正在同步 Shopify 类别..." : "Loading Shopify categories..."
+              )
+              .font(.caption)
             } else if shopifyService.availableCategories.isEmpty {
               Text(languageManager.isChinese ? "暂时没有可用类别" : "No categories available yet")
                 .font(.caption)
@@ -661,9 +662,12 @@ struct CartView: View {
   private var checkoutBar: some View {
     VStack(spacing: 10) {
       HStack {
-        Text(languageManager.isChinese ? "商品 \(shopifyService.cartItemCount) 件" : "\(shopifyService.cartItemCount) items")
-          .font(.subheadline)
-          .foregroundColor(.secondary)
+        Text(
+          languageManager.isChinese
+            ? "商品 \(shopifyService.cartItemCount) 件" : "\(shopifyService.cartItemCount) items"
+        )
+        .font(.subheadline)
+        .foregroundColor(.secondary)
         Spacer()
         Text(languageManager.isChinese ? "小計" : "Subtotal")
           .font(.subheadline)
@@ -687,18 +691,18 @@ struct CartView: View {
               : (languageManager.isChinese ? "使用 Stripe 安全付款" : "Pay Securely with Stripe")
           )
         }
-          .font(.headline)
-          .foregroundColor(.white)
-          .frame(maxWidth: .infinity)
-          .padding(.vertical, 14)
-          .background(
-            LinearGradient(
-              colors: [Color(hex: "4F46E5"), Color(hex: "2563EB")],
-              startPoint: .leading,
-              endPoint: .trailing
-            )
+        .font(.headline)
+        .foregroundColor(.white)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .background(
+          LinearGradient(
+            colors: [Color(hex: "4F46E5"), Color(hex: "2563EB")],
+            startPoint: .leading,
+            endPoint: .trailing
           )
-          .cornerRadius(12)
+        )
+        .cornerRadius(12)
       }
       .disabled(isPreparingCheckout)
     }
@@ -826,7 +830,8 @@ struct CartView: View {
     isPreparingCheckout = true
     let ownerProfile = OwnerProfileStore.shared.load()
 
-    shopifyService.createPaymentSheetSession(for: shopifyService.cartItems, customer: ownerProfile) { result in
+    shopifyService.createPaymentSheetSession(for: shopifyService.cartItems, customer: ownerProfile)
+    { result in
       isPreparingCheckout = false
 
       switch result {
@@ -839,7 +844,8 @@ struct CartView: View {
 
       case .failure:
         alertTitle = languageManager.isChinese ? "結帳失敗" : "Checkout Failed"
-        let fallback = languageManager.isChinese ? "目前無法建立 Stripe 付款頁。" : "Unable to prepare Stripe checkout."
+        let fallback =
+          languageManager.isChinese ? "目前無法建立 Stripe 付款頁。" : "Unable to prepare Stripe checkout."
         alertMessage = shopifyService.checkoutErrorMessage ?? fallback
       }
     }
@@ -850,7 +856,9 @@ struct CartView: View {
     case .completed:
       shopifyService.clearCart()
       alertTitle = languageManager.isChinese ? "付款成功" : "Payment Successful"
-      alertMessage = languageManager.isChinese ? "已收到你的付款，訂單正在處理。" : "Your payment was received and the order is now being processed."
+      alertMessage =
+        languageManager.isChinese
+        ? "已收到你的付款，訂單正在處理。" : "Your payment was received and the order is now being processed."
 
     case .canceled:
       break
@@ -913,7 +921,8 @@ enum AppStripeConfiguration {
 
   static var applePayMerchantID: String? {
     guard let value = Bundle.main.object(forInfoDictionaryKey: "ApplePayMerchantID") as? String,
-          !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+      !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    else {
       return nil
     }
 
@@ -965,8 +974,9 @@ struct StripePaymentSheetPresenter: UIViewControllerRepresentable {
 
     func presentIfNeeded() {
       guard !isPresenting,
-            let session,
-            let hostViewController else { return }
+        let session,
+        let hostViewController
+      else { return }
 
       isPresenting = true
 

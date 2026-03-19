@@ -4,6 +4,7 @@ import SwiftUI
 struct ProductDetailView: View {
     let product: ShopProduct
     @ObservedObject private var shopifyService = ShopifyService.shared
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var languageManager: LanguageManager
     @State private var didAddToCart = false
     @State private var paymentSheetSession: StripeCheckoutSession?
@@ -179,8 +180,23 @@ struct ProductDetailView: View {
             )
             .ignoresSafeArea()
         )
-        .navigationTitle(languageManager.isChinese ? "商品详情" : "Details")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
+        .toolbar(.hidden, for: .tabBar)
+        .overlay(alignment: .topLeading) {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.headline.weight(.semibold))
+                    .foregroundColor(.primary)
+                    .frame(width: 40, height: 40)
+                    .background(Color.white.opacity(0.9))
+                    .clipShape(Circle())
+            }
+            .padding(.top, 12)
+            .padding(.leading, 20)
+        }
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 8) {
                 if didAddToCart {
