@@ -92,6 +92,7 @@ struct MedicalServiceDetailView: View {
         }
         .navigationTitle(detail?.name ?? fallbackTitle)
         .navigationBarTitleDisplayMode(.inline)
+        .hideTabBarWhenPushed()
         .task { await store.fetch(category: category) }
     }
 }

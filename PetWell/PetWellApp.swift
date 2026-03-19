@@ -78,6 +78,7 @@ struct PetWellApp: App {
     }
     .modelContainer(for: [
       PetModel.self,
+      HealthReportModel.self,
       ChatSession.self,
       ChatMessageEntity.self,
       VaccinationModel.self,

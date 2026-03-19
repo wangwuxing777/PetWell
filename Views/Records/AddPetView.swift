@@ -43,6 +43,11 @@ struct AddPetView: View {
     @State private var allergies: String = ""
     @State private var notes: String = ""
 
+    // MARK: - Vaccination
+    @State private var isVaccinated: Bool = false
+    @State private var vaccineName: String = ""
+    @State private var vaccineDate: Date = Date()
+
     @State private var showValidationAlert = false
     @State private var validationMessage = ""
 
@@ -130,6 +135,17 @@ struct AddPetView: View {
                         .lineLimit(3...6)
                 }
 
+                Section("Vaccination") {
+                    Toggle("Vaccinated", isOn: $isVaccinated)
+
+                    if isVaccinated {
+                        TextField("Vaccine type", text: $vaccineName)
+                            .textInputAutocapitalization(.words)
+
+                        DatePicker("Vaccine date", selection: $vaccineDate, displayedComponents: .date)
+                    }
+                }
+
                 if !isEditMode {
                     Section {
                         Button {
@@ -166,6 +182,7 @@ struct AddPetView: View {
             } message: {
                 Text(validationMessage)
             }
+            .hideTabBarWhenPushed()
             .onAppear {
                 guard !didLoadExisting else { return }
                 if let pet = petToEdit {
@@ -180,6 +197,12 @@ struct AddPetView: View {
                     microchipId = pet.microchipId
                     allergies = pet.allergies
                     notes = pet.notes
+
+                    if let latestVaccine = pet.vaccinations.sorted(by: { $0.date > $1.date }).first {
+                        isVaccinated = true
+                        vaccineName = latestVaccine.name
+                        vaccineDate = latestVaccine.date
+                    }
                 }
                 didLoadExisting = true
             }
@@ -195,6 +218,13 @@ struct AddPetView: View {
         }
 
         let weightKg = parseWeightKg(weightKgText)
+        let trimmedVaccineName = vaccineName.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if isVaccinated && trimmedVaccineName.isEmpty {
+            validationMessage = "Please enter the vaccine type."
+            showValidationAlert = true
+            return
+        }
 
         do {
             if let pet = petToEdit {
@@ -210,6 +240,7 @@ struct AddPetView: View {
                 pet.microchipId = microchipId.trimmingCharacters(in: .whitespacesAndNewlines)
                 pet.allergies = allergies.trimmingCharacters(in: .whitespacesAndNewlines)
                 pet.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+                applyVaccinationChanges(to: pet, vaccineName: trimmedVaccineName)
 
                 try modelContext.save()
             } else {
@@ -227,6 +258,7 @@ struct AddPetView: View {
                     allergies: allergies.trimmingCharacters(in: .whitespacesAndNewlines),
                     notes: notes.trimmingCharacters(in: .whitespacesAndNewlines)
                 )
+                applyVaccinationChanges(to: pet, vaccineName: trimmedVaccineName)
                 modelContext.insert(pet)
                 try modelContext.save()
             }
@@ -242,5 +274,25 @@ struct AddPetView: View {
         guard !trimmed.isEmpty else { return 0 }
         let normalized = trimmed.replacingOccurrences(of: ",", with: ".")
         return Double(normalized) ?? 0
+    }
+
+    private func applyVaccinationChanges(to pet: PetModel, vaccineName: String) {
+        guard isVaccinated else {
+            // User explicitly marked as not vaccinated in this form.
+            if !pet.vaccinations.isEmpty {
+                for vaccine in pet.vaccinations {
+                    modelContext.delete(vaccine)
+                }
+                pet.vaccinations.removeAll()
+            }
+            return
+        }
+
+        if let latest = pet.vaccinations.max(by: { $0.date < $1.date }) {
+            latest.name = vaccineName
+            latest.date = vaccineDate
+        } else {
+            pet.vaccinations.append(VaccinationModel(name: vaccineName, date: vaccineDate))
+        }
     }
 }

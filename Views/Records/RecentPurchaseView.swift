@@ -73,7 +73,8 @@ struct RecentPurchaseView: View {
             }
         }
         .navigationTitle(languageManager.isChinese ? "最近購買" : "Recent Purchase")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
+        .hideTabBarWhenPushed()
         .sheet(item: $selectedOrder) { order in
             OrderDetailSheet(order: order)
         }

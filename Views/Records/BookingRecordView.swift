@@ -6,11 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct BookingRecordView: View {
     @EnvironmentObject var languageManager: LanguageManager
+    @Query(sort: \PetModel.name) private var pets: [PetModel]
+
     @State private var bookings: [BookingRecord] = []
     @State private var isLoading = false
+    @State private var selectedPet: PetModel?
     @State private var selectedFilter: BookingFilter = .all
 
     enum BookingFilter: String, CaseIterable {
@@ -21,40 +25,39 @@ struct BookingRecordView: View {
     }
 
     var filteredBookings: [BookingRecord] {
+        let petFiltered = selectedPet != nil
+            ? bookings.filter { $0.petName == selectedPet!.name }
+            : bookings
+
         switch selectedFilter {
         case .all:
-            return bookings
+            return petFiltered
         case .upcoming:
-            return bookings.filter { $0.status == .confirmed || $0.status == .pending }
+            return petFiltered.filter { $0.status == .confirmed || $0.status == .pending }
         case .completed:
-            return bookings.filter { $0.status == .completed }
+            return petFiltered.filter { $0.status == .completed }
         case .cancelled:
-            return bookings.filter { $0.status == .cancelled }
+            return petFiltered.filter { $0.status == .cancelled }
         }
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            // Filter Tabs
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    ForEach(BookingFilter.allCases, id: \.self) { filter in
-                        BookingFilterChip(
-                            title: filterTitle(filter),
-                            isSelected: selectedFilter == filter,
-                            onTap: { selectedFilter = filter }
-                        )
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-            }
-            .background(Color(UIColor.systemBackground))
+            // Pet Selection (Level 1 Menu)
+            petSelectorView
 
+            // Status Filter (Level 2 Menu) - only show after pet selected
+            if selectedPet != nil {
+                filterTabsView
+            }
+
+            // Content
             if isLoading {
                 Spacer()
                 ProgressView()
                 Spacer()
+            } else if selectedPet == nil {
+                selectPetPromptView
             } else if filteredBookings.isEmpty {
                 emptyStateView
             } else {
@@ -69,10 +72,75 @@ struct BookingRecordView: View {
             }
         }
         .navigationTitle(languageManager.isChinese ? "預約記錄" : "Booking Record")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
+        .hideTabBarWhenPushed()
         .onAppear {
             loadBookings()
         }
+    }
+
+    // MARK: - Pet Selector View
+    private var petSelectorView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 16) {
+                ForEach(pets) { pet in
+                    PetSelectorCard(
+                        pet: pet,
+                        isSelected: selectedPet?.id == pet.id,
+                        onTap: { selectedPet = pet }
+                    )
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 8)
+        }
+        .background(Color(UIColor.systemBackground))
+    }
+
+    // MARK: - Filter Tabs View
+    private var filterTabsView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(BookingFilter.allCases, id: \.self) { filter in
+                    BookingFilterChip(
+                        title: filterTitle(filter),
+                        isSelected: selectedFilter == filter,
+                        onTap: { selectedFilter = filter }
+                    )
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+        }
+        .background(Color(UIColor.systemBackground))
+        .overlay(
+            Rectangle()
+                .frame(height: 1)
+                .foregroundColor(Color(.systemGray5)),
+            alignment: .top
+        )
+    }
+
+    // MARK: - Select Pet Prompt
+    private var selectPetPromptView: some View {
+        VStack(spacing: 20) {
+            Spacer()
+            Image(systemName: "pawprint.circle")
+                .font(.system(size: 80))
+                .foregroundColor(.secondary.opacity(0.5))
+
+            Text(languageManager.isChinese ? "請先選擇一隻寵物" : "Please Select a Pet")
+                .font(.headline)
+
+            Text(languageManager.isChinese ? "從上方選擇一隻寵物以查看其預約記錄" : "Choose a pet from above to view their booking records")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+            Spacer()
+        }
+        .padding()
     }
 
     private func filterTitle(_ filter: BookingFilter) -> String {
@@ -359,6 +427,51 @@ class BookingService {
         // Placeholder - return mock data
         try? await Task.sleep(nanoseconds: 500_000_000)
         return BookingRecord.mockData
+    }
+}
+
+// MARK: - Pet Selector Card
+private struct PetSelectorCard: View {
+    let pet: PetModel
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 8) {
+                // Avatar
+                ZStack {
+                    Circle()
+                        .fill(isSelected ? Color.blue : Color(.systemGray3))
+                        .frame(width: 56, height: 56)
+
+                    if let data = pet.avatarImageData,
+                       let uiImg = UIImage(data: data) {
+                        Image(uiImage: uiImg)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 56, height: 56)
+                            .clipShape(Circle())
+                    } else {
+                        Image(systemName: pet.species.lowercased().contains("cat") ? "cat.fill" : "dog.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(.white)
+                    }
+                }
+                .overlay(
+                    Circle()
+                        .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 3)
+                )
+
+                // Name
+                Text(pet.name)
+                    .font(.subheadline.weight(isSelected ? .semibold : .regular))
+                    .foregroundColor(isSelected ? .blue : .primary)
+                    .lineLimit(1)
+                    .frame(width: 70)
+            }
+        }
+        .frame(width: 80)
     }
 }
 

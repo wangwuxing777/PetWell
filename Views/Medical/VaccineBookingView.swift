@@ -218,6 +218,7 @@ struct VaccineBookingView: View {
     .task(id: selectedDate) {
       await refreshUnavailableSlots()
     }
+    .hideTabBarWhenPushed()
   }
 
   private func confirmAppointment() async {

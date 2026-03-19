@@ -723,6 +723,7 @@ private struct VaccinationHubView: View {
     .navigationTitle("Vaccination")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar(.hidden, for: .tabBar)
+    .hideTabBarWhenPushed()
   }
 
   private var plannerHeaderCard: some View {
@@ -1316,6 +1317,7 @@ private struct TestClinicEntryView: View {
     .navigationTitle("Test Clinic")
     .navigationBarTitleDisplayMode(.inline)
     .background(Color(UIColor.systemGroupedBackground))
+    .hideTabBarWhenPushed()
     .task {
       do {
         clinics = try await ClinicService.shared.fetchAllClinics()

@@ -82,6 +82,7 @@ struct HealthCheckView: View {
         .background(Color(UIColor.systemGroupedBackground))
         .navigationTitle("Health Check")
         .navigationBarTitleDisplayMode(.inline)
+        .hideTabBarWhenPushed()
     }
 }
 

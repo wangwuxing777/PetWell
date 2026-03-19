@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 // MARK: - Scroll Offset Preference Key
 private struct ScrollOffsetPreferenceKey: PreferenceKey {
@@ -17,8 +18,16 @@ private struct ScrollOffsetPreferenceKey: PreferenceKey {
 struct InsuranceLandingView: View {
   @EnvironmentObject var languageManager: LanguageManager
   @EnvironmentObject var guideManager: GuideManager
+  @Query(sort: \PetModel.name) private var pets: [PetModel]
+
   @State private var scrollOffset: CGFloat = 0
-  @State private var isShowingRecommendation = false
+  @State private var showPetSelector = false
+  /// 驱动 fullScreenCover(item:)：non-nil 时弹出进度页，nil 时关闭。
+  /// 使用 item: 绑定替代 isPresented + if-let 组合，
+  /// 彻底消除 onDismiss 时序问题导致的白屏。
+  @State private var petForYouProgress: PetModel?
+  /// sheet 关闭前暂存用户选择的宠物，onDismiss 中再赋给 petForYouProgress。
+  @State private var pendingPetForYou: PetModel?
 
   // Header heights
   private let fullHeaderHeight: CGFloat = 280
@@ -119,10 +128,27 @@ struct InsuranceLandingView: View {
       .animation(.easeInOut(duration: 0.25), value: showMiniHeader)
       .navigationBarHidden(true)
     }
-    .fullScreenCover(isPresented: $isShowingRecommendation) {
-      RAGChatView(
-        contextString: languageManager.isChinese ? "為我推薦寵物保險" : "Pet Insurance Recommendation",
-        isPresented: $isShowingRecommendation)
+    .sheet(isPresented: $showPetSelector, onDismiss: {
+      // sheet 动画完全结束后再赋值给 petForYouProgress，触发 fullScreenCover(item:)。
+      // 用 pendingPetForYou 中转，彻底避免 @State 时序问题。
+      guard let pet = pendingPetForYou else { return }
+      pendingPetForYou = nil
+      petForYouProgress = pet
+    }) {
+      PetSelectorSheet { pet in
+        pendingPetForYou = pet
+      }
+    }
+    .fullScreenCover(item: $petForYouProgress) { pet in
+      NavigationStack {
+        ForYouProgressView(
+          pet: pet,
+          isPresented: Binding(
+            get: { petForYouProgress != nil },
+            set: { if !$0 { petForYouProgress = nil } }
+          )
+        )
+      }
     }
   }
 
@@ -193,7 +219,11 @@ struct InsuranceLandingView: View {
 
           // For You Button
           Button(action: {
-            isShowingRecommendation = true
+            if pets.count == 1, let pet = pets.first {
+              petForYouProgress = pet   // 直接触发 fullScreenCover(item:)，无需中间状态
+            } else {
+              showPetSelector = true
+            }
           }) {
             HStack(spacing: 4) {
               Image(systemName: "sparkles")
@@ -218,6 +248,7 @@ struct InsuranceLandingView: View {
                 )
             )
           }
+          .accessibilityIdentifier("ForYouButton")
           .fixedSize()
         }
       }

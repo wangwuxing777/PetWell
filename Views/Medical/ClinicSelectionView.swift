@@ -231,6 +231,7 @@ struct ClinicSelectionView: View {
     .navigationBarTitleDisplayMode(.inline)
     .toolbarBackground(Color(UIColor.systemGroupedBackground), for: .navigationBar)
     .toolbarBackground(.visible, for: .navigationBar)
+    .hideTabBarWhenPushed()
     .task {
       do {
         self.clinics = try await ClinicService.shared.fetchAllClinics()

@@ -11,10 +11,11 @@ struct RAGChatView: View {
   // Context Management
   var contextString: String?
   var initialModel: ChatModel = .insurance
+  var initialAIMessage: String? = nil   // ForYou pre-filled recommendation
   @Binding var isPresented: Bool
 
   var body: some View {
-    NavigationView {
+    NavigationStack {
       VStack(spacing: 0) {
         // ── CHAT AREA ──
         chatScrollView
@@ -34,6 +35,7 @@ struct RAGChatView: View {
               .font(.system(size: 17, weight: .medium))
               .foregroundColor(AppTheme.textPrimary)
           }
+          .contentShape(Rectangle())
         }
       }
     }
@@ -44,12 +46,19 @@ struct RAGChatView: View {
       }
 
       if ragService.messages.isEmpty {
-        let greetingText =
-          initialModel == .medical
-          ? "Hello, I am your medical assistant, how can I help you?"
-          : "Hello, I am your insurance assistant, how can I help you?"
-        let greeting = ChatMessage(content: greetingText, isUser: false)
-        ragService.messages.append(greeting)
+        if let prefilledMsg = initialAIMessage {
+          // ForYou flow: show recommendation directly as first AI message
+          let aiMsg = ChatMessage(content: prefilledMsg, isUser: false)
+          ragService.messages.append(aiMsg)
+        } else {
+          // Standard flow: show greeting
+          let greetingText =
+            initialModel == .medical
+            ? "Hello, I am your medical assistant, how can I help you?"
+            : "Hello, I am your insurance assistant, how can I help you?"
+          let greeting = ChatMessage(content: greetingText, isUser: false)
+          ragService.messages.append(greeting)
+        }
       }
       ragService.createSession()
     }
@@ -176,12 +185,10 @@ struct RAGChatView: View {
             )
             .clipShape(Circle())
 
-          Text(LocalizedStringKey(message.content))
-            .font(.body)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+          MarkdownContentView(content: message.content)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
             .background(bubbleColorAI)
-            .foregroundColor(.primary)
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
           Spacer()
         }

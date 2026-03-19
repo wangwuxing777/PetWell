@@ -31,6 +31,10 @@ struct RecordsView: View {
 
   @State private var showOwnerEditor = false
   @State private var ownerProfile: OwnerProfile = OwnerProfileStore.shared.load()
+  @State private var showPetOrderSheet = false
+  @State private var petOrder: [String] = []
+
+  private let petOrderKey = "petwell_profile_pet_order_v1"
 
   private let gridCols: [GridItem] = [
     GridItem(.flexible(), spacing: 12),
@@ -101,9 +105,20 @@ struct RecordsView: View {
 
             // MARK: Pet Profile list
             VStack(alignment: .leading, spacing: 10) {
-              Text("Pet Profile")
-                .font(.headline)
-                .padding(.horizontal)
+              HStack {
+                Text("Pet Profile")
+                  .font(.headline)
+
+                Spacer()
+
+                if pets.count > 1 {
+                  Button("Reorder") {
+                    showPetOrderSheet = true
+                  }
+                  .font(.subheadline)
+                }
+              }
+              .padding(.horizontal)
 
               if pets.isEmpty {
                 ContentUnavailableView(
@@ -113,8 +128,10 @@ struct RecordsView: View {
                 )
                 .padding(.horizontal)
               } else {
+                let displayedPets = Array(orderedPets.prefix(3))
+
                 LazyVStack(spacing: 12) {
-                  ForEach(pets) { pet in
+                  ForEach(displayedPets) { pet in
                     PetProfileCard(
                       pet: pet,
                       onShowPetID: { showPetIDFor = pet },
@@ -130,6 +147,13 @@ struct RecordsView: View {
                       }
                     }
                   }
+                }
+
+                if pets.count > 3 {
+                  Text("Showing top 3. Reorder to choose which pets appear here.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal)
                 }
               }
             }
@@ -154,7 +178,7 @@ struct RecordsView: View {
                 }
 
                 ModuleTile(title: "Insurance", systemImage: "shield") {
-                  InsuranceLandingView()
+                  PetInsurancePlaceholderView(pet: nil)
                 }
 
                 ModuleTile(title: "Activity Tracking", systemImage: "figure.walk") {
@@ -162,7 +186,7 @@ struct RecordsView: View {
                 }
 
                 ModuleTile(title: "Travel Document", systemImage: "doc.text") {
-                  TravelDocumentView()
+                  TravelDocumentView(pet: nil)
                 }
 
                 ModuleTile(title: "Pet Care Tips", systemImage: "lightbulb") {
@@ -184,6 +208,12 @@ struct RecordsView: View {
       .sheet(isPresented: $showOwnerEditor) {
         OwnerProfileEditorSheet(isMandatory: false) { updated in
           ownerProfile = updated
+        }
+      }
+      .sheet(isPresented: $showPetOrderSheet) {
+        PetOrderSheet(pets: orderedPets) { reorderedPets in
+          petOrder = reorderedPets.map(\.petID)
+          savePetOrder()
         }
       }
       .sheet(item: $showPetIDFor) { pet in
@@ -210,8 +240,46 @@ struct RecordsView: View {
       }
       .onAppear {
         ownerProfile = OwnerProfileStore.shared.load()
+        loadPetOrder()
+        syncPetOrderIfNeeded()
+      }
+      .onChange(of: pets.count) { _, _ in
+        syncPetOrderIfNeeded()
       }
     }
+  }
+
+  private var orderedPets: [PetModel] {
+    let orderIndex = Dictionary(uniqueKeysWithValues: petOrder.enumerated().map { ($1, $0) })
+    return pets.sorted { lhs, rhs in
+      let left = orderIndex[lhs.petID] ?? Int.max
+      let right = orderIndex[rhs.petID] ?? Int.max
+
+      if left != right { return left < right }
+      return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+    }
+  }
+
+  private func loadPetOrder() {
+    petOrder = UserDefaults.standard.stringArray(forKey: petOrderKey) ?? []
+  }
+
+  private func savePetOrder() {
+    UserDefaults.standard.set(petOrder, forKey: petOrderKey)
+  }
+
+  private func syncPetOrderIfNeeded() {
+    let currentIDs = Set(pets.map(\.petID))
+    var normalized = petOrder.filter { currentIDs.contains($0) }
+
+    let missingIDs = pets.map(\.petID).filter { !normalized.contains($0) }
+    if !missingIDs.isEmpty {
+      normalized.append(contentsOf: missingIDs)
+    }
+
+    guard normalized != petOrder else { return }
+    petOrder = normalized
+    savePetOrder()
   }
 }
 
@@ -227,6 +295,57 @@ extension RecordsView {
 }
 
 // MARK: - Profile UI Components
+
+private struct PetOrderSheet: View {
+  @Environment(\.dismiss) private var dismiss
+
+  let onSave: ([PetModel]) -> Void
+  @State private var draftPets: [PetModel]
+
+  init(pets: [PetModel], onSave: @escaping ([PetModel]) -> Void) {
+    self.onSave = onSave
+    _draftPets = State(initialValue: pets)
+  }
+
+  var body: some View {
+    NavigationStack {
+      List {
+        Section("Drag to reorder your pets") {
+          ForEach(draftPets) { pet in
+            HStack(spacing: 12) {
+              Image(systemName: "line.3.horizontal")
+                .foregroundStyle(.secondary)
+              Text(pet.name)
+              Spacer()
+              Text(pet.species)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
+          }
+          .onMove(perform: move)
+        }
+      }
+      .environment(\.editMode, .constant(.active))
+      .navigationTitle("Reorder Pets")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .topBarLeading) {
+          Button("Cancel") { dismiss() }
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+          Button("Done") {
+            onSave(draftPets)
+            dismiss()
+          }
+        }
+      }
+    }
+  }
+
+  private func move(from source: IndexSet, to destination: Int) {
+    draftPets.move(fromOffsets: source, toOffset: destination)
+  }
+}
 
 private struct PetProfileCard: View {
 

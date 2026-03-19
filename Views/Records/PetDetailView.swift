@@ -76,11 +76,11 @@ struct PetDetailView: View {
                                 ContactActionButton(icon: "doc.text.magnifyingglass", title: "Reports")
                             }
 
-                            NavigationLink(destination: InsuranceLandingView()) {
+                            NavigationLink(destination: PetInsurancePlaceholderView(pet: pet)) {
                                 ContactActionButton(icon: "shield.fill", title: "Insurance")
                             }
 
-                            NavigationLink(destination: TravelDocumentView()) {
+                            NavigationLink(destination: TravelDocumentView(pet: pet)) {
                                 ContactActionButton(icon: "airplane", title: "Travel")
                             }
                         }
@@ -189,7 +189,7 @@ struct PetDetailView: View {
         }
         .ignoresSafeArea(edges: .top)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden, for: .tabBar)
+        .hideTabBarWhenPushed()
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 12) {

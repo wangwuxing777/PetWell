@@ -56,6 +56,7 @@ struct VaccineDetailView: View {
       .padding(.top, 12)
       .padding(.leading, 18)
     }
+    .hideTabBarWhenPushed()
   }
 
   private var youngStageTitle: String {
