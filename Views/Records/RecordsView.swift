@@ -31,8 +31,14 @@ struct RecordsView: View {
 
   @State private var showOwnerEditor = false
   @State private var ownerProfile: OwnerProfile = OwnerProfileStore.shared.load()
-  @State private var showPetOrderSheet = false
   @State private var petOrder: [String] = []
+  @State private var isShowingAllPets = false
+  @State private var draggedPetID: String?
+  @State private var draggedPetStartFrame: CGRect = .zero
+  @State private var draggedPetOffset: CGSize = .zero
+  @State private var petCardFrames: [String: CGRect] = [:]
+  @State private var isPetEditMode = false
+  @State private var wasShowingAllPetsBeforeEditing = false
 
   private let petOrderKey = "petwell_profile_pet_order_v1"
 
@@ -105,17 +111,44 @@ struct RecordsView: View {
 
             // MARK: Pet Profile list
             VStack(alignment: .leading, spacing: 10) {
-              HStack {
+              HStack(alignment: .center) {
                 Text("Pet Profile")
                   .font(.headline)
 
                 Spacer()
 
-                if pets.count > 1 {
-                  Button("Reorder") {
-                    showPetOrderSheet = true
+                if isPetEditMode {
+                  Button("Done") {
+                    exitPetEditMode()
                   }
-                  .font(.subheadline)
+                  .font(.subheadline.weight(.semibold))
+                  .buttonStyle(.plain)
+                } else if canExpandPets {
+                  Button {
+                    withAnimation(expandCollapseAnimation) {
+                      isShowingAllPets.toggle()
+                    }
+                  } label: {
+                    HStack(spacing: 6) {
+                      ZStack(alignment: .trailing) {
+                        Text("Show All")
+                          .opacity(isShowingAllPets ? 0 : 1)
+                        Text("Show Less")
+                          .opacity(isShowingAllPets ? 1 : 0)
+                      }
+                      .frame(width: 88, alignment: .trailing)
+
+                      Image(systemName: "chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .rotationEffect(.degrees(isShowingAllPets ? 180 : 0))
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .contentTransition(.opacity)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+                    .frame(minWidth: 124, alignment: .trailing)
+                  }
+                  .buttonStyle(.plain)
                 }
               }
               .padding(.horizontal)
@@ -128,33 +161,42 @@ struct RecordsView: View {
                 )
                 .padding(.horizontal)
               } else {
-                let displayedPets = Array(orderedPets.prefix(3))
-
-                LazyVStack(spacing: 12) {
-                  ForEach(displayedPets) { pet in
-                    PetProfileCard(
-                      pet: pet,
-                      onShowPetID: { showPetIDFor = pet },
-                      onCardTapped: { selectedPetForDetail = pet }
-                    )
-                    .padding(.horizontal)
-                    .contextMenu {
-                      Button(role: .destructive) {
-                        petPendingDelete = pet
-                        showDeleteConfirm = true
-                      } label: {
-                        Label("Delete", systemImage: "trash")
-                      }
+                ZStack(alignment: .topLeading) {
+                  VStack(spacing: 12) {
+                    ForEach(displayedPets) { pet in
+                      petCard(for: pet)
+                        .transition(
+                          .asymmetric(
+                            insertion: .move(edge: .top).combined(with: .opacity),
+                            removal: .scale(scale: 0.98, anchor: .top).combined(with: .opacity)
+                          )
+                        )
                     }
                   }
-                }
 
-                if pets.count > 3 {
-                  Text("Showing top 3. Reorder to choose which pets appear here.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal)
+                  if let draggedPet {
+                    PetProfileCard(
+                      pet: draggedPet,
+                      isEditing: true,
+                      onShowPetID: { },
+                      onCardTapped: { },
+                      onDelete: { }
+                    )
+                    .frame(width: draggedPetStartFrame.width)
+                    .shadow(color: .black.opacity(0.16), radius: 18, y: 10)
+                    .scaleEffect(1.03)
+                    .position(
+                      x: draggedPetStartFrame.midX + draggedPetOffset.width,
+                      y: draggedPetStartFrame.midY + draggedPetOffset.height
+                    )
+                    .allowsHitTesting(false)
+                    .zIndex(10)
+                  }
                 }
+                .coordinateSpace(name: "petProfileList")
+                .onPreferenceChange(PetCardFramePreferenceKey.self) { petCardFrames = $0 }
+                .animation(expandCollapseAnimation, value: isShowingAllPets)
+                .animation(reorderAnimation, value: petOrder)
               }
             }
 
@@ -210,33 +252,22 @@ struct RecordsView: View {
           ownerProfile = updated
         }
       }
-      .sheet(isPresented: $showPetOrderSheet) {
-        PetOrderSheet(pets: orderedPets) { reorderedPets in
-          petOrder = reorderedPets.map(\.petID)
-          savePetOrder()
-        }
-      }
       .sheet(item: $showPetIDFor) { pet in
         PetIDSheet(pet: pet)
       }
-      .confirmationDialog(
+      .alert(
         "Delete this pet profile?",
         isPresented: $showDeleteConfirm,
-        titleVisibility: .visible
-      ) {
+        presenting: petPendingDelete
+      ) { pet in
         Button("Delete", role: .destructive) {
-          guard let pet = petPendingDelete else { return }
           modelContext.delete(pet)
           try? modelContext.save()
           petPendingDelete = nil
         }
-        Button("Cancel", role: .cancel) {
-          petPendingDelete = nil
-        }
+        Button("Cancel", role: .cancel) { petPendingDelete = nil }
       } message: {
-        if let pet = petPendingDelete {
-          Text("This will permanently remove \(pet.name) and all related records.")
-        }
+        Text("This will permanently remove \($0.name) and all related records.")
       }
       .onAppear {
         ownerProfile = OwnerProfileStore.shared.load()
@@ -245,6 +276,12 @@ struct RecordsView: View {
       }
       .onChange(of: pets.count) { _, _ in
         syncPetOrderIfNeeded()
+        if pets.count < 2 {
+          isPetEditMode = false
+          draggedPetID = nil
+          draggedPetOffset = .zero
+          draggedPetStartFrame = .zero
+        }
       }
     }
   }
@@ -258,6 +295,168 @@ struct RecordsView: View {
       if left != right { return left < right }
       return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
     }
+  }
+
+  private var displayedPets: [PetModel] {
+    isShowingAllPets ? orderedPets : Array(orderedPets.prefix(3))
+  }
+
+  private var draggedPet: PetModel? {
+    guard let draggedPetID else { return nil }
+    return orderedPets.first(where: { $0.petID == draggedPetID })
+  }
+
+  private var canExpandPets: Bool {
+    orderedPets.count > 3
+  }
+
+  private var canReorderPets: Bool {
+    orderedPets.count > 1
+  }
+
+  private var expandCollapseAnimation: Animation {
+    .spring(response: 0.36, dampingFraction: 0.86)
+  }
+
+  private var reorderAnimation: Animation {
+    .spring(response: 0.28, dampingFraction: 0.82)
+  }
+
+  @ViewBuilder
+  private func petCard(for pet: PetModel) -> some View {
+    if isPetEditMode {
+      PetProfileCard(
+        pet: pet,
+        isEditing: true,
+        onShowPetID: { showPetIDFor = pet },
+        onCardTapped: { },
+        onDelete: {
+          petPendingDelete = pet
+          showDeleteConfirm = true
+        }
+      )
+      .modifier(WiggleModifier(isActive: draggedPetID != pet.petID, phase: wigglePhase(for: pet.petID)))
+      .padding(.horizontal)
+      .opacity(draggedPetID == pet.petID ? 0.001 : 1)
+      .scaleEffect(draggedPetID == pet.petID ? 0.98 : 1)
+      .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+      .background(
+        GeometryReader { proxy in
+          Color.clear
+            .preference(key: PetCardFramePreferenceKey.self, value: [pet.petID: proxy.frame(in: .named("petProfileList"))])
+        }
+      )
+      .simultaneousGesture(editModeDragGesture(for: pet))
+      .allowsHitTesting(!(draggedPetID == pet.petID))
+    } else {
+      PetProfileCard(
+        pet: pet,
+        isEditing: false,
+        onShowPetID: { showPetIDFor = pet },
+        onCardTapped: { selectedPetForDetail = pet },
+        onDelete: { }
+      )
+      .padding(.horizontal)
+      .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+      .background(
+        GeometryReader { proxy in
+          Color.clear
+            .preference(key: PetCardFramePreferenceKey.self, value: [pet.petID: proxy.frame(in: .named("petProfileList"))])
+        }
+      )
+      .simultaneousGesture(
+        LongPressGesture(minimumDuration: 0.45)
+          .onEnded { _ in
+            enterPetEditMode()
+          }
+      )
+    }
+  }
+
+  private func editModeDragGesture(for pet: PetModel) -> some Gesture {
+    DragGesture(minimumDistance: 4, coordinateSpace: .named("petProfileList"))
+      .onChanged { value in
+        guard isPetEditMode else { return }
+        if draggedPetID == nil {
+          draggedPetID = pet.petID
+          draggedPetStartFrame = petCardFrames[pet.petID] ?? .zero
+        }
+        guard draggedPetID == pet.petID else { return }
+        draggedPetOffset = value.translation
+        updateDraggedPetTarget()
+      }
+      .onEnded { _ in
+        guard draggedPetID == pet.petID else { return }
+        finalizePetDrop()
+      }
+  }
+
+  private func updateDraggedPetTarget() {
+    guard let draggedPetID else { return }
+    let dragMidY = draggedPetStartFrame.midY + draggedPetOffset.height
+    let candidateFrames = displayedPets
+      .filter { $0.petID != draggedPetID }
+      .compactMap { pet -> (String, CGRect)? in
+        guard let frame = petCardFrames[pet.petID] else { return nil }
+        return (pet.petID, frame)
+      }
+
+    guard let destinationPetID =
+      candidateFrames.min(by: { abs($0.1.midY - dragMidY) < abs($1.1.midY - dragMidY) })?.0
+    else { return }
+
+    movePet(from: draggedPetID, to: destinationPetID)
+  }
+
+  private func movePet(from sourcePetID: String, to destinationPetID: String) {
+    guard sourcePetID != destinationPetID else { return }
+
+    var updatedOrder = orderedPets.map(\.petID)
+    guard let sourceIndex = updatedOrder.firstIndex(of: sourcePetID),
+          let destinationIndex = updatedOrder.firstIndex(of: destinationPetID) else { return }
+
+    guard updatedOrder[destinationIndex] != sourcePetID else { return }
+
+    withAnimation(reorderAnimation) {
+      updatedOrder.move(
+        fromOffsets: IndexSet(integer: sourceIndex),
+        toOffset: destinationIndex > sourceIndex ? destinationIndex + 1 : destinationIndex
+      )
+      petOrder = updatedOrder
+    }
+
+    savePetOrder()
+  }
+
+  private func finalizePetDrop() {
+    draggedPetID = nil
+    draggedPetOffset = .zero
+    draggedPetStartFrame = .zero
+  }
+
+  private func enterPetEditMode() {
+    guard canReorderPets, !isPetEditMode else { return }
+    wasShowingAllPetsBeforeEditing = isShowingAllPets
+    withAnimation(expandCollapseAnimation) {
+      isPetEditMode = true
+      if canExpandPets {
+        isShowingAllPets = true
+      }
+    }
+  }
+
+  private func exitPetEditMode() {
+    withAnimation(expandCollapseAnimation) {
+      isPetEditMode = false
+      draggedPetID = nil
+      if canExpandPets && !wasShowingAllPetsBeforeEditing {
+        isShowingAllPets = false
+      }
+    }
+  }
+
+  private func wigglePhase(for petID: String) -> Double {
+    Double(abs(petID.hashValue % 6)) * 0.02
   }
 
   private func loadPetOrder() {
@@ -296,62 +495,13 @@ extension RecordsView {
 
 // MARK: - Profile UI Components
 
-private struct PetOrderSheet: View {
-  @Environment(\.dismiss) private var dismiss
-
-  let onSave: ([PetModel]) -> Void
-  @State private var draftPets: [PetModel]
-
-  init(pets: [PetModel], onSave: @escaping ([PetModel]) -> Void) {
-    self.onSave = onSave
-    _draftPets = State(initialValue: pets)
-  }
-
-  var body: some View {
-    NavigationStack {
-      List {
-        Section("Drag to reorder your pets") {
-          ForEach(draftPets) { pet in
-            HStack(spacing: 12) {
-              Image(systemName: "line.3.horizontal")
-                .foregroundStyle(.secondary)
-              Text(pet.name)
-              Spacer()
-              Text(pet.species)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-            }
-          }
-          .onMove(perform: move)
-        }
-      }
-      .environment(\.editMode, .constant(.active))
-      .navigationTitle("Reorder Pets")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .topBarLeading) {
-          Button("Cancel") { dismiss() }
-        }
-        ToolbarItem(placement: .topBarTrailing) {
-          Button("Done") {
-            onSave(draftPets)
-            dismiss()
-          }
-        }
-      }
-    }
-  }
-
-  private func move(from source: IndexSet, to destination: Int) {
-    draftPets.move(fromOffsets: source, toOffset: destination)
-  }
-}
-
 private struct PetProfileCard: View {
 
   let pet: PetModel
+  let isEditing: Bool
   let onShowPetID: () -> Void
   let onCardTapped: () -> Void
+  let onDelete: () -> Void
 
   private var ageText: String {
     let year = Calendar.current.component(.year, from: Date())
@@ -404,8 +554,8 @@ private struct PetProfileCard: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
-      HStack(alignment: .top, spacing: 12) {
+    HStack(alignment: .center, spacing: 16) {
+      HStack(alignment: .center, spacing: 14) {
         ZStack {
           Circle().fill(.thinMaterial)
 
@@ -417,14 +567,14 @@ private struct PetProfileCard: View {
               .scaledToFill()
           } else {
             Image(systemName: pet.species.lowercased().contains("cat") ? "cat" : "dog")
-              .font(.system(size: 28))
+              .font(.system(size: 30))
               .foregroundStyle(.secondary)
           }
         }
-        .frame(width: 56, height: 56)
+        .frame(width: 60, height: 60)
         .clipShape(Circle())
 
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 8) {
           HStack(spacing: 6) {
             Text(pet.name)
               .font(.headline)
@@ -451,52 +601,61 @@ private struct PetProfileCard: View {
             .font(.subheadline)
             .foregroundStyle(vaccinationStatusText == "Fully Vaccinated" ? .green : .orange)
           }
-        }
 
-        Spacer()
+          if latestVaccination != nil {
+            VStack(alignment: .leading, spacing: 6) {
+              HStack(spacing: 6) {
+                Text("Next Vaccination")
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+                Text(nextVaccinationLabel)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+              }
 
-        VStack(alignment: .trailing, spacing: 10) {
-          Button {
-            onShowPetID()
-          } label: {
-            Image(systemName: "qrcode")
-              .font(.headline)
-              .padding(8)
-              .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+              ProgressView(value: vaccinationProgress)
+                .tint(.green)
+                .frame(maxWidth: 160, alignment: .leading)
+            }
           }
-          .accessibilityLabel("Pet ID")
-
-          NavigationLink {
-            HealthReportUploadView(pet: pet)
-          } label: {
-            Image(systemName: "doc.viewfinder")
-              .font(.headline)
-              .padding(8)
-              .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-          }
-          .accessibilityLabel("Upload Report")
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
       }
 
-      if latestVaccination != nil {
-        HStack {
-          Text("Next Vaccination:")
-            .font(.caption)
-            .foregroundStyle(.secondary)
-          Spacer()
-          Text(nextVaccinationLabel)
-            .font(.caption)
-            .foregroundStyle(.secondary)
+      VStack(spacing: 12) {
+        Button {
+          onShowPetID()
+        } label: {
+          Image(systemName: "qrcode")
+            .font(.headline)
+            .frame(width: 36, height: 36)
+            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
+        .accessibilityLabel("Pet ID")
+        .disabled(isEditing)
+        .opacity(isEditing ? 0.55 : 1)
 
-        ProgressView(value: vaccinationProgress)
-          .tint(.green)
+        NavigationLink {
+          HealthReportUploadView(pet: pet)
+        } label: {
+          Image(systemName: "doc.viewfinder")
+            .font(.headline)
+            .frame(width: 36, height: 36)
+            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .accessibilityLabel("Upload Report")
+        .disabled(isEditing)
+        .opacity(isEditing ? 0.55 : 1)
       }
+      .frame(width: 40)
     }
-    .padding(14)
+    .padding(.horizontal, 16)
+    .padding(.vertical, 18)
     .background(
       Button {
-        onCardTapped()
+        if !isEditing {
+          onCardTapped()
+        }
       } label: {
         RoundedRectangle(cornerRadius: 16, style: .continuous)
           .fill(Color(.secondarySystemBackground))
@@ -507,6 +666,55 @@ private struct PetProfileCard: View {
       RoundedRectangle(cornerRadius: 16, style: .continuous)
         .stroke(Color(.separator).opacity(0.15), lineWidth: 1)
     )
+    .overlay(alignment: .topLeading) {
+      if isEditing {
+        Button {
+          onDelete()
+        } label: {
+          Image(systemName: "minus.circle.fill")
+            .font(.title3.weight(.bold))
+            .symbolRenderingMode(.palette)
+            .foregroundStyle(.white, .red)
+            .background(Color(.systemBackground), in: Circle())
+        }
+        .buttonStyle(.plain)
+        .offset(x: -8, y: -8)
+        .accessibilityLabel("Delete pet")
+      }
+    }
+  }
+}
+
+private struct WiggleModifier: ViewModifier {
+  let isActive: Bool
+  let phase: Double
+
+  @State private var isAnimating = false
+
+  func body(content: Content) -> some View {
+    content
+      .rotationEffect(.degrees(isActive ? (isAnimating ? 1.1 : -1.1) : 0))
+      .offset(y: isActive ? (isAnimating ? 1 : -1) : 0)
+      .animation(
+        isActive
+          ? .easeInOut(duration: 0.14).repeatForever(autoreverses: true).delay(phase)
+          : .easeOut(duration: 0.12),
+        value: isAnimating
+      )
+      .onAppear {
+        isAnimating = isActive
+      }
+      .onChange(of: isActive) { _, active in
+        isAnimating = active
+      }
+  }
+}
+
+private struct PetCardFramePreferenceKey: PreferenceKey {
+  static var defaultValue: [String: CGRect] = [:]
+
+  static func reduce(value: inout [String: CGRect], nextValue: () -> [String: CGRect]) {
+    value.merge(nextValue(), uniquingKeysWith: { _, new in new })
   }
 }
 
