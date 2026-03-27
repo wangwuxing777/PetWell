@@ -1,31 +1,23 @@
 # WORK_CONTEXT — PetWell (iOS)
 
-**TASK_ID:** TASK-20260309-2000
-**状态:** 🔄 进行中（Profile/Records 表单与 UI 连续优化）
-**更新时间:** 2026-03-09 21:40
+**TASK_ID:** TASK-20260327-2020
+**更新时间:** 2026-03-27 20:20
 **完整记录:** [→ 根目录 master_progress.md](../../master_progress.md)
 
 ## 当前任务
-修复 Pet Profile 中新增/编辑宠物时无法维护疫苗信息的问题：在 Add/Edit Pet 表单中补回“是否已接种 + 疫苗类型 + 日期”并写入数据模型。
+Pull latest + code review session。PR #11 已合并入 main，当前分支已 fast-forward 同步。
 
 ## 状态速览
-- ✅ 已完成：Health Reports 页面宠物选择器改为横向可滑动
-- ✅ 已完成：Profile 页宠物卡片改为仅展示前 3 个 + 支持 Reorder
-- ✅ 已完成：修复新增宠物失败回归（排序持久化改为 UserDefaults）
-- ✅ 已完成：Pet Management 六个页面标题统一为 inline（居中）
-- ✅ 已完成：Add/Edit Pet 表单新增 Vaccination 区块（Vaccinated / Vaccine type / Vaccine date）
-- ✅ 已完成：保存逻辑支持疫苗记录新增/更新；取消接种时清除既有疫苗记录
-- ✅ 已完成：`xcodebuild` 全量构建验证通过（BUILD SUCCEEDED）
+- ✅ 已完成：`git fetch origin` + `git merge origin/main`（fast-forward 到 7046cc3）
+- ✅ 已完成：代码审查 — RecordsView.swift + TravelDocumentView.swift
+- 🔄 进行中：等待用户确认修复方向或开始新任务
 
 ## 本次涉及的关键文件
-- `Views/Records/AddPetView.swift` — 新增/编辑宠物表单添加疫苗字段与保存逻辑
-- `Views/Records/RecordsView.swift` — 前序变更（列表排序/展示优化）
-- `Views/Records/BookingRecordView.swift` — 标题样式统一（前序变更）
-- `Views/Records/RecentPurchaseView.swift` — 标题样式统一（前序变更）
-- `Views/Records/TravelDocumentView.swift` — 标题样式统一（前序变更）
-- `Views/Records/ActivityTrackingView.swift` — 标题样式统一（前序变更）
-- `Views/Records/PetCareTipsView.swift` — 标题样式统一（前序变更）
-- `Views/Shared/ViewModifiers.swift` — Insurance 占位页去重标题（前序变更）
+- `Views/Records/RecordsView.swift` — 宠物卡片拖拽排序 + 展开/收起逻辑（未提交的本地修改）
+- `Views/Records/TravelDocumentView.swift` — 旅行证件模块（已提交，含 mock data）
 
 ## 注意事项
-- 当前 Add/Edit 里维护的是“最新疫苗记录”；如选择未接种并保存，会清空该宠物现有疫苗记录。
+- 构建环境问题：Xcode 26.4 / iOS 26.4 SDK，但仅安装了 iOS 26.2 Simulator Runtime → 需在 Xcode Settings > Components 下载 iOS 26.4 Runtime
+- TravelDocumentView 有 3 处 hardcoded `petId: "1"`（行 709、987、1000）—— 应替换为 `pet?.petID ?? UUID().uuidString`
+- TravelDocumentView 使用 `PetDocument.mockData` 而非真实持久化 —— 属于占位实现，待后端接入时替换
+- RecordsView 本地修改尚未提交
