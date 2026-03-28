@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - API Configuration
 enum AuthAPI {
-    static let baseURL = "http://localhost:8000"
+    static let baseURL = "https://pawrd-backend.zeabur.app"
 
     enum Endpoints {
         static let login    = "\(baseURL)/api/auth/login"

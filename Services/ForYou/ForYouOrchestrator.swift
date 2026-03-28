@@ -197,7 +197,7 @@ final class ForYouOrchestrator: ObservableObject {
 
     // MARK: - RAG Network Calls
 
-    private let baseURL = "http://localhost:8000"
+    private let baseURL = "https://pawrd-backend.zeabur.app"
 
     private func callMedicalRAG(healthText: String, pet: PetModel) async -> String? {
         guard let url = URL(string: "\(baseURL)/api/chat") else { return nil }

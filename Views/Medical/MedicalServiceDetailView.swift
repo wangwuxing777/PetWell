@@ -38,7 +38,7 @@ class MedicalServiceStore: ObservableObject {
     @Published var cache: [String: MedicalServiceDetail] = [:]
     @Published var loading: Set<String> = []
 
-    private let baseURL = "http://localhost:8000"
+    private let baseURL = "https://pawrd-backend.zeabur.app"
 
     func fetch(category: String) async {
         guard cache[category] == nil, !loading.contains(category) else { return }

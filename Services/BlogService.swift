@@ -32,7 +32,7 @@ class BlogService: ObservableObject {
   @Published var posts: [BlogPostModel] = []
   private(set) var currentAvatarUrl: String = ""
 
-  private let baseURL = "http://localhost:8000"
+  private let baseURL = "https://pawrd-backend.zeabur.app"
 
   /// Called by AuthViewModel after every successful login/register.
   /// Replaces the old "Dev A" placeholder with the real logged-in user.

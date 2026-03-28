@@ -2,7 +2,7 @@ import Foundation
 
 /// Service to fetch vet clinic data from the Go backend
 class VetService {
-  static let baseURL = "http://localhost:8000"
+  static let baseURL = "https://pawrd-backend.zeabur.app"
 
   /// - Parameters:
   ///   - district: The district slug (optional if query is provided)

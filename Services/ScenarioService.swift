@@ -16,7 +16,7 @@ final class ScenarioService: ObservableObject {
   @Published var isLoading = false
   @Published var errorMessage: String?
 
-  private let baseURL = "http://127.0.0.1:8000"
+  private let baseURL = "https://pawrd-backend.zeabur.app"
 
   init() {
     Task {

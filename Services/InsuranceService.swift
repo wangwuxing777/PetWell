@@ -67,7 +67,7 @@ struct ServiceSubcategory: Codable, Identifiable {
 final class InsuranceService: ObservableObject {
   static let shared = InsuranceService()
 
-  private let baseURL = "http://127.0.0.1:8000"
+  private let baseURL = "https://pawrd-backend.zeabur.app"
 
   enum NetworkError: LocalizedError {
     case nonHTTPResponse

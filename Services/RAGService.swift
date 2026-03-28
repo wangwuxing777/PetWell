@@ -97,7 +97,7 @@ class RAGService: ObservableObject {
   @Published var lastActiveProvider: String?
 
   // Configurable endpoint
-  private let baseURL = "http://localhost:8000"
+  private let baseURL = "https://pawrd-backend.zeabur.app"
 
   // MARK: - Session Management
 

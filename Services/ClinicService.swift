@@ -4,7 +4,7 @@ import Foundation
 class ClinicService {
     static let shared = ClinicService()
     
-    private let baseUrl = "http://localhost:8000"
+    private let baseUrl = "https://pawrd-backend.zeabur.app"
     
     func fetchEmergencyClinics() async throws -> [Clinic] {
         guard let url = URL(string: "\(baseUrl)/emergency-clinics") else {

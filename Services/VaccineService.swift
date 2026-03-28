@@ -4,7 +4,7 @@ import Foundation
 class VaccineService {
     static let shared = VaccineService()
     
-    private let urlString = "http://localhost:8000/vaccines"
+    private let urlString = "https://pawrd-backend.zeabur.app/vaccines"
     
     func fetchVaccines() async throws -> [Vaccine] {
         guard let url = URL(string: urlString) else {

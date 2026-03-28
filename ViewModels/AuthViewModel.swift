@@ -18,7 +18,7 @@ class AuthViewModel: ObservableObject {
   @Published var hasCompletedOnboarding: Bool = false
   @Published var userName: String = ""
 
-  private let loginURL = "http://localhost:8000/api/auth/login"
+  private let loginURL = "https://pawrd-backend.zeabur.app/api/auth/login"
 
   init() {
     // Restore persisted state

@@ -408,7 +408,7 @@ class ShareService {
         allowDownload: Bool
     ) async throws -> ShareLinkResponse {
 
-        let baseURL = "http://localhost:8000"
+        let baseURL = "https://pawrd-backend.zeabur.app"
         guard let url = URL(string: "\(baseURL)/pets/\(petId)/share") else {
             throw ShareError.invalidURL
         }

@@ -413,7 +413,7 @@ enum BookingStatus: String, Codable {
 class BookingService {
     // TODO: Replace with actual API call
     // static func fetchBookings() async -> [BookingRecord] {
-    //     guard let url = URL(string: "http://localhost:8000/api/bookings") else {
+    //     guard let url = URL(string: "https://pawrd-backend.zeabur.app/api/bookings") else {
     //         return []
     //     }
     //     var request = URLRequest(url: url)

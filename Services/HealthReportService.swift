@@ -24,7 +24,7 @@ private struct HealthReportAPIResponse: Codable {
 final class HealthReportService {
   static let shared = HealthReportService()
 
-  private let baseURL = "http://localhost:8000"
+  private let baseURL = "https://pawrd-backend.zeabur.app"
 
   /// Convert image to base64 and send directly to AI analysis.
   /// Vendors are external — they cannot reach localhost URLs,
